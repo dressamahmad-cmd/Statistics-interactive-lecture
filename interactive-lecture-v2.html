@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 11 — Simple Linear Regression &amp; Correlation | Interactive Lecture</title>
+<style>
+  :root{
+    --primary:#0b63c5;
+    --primary-dark:#084a94;
+    --accent:#06b6d4;
+    --accent-soft:#cffafe;
+    --bg:#f2f9ff;
+    --card:#ffffff;
+    --text:#123047;
+    --muted:#5b7189;
+    --ok:#0f9d58;
+    --bad:#e53935;
+    --warn:#f59e0b;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(11,99,197,.10);
+    --shadow-lg:0 14px 36px rgba(11,99,197,.16);
+    font-size:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",Arial,sans-serif;
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #e0f2fe 0%, transparent 60%),
+      radial-gradient(900px 400px at 110% 0%, #cffafe 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    line-height:1.75;
+    min-height:100vh;
+  }
+
+  /* ============ HEADER ============ */
+  header.topbar{
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary) 45%,var(--accent));
+    color:#fff;
+    box-shadow:0 6px 22px rgba(8,74,148,.35);
+  }
+  .topbar-inner{
+    max-width:1150px;margin:0 auto;padding:12px 18px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.02rem}
+  .brand .logo{
+    width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.18);
+    display:grid;place-items:center;font-size:1.1rem;border:1px solid rgba(255,255,255,.35)
+  }
+  .brand small{display:block;font-weight:400;opacity:.85;font-size:.72rem}
+  .spacer{flex:1}
+  .chip{
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+    padding:5px 12px;border-radius:999px;font-size:.82rem;display:flex;align-items:center;gap:6px
+  }
+  .chip b{font-size:.95rem}
+  .chip.streak{background:rgba(255,214,102,.25);border-color:rgba(255,214,102,.6)}
+
+  .progress-wrap{
+    max-width:1150px;margin:0 auto;padding:0 18px 12px;
+  }
+  .progress-track{
+    height:9px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden
+  }
+  .progress-fill{
+    height:100%;width:0%;border-radius:999px;
+    background:linear-gradient(90deg,#67e8f9,#a7f3d0);
+    transition:width .45s cubic-bezier(.2,.8,.3,1);
+  }
+
+  /* ============ NAV TABS ============ */
+  nav.tabs{
+    max-width:1150px;margin:14px auto 0;padding:0 18px;
+    display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;
+  }
+  nav.tabs::-webkit-scrollbar{height:6px}
+  nav.tabs::-webkit-scrollbar-thumb{background:#bae6fd;border-radius:99px}
+  .tab{
+    flex:0 0 auto;border:1px solid #cfe4f7;background:#fff;color:var(--muted);
+    padding:8px 14px;border-radius:999px;font-size:.84rem;font-weight:600;cursor:pointer;
+    transition:.2s;white-space:nowrap
+  }
+  .tab:hover{border-color:var(--accent);color:var(--primary)}
+  .tab.active{background:linear-gradient(120deg,var(--primary),var(--accent));color:#fff;border-color:transparent;box-shadow:var(--shadow)}
+  .tab .num{
+    display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;
+    background:rgba(255,255,255,.28);font-size:.72rem;margin-right:6px
+  }
+  .tab:not(.active) .num{background:#e6f3ff;color:var(--primary)}
+
+  /* ============ LAYOUT ============ */
+  main{max-width:1150px;margin:0 auto;padding:22px 18px 90px}
+  section.slide{display:none;animation:fadeUp .4s ease}
+  section.slide.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .card{
+    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:22px 24px;margin-bottom:18px;border:1px solid #e3effa;
+  }
+  .card.accent{border-left:6px solid var(--accent)}
+  .card.primary{border-left:6px solid var(--primary)}
+
+  h2.slide-title{
+    font-size:1.45rem;margin:0 0 6px;color:var(--primary-dark);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap
+  }
+  h2.slide-title .badge{
+    font-size:.7rem;background:var(--accent-soft);color:#0e7490;border:1px solid #a5f3fc;
+    padding:3px 10px;border-radius:999px;font-weight:700;letter-spacing:.4px
+  }
+  .subtitle{color:var(--muted);font-size:.9rem;margin:0 0 18px}
+
+  h3{color:var(--primary);margin:18px 0 8px;font-size:1.08rem}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 22px;padding:0}
+  li{margin:6px 0}
+  .ar{
+    font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif;
+    color:#0e7490;font-weight:600;direction:rtl;display:inline-block
+  }
+  .term{
+    background:#e8f4ff;color:var(--primary-dark);border-bottom:2px solid #bae0ff;
+    padding:0 6px;border-radius:6px;font-weight:700
+  }
+  .hl{background:linear-gradient(transparent 60%,#a5f3fc 60%);font-weight:700}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+
+  /* ============ FLIP CARDS ============ */
+  .flip{
+    perspective:1000px;height:170px;cursor:pointer;
+  }
+  .flip-inner{
+    position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d;
+  }
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;
+    display:grid;place-items:center;text-align:center;padding:16px;
+    box-shadow:var(--shadow);border:1px solid #d9ecfb
+  }
+  .flip-front{background:linear-gradient(140deg,#e0f2fe,#cffafe);color:var(--primary-dark);font-weight:700;font-size:1.02rem}
+  .flip-back{background:linear-gradient(140deg,var(--primary),var(--accent));color:#fff;transform:rotateY(180deg);font-size:.9rem;line-height:1.6}
+  .flip-hint{position:absolute;bottom:8px;right:12px;font-size:.7rem;opacity:.7}
+
+  /* ============ QUIZ ============ */
+  .quiz{background:#f8fcff;border:1px dashed #bae0ff;border-radius:14px;padding:16px 18px;margin:14px 0}
+  .quiz .q{font-weight:700;color:var(--primary-dark);margin-bottom:10px;display:flex;gap:8px}
+  .quiz .q .qnum{
+    flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--primary);color:#fff;
+    display:grid;place-items:center;font-size:.8rem
+  }
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{
+    background:#fff;border:1.5px solid #d7e8f8;border-radius:10px;padding:10px 14px;
+    cursor:pointer;transition:.18s;font-size:.92rem;display:flex;align-items:center;gap:10px
+  }
+  .opt:hover{border-color:var(--accent);transform:translateX(3px)}
+  .opt .key{
+    width:26px;height:26px;border-radius:50%;background:#eaf5ff;color:var(--primary);
+    display:grid;place-items:center;font-weight:700;font-size:.8rem;flex:0 0 auto
+  }
+  .opt.correct{background:#e7f9ef;border-color:var(--ok);color:#0b6b3a}
+  .opt.correct .key{background:var(--ok);color:#fff}
+  .opt.wrong{background:#fdecea;border-color:var(--bad);color:#a3271f}
+  .opt.wrong .key{background:var(--bad);color:#fff}
+  .opt.disabled{pointer-events:none;opacity:.85}
+  .feedback{margin-top:10px;font-size:.88rem;font-weight:600;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{color:var(--ok)}
+  .feedback.no{color:var(--bad)}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    border:none;border-radius:999px;padding:10px 20px;font-weight:700;cursor:pointer;
+    font-size:.9rem;transition:.2s;font-family:inherit
+  }
+  .btn.primary{background:linear-gradient(120deg,var(--primary),var(--accent));color:#fff;box-shadow:var(--shadow)}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+  .btn.ghost{background:#fff;color:var(--primary);border:1.5px solid #bae0ff}
+  .btn.ghost:hover{background:#eaf5ff}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+  /* ============ REVEAL ============ */
+  .reveal{
+    background:#fff7e6;border:1px dashed #f5c56b;border-radius:12px;padding:12px 16px;margin:10px 0;
+  }
+  .reveal summary{cursor:pointer;font-weight:700;color:#9a6400;list-style:none;display:flex;align-items:center;gap:8px}
+  .reveal summary::-webkit-details-marker{display:none}
+  .reveal summary::before{content:"💡";font-size:1.1rem}
+  .reveal[open] summary{margin-bottom:8px}
+  .reveal .body{color:#6b4a00;font-size:.92rem}
+
+  /* ============ SCATTER PLOT ============ */
+  .plot-box{background:#fff;border-radius:14px;padding:12px;border:1px solid #e3effa;text-align:center}
+  .plot-box svg{max-width:100%;height:auto}
+  .plot-box .cap{font-size:.82rem;color:var(--muted);margin-top:6px}
+  .plot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:760px){.plot-grid{grid-template-columns:1fr}}
+
+  /* ============ FORMULA ============ */
+  .formula{
+    background:linear-gradient(140deg,#eaf6ff,#f0fdff);border:1px solid #bae0ff;
+    border-radius:14px;padding:16px 18px;margin:12px 0;text-align:center;
+    font-size:1.02rem;overflow-x:auto
+  }
+  .formula .frac{
+    display:inline-block;vertical-align:middle;text-align:center;margin:0 6px
+  }
+  .formula .frac .top{border-bottom:2px solid var(--primary);padding:0 8px 3px}
+  .formula .frac .bot{padding:3px 8px 0}
+  .formula .sqrt{display:inline-block;border-top:2px solid var(--primary);padding-top:2px}
+
+  /* ============ STEP BY STEP ============ */
+  .steps{counter-reset:step}
+  .step{
+    display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed #dbeafe
+  }
+  .step:last-child{border-bottom:none}
+  .step .n{
+    flex:0 0 auto;width:32px;height:32px;border-radius:10px;
+    background:linear-gradient(140deg,var(--primary),var(--accent));color:#fff;
+    display:grid;place-items:center;font-weight:700
+  }
+  .step .c{flex:1;font-size:.93rem}
+  .step .c b{color:var(--primary-dark)}
+
+  /* ============ TABLE ============ */
+  table.data{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+  table.data th,table.data td{border:1px solid #d9ecfb;padding:8px 10px;text-align:center}
+  table.data th{background:#eaf5ff;color:var(--primary-dark)}
+  table.data tr:nth-child(even) td{background:#f8fcff}
+
+  /* ============ THINK-PAIR-SHARE ============ */
+  .tps{
+    background:linear-gradient(140deg,#fff7e6,#fffbeb);border:1px solid #fcd34d;
+    border-radius:14px;padding:16px 18px;margin:14px 0
+  }
+  .tps h4{margin:0 0 8px;color:#92400e;display:flex;align-items:center;gap:8px}
+  .tps .phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+  @media(max-width:700px){.tps .phases{grid-template-columns:1fr}}
+  .phase{background:#fff;border-radius:10px;padding:10px;border:1px solid #fde68a}
+  .phase b{display:block;color:#b45309;font-size:.85rem;margin-bottom:4px}
+  .phase span{font-size:.83rem;color:#6b4a00}
+
+  /* ============ TIMER ============ */
+  .timer{
+    display:inline-flex;align-items:center;gap:8px;background:#eaf5ff;border:1px solid #bae0ff;
+    padding:6px 14px;border-radius:999px;font-weight:700;color:var(--primary-dark)
+  }
+  .timer button{
+    border:none;background:var(--primary);color:#fff;border-radius:50%;width:26px;height:26px;
+    cursor:pointer;font-size:.9rem;line-height:1;display:grid;place-items:center
+  }
+  .timer button:hover{background:var(--accent)}
+
+  /* ============ FOOTER NAV ============ */
+  .slide-nav{
+    position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);
+    backdrop-filter:blur(8px);border-top:1px solid #d9ecfb;
+    padding:10px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:40
+  }
+  .slide-nav .inner{max-width:1150px;margin:0 auto;width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .slide-nav .pos{font-size:.85rem;color:var(--muted);font-weight:600}
+
+  /* ============ OBJECTIVES ============ */
+  .obj-list{list-style:none;margin:0;padding:0}
+  .obj-list li{
+    display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;
+    background:#f8fcff;border:1px solid #e3effa;margin-bottom:8px
+  }
+  .obj-list li .icon{
+    flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:var(--accent-soft);
+    color:#0e7490;display:grid;place-items:center;font-weight:700;font-size:.9rem
+  }
+
+  /* ============ SUMMARY ============ */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .sum-card{
+    background:linear-gradient(140deg,#f0f9ff,#e0f7ff);border:1px solid #bae0ff;border-radius:14px;
+    padding:14px
+  }
+  .sum-card h4{margin:0 0 6px;color:var(--primary-dark);font-size:.95rem}
+  .sum-card p{margin:0;font-size:.85rem;color:#334e68}
+
+  .toast{
+    position:fixed;top:80px;right:20px;z-index:100;
+    background:linear-gradient(120deg,var(--ok),#34d399);color:#fff;
+    padding:12px 20px;border-radius:12px;font-weight:700;box-shadow:var(--shadow-lg);
+    transform:translateX(140%);transition:transform .4s cubic-bezier(.2,.8,.3,1)
+  }
+  .toast.show{transform:translateX(0)}
+  .toast.bad{background:linear-gradient(120deg,var(--bad),#f87171)}
+
+  .kbd{
+    background:#eaf5ff;border:1px solid #bae0ff;border-bottom-width:3px;border-radius:6px;
+    padding:1px 7px;font-size:.82rem;font-weight:700;color:var(--primary-dark)
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo">📊</div>
+      <div>
+        Chapter 11 — Simple Linear Regression &amp; Correlation
+        <small>Interactive Lecture · First-Year Bachelor</small>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="chip">🏆 Score: <b id="scoreVal">0</b></div>
+    <div class="chip streak">🔥 Streak: <b id="streakVal">0</b></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</header>
+
+<!-- ================= TABS ================= -->
+<nav class="tabs" id="tabs"></nav>
+
+<!-- ================= MAIN ================= -->
+<main id="main">
+
+<!-- ========== SLIDE 1: INTRO ========== -->
+<section class="slide active" data-title="Introduction">
+  <div class="card primary">
+    <h2 class="slide-title">Welcome 👋 <span class="badge">Slide 1</span></h2>
+    <p class="subtitle">Chapter 11 · Simple Linear Regression and Correlation · <span class="ar">الارتباط والانحدار الخطي البسيط</span></p>
+
+    <p>In this lecture we answer one big question:</p>
+    <div class="formula" style="font-size:1.1rem">
+      <b>Is there a relationship between two numerical variables?</b><br>
+      <span class="ar">هل توجد علاقة بين متغيرين رقميين؟</span>
+    </div>
+
+    <p>These two variables could be:</p>
+    <ul>
+      <li>Hours of study <span class="ar">(ساعات الدراسة)</span> and exam score <span class="ar">(درجة الاختبار)</span>.</li>
+      <li>Age <span class="ar">(العمر)</span> and blood pressure <span class="ar">(ضغط الدم)</span>.</li>
+      <li>Exercise hours and body weight.</li>
+    </ul>
+
+    <h3>🎯 Learning Objectives — <span class="ar">أهداف المحاضرة</span></h3>
+    <ul class="obj-list">
+      <li><span class="icon">1</span><div>Distinguish between <span class="term">Correlation</span> and <span class="term">Regression</span>.</div></li>
+      <li><span class="icon">2</span><div>Identify simple vs. multiple relationships, positive vs. negative.</div></li>
+      <li><span class="icon">3</span><div>Read and interpret a <span class="term">Scatter Plot</span>.</div></li>
+      <li><span class="icon">4</span><div>Compute and interpret the <span class="term">Pearson correlation coefficient r</span>.</div></li>
+      <li><span class="icon">5</span><div>Build the <span class="term">Least-Squares regression line</span> and use it for prediction.</div></li>
+    </ul>
+  </div>
+
+  <div class="card accent">
+    <h3>🧭 How this lecture works</h3>
+    <p>Each slide has <b>short explanations</b>, <b>interactive activities</b>, and <b>instant feedback quizzes</b>. Answer questions to earn points and build your streak. You can move back and forth using the buttons at the bottom.</p>
+    <p><span class="kbd">Tip</span> All quizzes are self-checked — no submission needed. A 25-question <b>Final Exam</b> is the last tab.</p><p style="font-size:.82rem;color:var(--muted)">Content adapted from the Chapter 11 slides by Dr. Jumanah Ahmed Darwish.</p>
+  </div>
+
+  <div class="tps">
+    <h4>🤝 Think–Pair–Share <span class="ar">(فكّر – ناقش – شارك)</span></h4>
+    <p>Before we start: <b>Give one example</b> of two numerical variables you think are related.</p>
+    <div class="phases">
+      <div class="phase"><b>1. Think (30s)</b><span>Write your example alone.</span></div>
+      <div class="phase"><b>2. Pair (60s)</b><span>Compare with your neighbor.</span></div>
+      <div class="phase"><b>3. Share (30s)</b><span>One example to the class.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 2: CORRELATION vs REGRESSION ========== -->
+<section class="slide" data-title="Correlation vs Regression">
+  <div class="card primary">
+    <h2 class="slide-title">Correlation vs. Regression <span class="badge">Slide 2</span></h2>
+    <p class="subtitle">Two inferential statistics tools — <span class="ar">الارتباط والانحدار</span></p>
+
+    <div class="grid2">
+      <div class="flip" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">📈 Correlation<br><small style="font-weight:400">Click to flip</small></div>
+          <div class="flip-face flip-back">A statistical method to determine <b>whether</b> a linear relationship between variables exists.<br><span class="ar">هل توجد علاقة؟</span></div>
+        </div>
+      </div>
+      <div class="flip" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">📉 Regression<br><small style="font-weight:400">Click to flip</small></div>
+          <div class="flip-face flip-back">A statistical method to <b>describe the nature</b> of the relationship: positive/negative, linear/nonlinear.<br><span class="ar">وصف طبيعة العلاقة</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Types of Relationships</h3>
+    <div class="grid2">
+      <div class="plot-box">
+        <h4 style="color:var(--primary);margin:4px 0">Simple <span class="ar">(بسيط)</span></h4>
+        <p style="font-size:.88rem">Two variables: <b>one independent</b> (X) and <b>one dependent</b> (Y).</p>
+      </div>
+      <div class="plot-box">
+        <h4 style="color:var(--primary);margin:4px 0">Multiple <span class="ar">(متعدد)</span></h4>
+        <p style="font-size:.88rem">Two or more independent variables predicting <b>one</b> dependent variable.</p>
+      </div>
+    </div>
+
+    <details class="reveal">
+      <summary>Example: Age &amp; Blood Pressure — is it simple or multiple?</summary>
+      <div class="body">
+        <b>Type:</b> Simple relationship.<br>
+        <b>Independent (X):</b> Age.<br>
+        <b>Dependent (Y):</b> Blood pressure.
+      </div>
+    </details>
+
+    <details class="reveal">
+      <summary>Example: Math score vs. hours of study + absences + IQ</summary>
+      <div class="body">
+        <b>Type:</b> Multiple relationship.<br>
+        <b>Independent (X's):</b> Hours of study, absences, IQ.<br>
+        <b>Dependent (Y):</b> Final math score.
+      </div>
+    </details>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">?</span> A study uses <b>age, diet, and exercise</b> to predict <b>cholesterol level</b>. This is a:</div>
+    <div class="opts">
+      <div class="opt" data-correct="false"><span class="key">A</span> Simple relationship</div>
+      <div class="opt" data-correct="true"><span class="key">B</span> Multiple relationship</div>
+      <div class="opt" data-correct="false"><span class="key">C</span> No relationship</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! Three independent variables → multiple relationship." data-fb-no="Not quite. Multiple independent variables → multiple relationship."></div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 3: POSITIVE vs NEGATIVE ========== -->
+<section class="slide" data-title="Positive vs Negative">
+  <div class="card primary">
+    <h2 class="slide-title">Positive vs. Negative Relationship <span class="badge">Slide 3</span></h2>
+    <p class="subtitle"><span class="ar">علاقة طردية / عكسية</span></p>
+
+    <div class="grid2">
+      <div class="plot-box">
+        <div style="font-size:2rem">⬆️⬆️</div>
+        <h4 style="color:var(--ok)">Positive <span class="ar">(طردية)</span></h4>
+        <p style="font-size:.9rem">Both variables increase or decrease <b>together</b>.</p>
+        <p style="font-size:.85rem;color:var(--muted)">Example: height &amp; perfect weight.</p>
+      </div>
+      <div class="plot-box">
+        <div style="font-size:2rem">⬆️⬇️</div>
+        <h4 style="color:var(--bad)">Negative <span class="ar">(عكسية)</span></h4>
+        <p style="font-size:.9rem">As one increases, the other <b>decreases</b>.</p>
+        <p style="font-size:.85rem;color:var(--muted)">Example: strength of people over 60 as age increases.</p>
+      </div>
+    </div>
+
+    <h3>🧠 Quick check</h3>
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">1</span> Exercise hours and body weight →</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> Positive</div>
+        <div class="opt" data-correct="true"><span class="key">B</span> Negative</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> No relationship</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! More exercise → less weight." data-fb-no="Think: as exercise increases, weight tends to decrease."></div>
+    </div>
+
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">2</span> A person's height and number of fingers →</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> Positive</div>
+        <div class="opt" data-correct="false"><span class="key">B</span> Negative</div>
+        <div class="opt" data-correct="true"><span class="key">C</span> No relationship</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! Height doesn't affect number of fingers." data-fb-no="Height and finger count are independent."></div>
+    </div>
+
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">3</span> Hours of studying and final score →</div>
+      <div class="opts">
+        <div class="opt" data-correct="true"><span class="key">A</span> Positive</div>
+        <div class="opt" data-correct="false"><span class="key">B</span> Negative</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> No relationship</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! More study hours → higher score (on average)." data-fb-no="More studying usually leads to higher scores."></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 4: SCATTER PLOT ========== -->
+<section class="slide" data-title="Scatter Plot">
+  <div class="card primary">
+    <h2 class="slide-title">Graphing Bivariate Relationships — Scatter Plot <span class="badge">Slide 4</span></h2>
+    <p class="subtitle">Section 2.8 · <span class="ar">مخطط الانتشار</span></p>
+
+    <div class="formula">
+      A scatter plot is a graph of the ordered pairs <b>(x, y)</b>.<br>
+      <b>X</b> = Independent (explanatory / predictor) &nbsp;·&nbsp; <b>Y</b> = Dependent (response / outcome)
+    </div>
+
+    <h3>📊 Three shapes — click each one</h3>
+    <div class="plot-grid">
+      <div class="plot-box" onclick="showPlotFeedback('positive')" style="cursor:pointer">
+        <svg viewBox="0 0 200 180" width="100%">
+          <line x1="20" y1="160" x2="190" y2="160" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="20" y1="160" x2="20" y2="10" stroke="#94a3b8" stroke-width="2"/>
+          <!-- positive trend -->
+          <circle cx="35" cy="150" r="5" fill="#0b63c5"/><circle cx="50" cy="140" r="5" fill="#0b63c5"/>
+          <circle cx="60" cy="135" r="5" fill="#0b63c5"/><circle cx="75" cy="120" r="5" fill="#0b63c5"/>
+          <circle cx="90" cy="115" r="5" fill="#0b63c5"/><circle cx="105" cy="95" r="5" fill="#0b63c5"/>
+          <circle cx="120" cy="85" r="5" fill="#0b63c5"/><circle cx="135" cy="65" r="5" fill="#0b63c5"/>
+          <circle cx="150" cy="55" r="5" fill="#0b63c5"/><circle cx="165" cy="35" r="5" fill="#0b63c5"/>
+        </svg>
+        <div class="cap">a. <b>?</b> relationship — click me</div>
+      </div>
+
+      <div class="plot-box" onclick="showPlotFeedback('negative')" style="cursor:pointer">
+        <svg viewBox="0 0 200 180" width="100%">
+          <line x1="20" y1="160" x2="190" y2="160" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="20" y1="160" x2="20" y2="10" stroke="#94a3b8" stroke-width="2"/>
+          <circle cx="35" cy="35" r="5" fill="#06b6d4"/><circle cx="50" cy="45" r="5" fill="#06b6d4"/>
+          <circle cx="65" cy="70" r="5" fill="#06b6d4"/><circle cx="80" cy="60" r="5" fill="#06b6d4"/>
+          <circle cx="95" cy="85" r="5" fill="#06b6d4"/><circle cx="110" cy="100" r="5" fill="#06b6d4"/>
+          <circle cx="125" cy="110" r="5" fill="#06b6d4"/><circle cx="140" cy="125" r="5" fill="#06b6d4"/>
+          <circle cx="155" cy="135" r="5" fill="#06b6d4"/><circle cx="170" cy="150" r="5" fill="#06b6d4"/>
+        </svg>
+        <div class="cap">b. <b>?</b> relationship — click me</div>
+      </div>
+
+      <div class="plot-box" onclick="showPlotFeedback('none')" style="cursor:pointer">
+        <svg viewBox="0 0 200 180" width="100%">
+          <line x1="20" y1="160" x2="190" y2="160" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="20" y1="160" x2="20" y2="10" stroke="#94a3b8" stroke-width="2"/>
+          <circle cx="40" cy="60" r="5" fill="#a5b4fc"/><circle cx="55" cy="120" r="5" fill="#a5b4fc"/>
+          <circle cx="70" cy="40" r="5" fill="#a5b4fc"/><circle cx="85" cy="100" r="5" fill="#a5b4fc"/>
+          <circle cx="100" cy="70" r="5" fill="#a5b4fc"/><circle cx="115" cy="130" r="5" fill="#a5b4fc"/>
+          <circle cx="130" cy="50" r="5" fill="#a5b4fc"/><circle cx="145" cy="90" r="5" fill="#a5b4fc"/>
+          <circle cx="160" cy="110" r="5" fill="#a5b4fc"/><circle cx="175" cy="45" r="5" fill="#a5b4fc"/>
+        </svg>
+        <div class="cap">c. <b>?</b> relationship — click me</div>
+      </div>
+    </div>
+
+    <h3>✏️ Exercise — Water Consumption vs. Temperature</h3>
+    <div class="plot-box">
+      <div id="plotWater"></div>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">?</span> The relationship in this plot is:</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> Negative</div>
+        <div class="opt" data-correct="true"><span class="key">B</span> Positive</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> No relationship</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! As temperature rises, water consumption rises → positive." data-fb-no="Look at the trend: as X increases, Y also increases."></div>
+    </div>
+    <h3>✏️ Exercise — Scatter of x and y</h3>
+    <div class="plot-box"><div id="plotXY"></div></div>
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">?</span> The relationship shown in this plot is:</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> Negative</div>
+        <div class="opt" data-correct="false"><span class="key">B</span> Positive</div>
+        <div class="opt" data-correct="true"><span class="key">C</span> No relationship</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! The points show no upward or downward pattern." data-fb-no="No consistent trend: y goes up and down as x increases."></div>
+    </div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">?</span> A scatter plot with points going up and down randomly shows:</div>
+    <div class="opts">
+      <div class="opt" data-correct="false"><span class="key">A</span> Strong positive</div>
+      <div class="opt" data-correct="false"><span class="key">B</span> Strong negative</div>
+      <div class="opt" data-correct="true"><span class="key">C</span> No relationship</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! No clear pattern → no linear relationship." data-fb-no="Random scatter means no clear pattern."></div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 5: CORRELATION COEFFICIENT ========== -->
+<section class="slide" data-title="Correlation Coefficient">
+  <div class="card primary">
+    <h2 class="slide-title">The Coefficient of Correlation <span class="badge">Slide 5</span></h2>
+    <p class="subtitle">Section 11.5 · <span class="ar">معامل الارتباط</span></p>
+
+    <p>A <span class="term">correlation coefficient</span> is a <b>numerical measure</b> of the <b>strength</b> and <b>direction</b> of a <b>linear</b> relationship between two variables.</p>
+
+    <div class="grid2">
+      <div class="plot-box">
+        <h4 style="color:var(--primary)">Sample</h4>
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">r</div>
+        <p style="font-size:.85rem">Sample correlation coefficient</p>
+      </div>
+      <div class="plot-box">
+        <h4 style="color:var(--primary)">Population</h4>
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">ρ</div>
+        <p style="font-size:.85rem">Population correlation coefficient</p>
+      </div>
+    </div>
+
+    <div class="formula" style="font-size:1.2rem">
+      −1 ≤ r ≤ +1
+    </div>
+
+    <h3>📏 How to interpret r</h3>
+    <div class="plot-box">
+      <svg viewBox="0 0 700 90" width="100%">
+        <defs>
+          <linearGradient id="grad1" x1="0" x2="1">
+            <stop offset="0%" stop-color="#e53935"/>
+            <stop offset="50%" stop-color="#fbbf24"/>
+            <stop offset="100%" stop-color="#0f9d58"/>
+          </linearGradient>
+        </defs>
+        <rect x="40" y="30" width="620" height="20" rx="10" fill="url(#grad1)" opacity=".35"/>
+        <line x1="40" y1="55" x2="660" y2="55" stroke="#334e68" stroke-width="2"/>
+        <text x="40" y="78" font-size="13" text-anchor="middle" fill="#334e68" font-weight="700">−1</text>
+        <text x="350" y="78" font-size="13" text-anchor="middle" fill="#334e68" font-weight="700">0</text>
+        <text x="660" y="78" font-size="13" text-anchor="middle" fill="#334e68" font-weight="700">+1</text>
+        <text x="120" y="20" font-size="11" text-anchor="middle" fill="#b91c1c" font-weight="700">Strong negative</text>
+        <text x="350" y="20" font-size="11" text-anchor="middle" fill="#92400e" font-weight="700">No linear</text>
+        <text x="580" y="20" font-size="11" text-anchor="middle" fill="#0b6b3a" font-weight="700">Strong positive</text>
+      </svg>
+    </div>
+
+    <div class="grid2">
+      <div class="sum-card">
+        <h4>r = +1</h4><p>Perfect positive linear relationship.</p>
+      </div>
+      <div class="sum-card">
+        <h4>r = −1</h4><p>Perfect negative linear relationship.</p>
+      </div>
+      <div class="sum-card">
+        <h4>r close to +1</h4><p>Strong positive linear relationship.</p>
+      </div>
+      <div class="sum-card">
+        <h4>r close to −1</h4><p>Strong negative linear relationship.</p>
+      </div>
+      <div class="sum-card">
+        <h4>r close to 0</h4><p>Weak linear relationship.</p>
+      </div>
+      <div class="sum-card">
+        <h4>r = 0</h4><p>No linear relationship.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent">
+    <h3>🎚️ Explore r — drag the slider <span class="ar">(جرّب بنفسك)</span></h3>
+    <p style="font-size:.9rem">The lecture's scale places <i>moderate</i> correlation around ±0.5, <i>strong</i> toward ±1 and <i>weak</i> toward 0. The numeric cut-offs in the label (0.3 and 0.7) are a common rule of thumb, not part of the slides. The six buttons reproduce the lecture's plots for r = ±0.5, ±0.9, ±1.</p>
+    <div class="plot-box"><div id="rPlot"></div>
+      <input type="range" id="rSlider" min="-1" max="1" step="0.05" value="0.9" style="width:100%" aria-label="Correlation coefficient r">
+      <div style="font-weight:700;margin:6px 0" id="rLabel"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><button class="btn ghost" onclick="setR(0.5)">r = 0.5</button><button class="btn ghost" onclick="setR(0.9)">r = 0.9</button><button class="btn ghost" onclick="setR(1)">r = 1</button><button class="btn ghost" onclick="setR(-0.5)">r = -0.5</button><button class="btn ghost" onclick="setR(-0.9)">r = -0.9</button><button class="btn ghost" onclick="setR(-1)">r = -1</button></div>
+    </div>
+  </div>
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">1</span> The correlation between <b>number of absences</b> and <b>final grade</b> might be:</div>
+    <div class="opts">
+      <div class="opt" data-correct="false"><span class="key">A</span> close to 1</div>
+      <div class="opt" data-correct="true"><span class="key">B</span> close to −1</div>
+      <div class="opt" data-correct="false"><span class="key">C</span> 0</div>
+      <div class="opt" data-correct="false"><span class="key">D</span> 0.1</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! More absences → lower grade → negative." data-fb-no="More absences usually mean lower grades → strong negative."></div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">2</span> Which value could <b>NOT</b> represent a correlation coefficient?</div>
+    <div class="opts">
+      <div class="opt" data-correct="true"><span class="key">A</span> r = 1.08</div>
+      <div class="opt" data-correct="false"><span class="key">B</span> r = 0.95</div>
+      <div class="opt" data-correct="false"><span class="key">C</span> r = −0.73</div>
+      <div class="opt" data-correct="false"><span class="key">D</span> r = −1.0</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! r must be between −1 and +1." data-fb-no="Remember: r ∈ [−1, +1]. 1.08 is out of range."></div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">3</span> The correlation between <b>hours of study</b> and <b>final grade</b> might be:</div>
+    <div class="opts">
+      <div class="opt" data-correct="false"><span class="key">A</span> 0.04</div>
+      <div class="opt" data-correct="true"><span class="key">B</span> 0.89</div>
+      <div class="opt" data-correct="false"><span class="key">C</span> 0</div>
+      <div class="opt" data-correct="false"><span class="key">D</span> −0.15</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! Strong positive relationship." data-fb-no="More study hours → higher grade → positive and fairly strong."></div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">4</span> If r = −0.11, the linear relationship is:</div>
+    <div class="opts">
+      <div class="opt" data-correct="false"><span class="key">A</span> Positive strong</div>
+      <div class="opt" data-correct="false"><span class="key">B</span> Negative strong</div>
+      <div class="opt" data-correct="false"><span class="key">C</span> Positive weak</div>
+      <div class="opt" data-correct="true"><span class="key">D</span> Negative weak</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! Negative sign + value close to 0 → weak negative." data-fb-no="The sign gives direction, the magnitude gives strength. −0.11 is very close to 0."></div>
+  </div>
+
+  <div class="card accent">
+    <h3>📌 Exercise 11.64 — Interpret each r</h3>
+    <details class="reveal">
+      <summary>a. r = 1</summary><div class="body">Perfect positive relationship.</div>
+    </details>
+    <details class="reveal">
+      <summary>b. r = −1</summary><div class="body">Perfect negative relationship.</div>
+    </details>
+    <details class="reveal">
+      <summary>c. r = 0</summary><div class="body">No linear relationship.</div>
+    </details>
+    <details class="reveal">
+      <summary>d. r = −0.90</summary><div class="body">Strong negative relationship.</div>
+    </details>
+  </div>
+</section>
+
+<!-- ========== SLIDE 6: PEARSON FORMULA ========== -->
+<section class="slide" data-title="Pearson Formula">
+  <div class="card primary">
+    <h2 class="slide-title">Pearson Correlation Coefficient <span class="badge">Slide 6</span></h2>
+    <p class="subtitle">Used with two <b>quantitative</b> variables · <span class="ar">معامل ارتباط بيرسون</span></p>
+
+    <div class="formula">
+      <span class="frac">
+        <span class="top">n(Σxy) − (Σx)(Σy)</span>
+        <span class="bot">√[ n(Σx²) − (Σx)² ] · [ n(Σy²) − (Σy)² ]</span>
+      </span>
+      <div style="margin-top:10px;font-size:.85rem;color:var(--muted)">where <b>n</b> = number of data pairs</div>
+    </div>
+
+    <h3>🧮 Worked Example</h3>
+    <p>Given: <b>Σx = 57, Σy = 511, Σxy = 3745, Σx² = 579, Σy² = 38,993, n = 7 <span style="font-size:.8rem;color:var(--muted)">(printed as 38.993 in the source slide; the point is a thousands separator, which is what reproduces r = −0.944)</span></b></p>
+
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div class="c">Numerator: <b>n(Σxy) − (Σx)(Σy)</b> = 7(3745) − (57)(511) = 26215 − 29127 = <b>−2912</b></div></div>
+      <div class="step"><div class="n">2</div><div class="c">First bracket: <b>n(Σx²) − (Σx)²</b> = 7(579) − 57² = 4053 − 3249 = <b>804</b></div></div>
+      <div class="step"><div class="n">3</div><div class="c">Second bracket: <b>n(Σy²) − (Σy)²</b> = 7(38,993) − 511² = 272,951 − 261,121 = <b>11,830</b></div></div>
+      <div class="step"><div class="n">4</div><div class="c">r = −2912 / √(804 × 11,830) = −2912 / 3084.0 = <b>−0.944</b></div></div>
+    </div>
+
+    <div class="formula" style="font-size:1.15rem;color:var(--primary-dark)">
+      <b>r = −0.944</b> → Strong negative linear relationship
+    </div>
+
+    <details class="reveal">
+      <summary>Another example (Σx = 153.8, Σy = 18.7, Σxy = 682.77, Σx² = 5859.26, Σy² = 80.67, n = 6)</summary>
+      <div class="body">
+        Numerator = 6(682.77) − (153.8)(18.7) = 4096.62 − 2876.06 = <b>1220.56</b><br>Brackets: 6(5859.26) − 153.8² = <b>11,501.12</b> and 6(80.67) − 18.7² = <b>134.33</b><br>r = 1220.56 / √(11,501.12 × 134.33) = 1220.56 / 1242.96 = <b>0.982</b> → strong positive correlation.
+      </div>
+    </details>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">?</span> Pearson's r is used when we have:</div>
+    <div class="opts">
+      <div class="opt" data-correct="false"><span class="key">A</span> One quantitative + one categorical variable</div>
+      <div class="opt" data-correct="true"><span class="key">B</span> Two quantitative variables</div>
+      <div class="opt" data-correct="false"><span class="key">C</span> Two categorical variables</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! Pearson's r requires two quantitative (numerical) variables." data-fb-no="Pearson's r works with two quantitative variables."></div>
+  </div>
+
+  <div class="card accent">
+    <h3>📊 SPSS Output Exercise</h3>
+    <table class="data"><tr><th></th><th></th><th>Hours of study</th><th>Final grade</th></tr>
+      <tr><td rowspan="3"><b>Hours of study</b></td><td>Pearson Correlation</td><td>1</td><td>.881**</td></tr>
+      <tr><td>Sig. (2-tailed)</td><td></td><td>.000</td></tr><tr><td>N</td><td>433</td><td>426</td></tr>
+      <tr><td rowspan="3"><b>Final grade</b></td><td>Pearson Correlation</td><td>.881**</td><td>1</td></tr>
+      <tr><td>Sig. (2-tailed)</td><td>.000</td><td></td></tr><tr><td>N</td><td>426</td><td>430</td></tr></table>
+    <p style="font-size:.82rem;color:var(--muted)">**. Correlation is significant at the 0.01 level (2-tailed).</p>
+    <details class="reveal">
+      <summary>1. What test is used?</summary>
+      <div class="body">Pearson correlation coefficient.</div>
+    </details>
+    <details class="reveal">
+      <summary>2. What is r? Comment on it.</summary>
+      <div class="body"><b>r = 0.881</b> → strong positive relationship between hours of study and final grade.</div>
+    </details>
+  </div>
+</section>
+
+<!-- ========== SLIDE 7: REGRESSION ========== -->
+<section class="slide" data-title="Regression Line">
+  <div class="card primary">
+    <h2 class="slide-title">Fitting the Model — Least Squares <span class="badge">Slide 7</span></h2>
+    <p class="subtitle">Sections 11.1 &amp; 11.2 · <span class="ar">خط الانحدار بطريقة المربعات الصغرى</span></p>
+
+    <p>The regression line is the <b>line of best fit</b>: the sum of squared vertical distances from each point to the line is <b>minimized</b>.</p>
+
+    <div class="plot-box">
+      <div id="plotReg"></div>
+      <div class="cap">Red dashed lines = residuals (vertical distances from points to the least-squares line)<br>Fitted line for these illustrative points: <b id="regEq"></b></div>
+    </div>
+
+    <p style="font-size:.92rem"><b>Probabilistic model (11.1):</b> y = β₀ + β₁x + ε, where ε is the random error. The fitted line y′ = a + bx estimates it: <b>a</b> = β₀ (y-intercept) and <b>b</b> = β₁ (slope), as in the lecture figure.</p>
+    <h3>📐 Equations</h3>
+    <div class="formula">
+      <b>y′ = a + b x</b>
+    </div>
+    <div class="grid2">
+      <div class="formula" style="font-size:.9rem">
+        <b>a</b> = <span class="frac"><span class="top">(Σy)(Σx²) − (Σx)(Σxy)</span><span class="bot">n(Σx²) − (Σx)²</span></span>
+        <div style="margin-top:6px;font-size:.8rem;color:var(--muted)">y-intercept</div>
+      </div>
+      <div class="formula" style="font-size:.9rem">
+        <b>b</b> = <span class="frac"><span class="top">n(Σxy) − (Σx)(Σy)</span><span class="bot">n(Σx²) − (Σx)²</span></span>
+        <div style="margin-top:6px;font-size:.8rem;color:var(--muted)">slope</div>
+      </div>
+    </div>
+
+    <h3>🧮 Worked Example</h3>
+    <p>Given: <b>Σx = 153.8, Σy = 18.7, Σxy = 682.77, Σx² = 5859.26, n = 6</b></p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div class="c"><b>a</b> = [(18.7)(5859.26) − (153.8)(682.77)] / [6(5859.26) − 153.8²] = <b>0.396</b></div></div>
+      <div class="step"><div class="n">2</div><div class="c"><b>b</b> = [6(682.77) − (153.8)(18.7)] / [6(5859.26) − 153.8²] = <b>0.106</b></div></div>
+      <div class="step"><div class="n">3</div><div class="c">Regression equation: <b>y′ = 0.396 + 0.106 x</b></div></div>
+    </div>
+
+    <h3>💬 How to comment on b</h3>
+    <ul>
+      <li>If <b>b &gt; 0</b>: when X increases by 1 unit, Y <b>increases</b> by b on average.</li>
+      <li>If <b>b &lt; 0</b>: when X increases by 1 unit, Y <b>decreases</b> by |b| on average.</li>
+    </ul>
+
+    <div class="tps">
+      <h4>✍️ Practice: comment on y′ = 0.396 + 0.106x</h4>
+      <p style="font-size:.9rem">X = hours of exercise, Y = weight.</p>
+      <details class="reveal">
+        <summary>Show answer</summary>
+        <div class="body">When exercise hours (X) increase by <b>1 hour</b>, weight (Y) increases by <b>0.106</b> on average.</div>
+      </details>
+    </div>
+
+    <h3>🧮 Second Example</h3>
+    <p>Given: <b>Σx = 57, Σy = 511, Σxy = 3745, Σx² = 579, n = 7</b></p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div class="c"><b>a</b> = [(511)(579) − (57)(3745)] / [7(579) − 57²] = <b>102.493</b></div></div>
+      <div class="step"><div class="n">2</div><div class="c"><b>b</b> = [7(3745) − (57)(511)] / [7(579) − 57²] = <b>−3.622</b></div></div>
+      <div class="step"><div class="n">3</div><div class="c">Equation: <b>y′ = 102.493 − 3.622 x</b></div></div>
+      <div class="step"><div class="n">4</div><div class="c">Comment: When X increases by 1 unit, Y <b>decreases</b> by 3.622 on average.</div></div>
+    </div>
+
+    <div class="card accent" style="margin-top:14px">
+      <h3>⚠️ Important Remark</h3>
+      <div class="formula">
+        sign(<b>r</b>) = sign(<b>b</b>)<br>
+        <span style="font-size:.9rem">Positive r ↔ positive b &nbsp;·&nbsp; Negative r ↔ negative b</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">1</span> The correlation coefficient and the slope of the regression line are the same in:</div>
+    <div class="opts">
+      <div class="opt" data-correct="true"><span class="key">A</span> Only sign</div>
+      <div class="opt" data-correct="false"><span class="key">B</span> Only value</div>
+      <div class="opt" data-correct="false"><span class="key">C</span> Sign and value</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! They share the same sign, but not the same value." data-fb-no="r and b have the same sign only — their values differ."></div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="q"><span class="qnum">2</span> If the regression line is y = −5x + 3, the sign of r is:</div>
+    <div class="opts">
+      <div class="opt" data-correct="false"><span class="key">A</span> Positive</div>
+      <div class="opt" data-correct="false"><span class="key">B</span> −5</div>
+      <div class="opt" data-correct="true"><span class="key">C</span> Negative</div>
+    </div>
+    <div class="feedback" data-fb-ok="Correct! b = −5 → negative slope → r is negative." data-fb-no="The slope is −5 → negative → r must be negative."></div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 8: PREDICTION ========== -->
+<section class="slide" data-title="Prediction">
+  <div class="card primary">
+    <h2 class="slide-title">Using the Model for Prediction <span class="badge">Slide 8</span></h2>
+    <p class="subtitle">Section 11.6 · <span class="ar">استخدام النموذج للتنبؤ</span></p>
+
+    <p>Once we have the regression equation, we can <b>predict</b> the value of Y for a given X.</p>
+
+    <div class="formula">
+      y′ = 0.396 + 0.106 x
+    </div>
+
+    <h3>🧮 Example</h3>
+    <p>Predict the income of a car rental agency that has <b>20 automobiles</b>.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div class="c">Substitute x = 20</div></div>
+      <div class="step"><div class="n">2</div><div class="c">y′ = 0.396 + 0.106(20)</div></div>
+      <div class="step"><div class="n">3</div><div class="c">y′ = 0.396 + 2.12 = <b>2.516</b></div></div>
+    </div>
+
+    <div class="tps">
+      <h4>✍️ Try it yourself</h4>
+      <p>Using y′ = 0.396 + 0.106x, predict Y when x = 50.</p>
+      <details class="reveal">
+        <summary>Show answer</summary>
+        <div class="body">y′ = 0.396 + 0.106(50) = 0.396 + 5.3 = <b>5.696</b></div>
+      </details>
+    </div>
+
+    <div class="plot-box" style="text-align:left"><h4>⚠️ Two cautions <span style="font-weight:400;font-size:.8rem;color:var(--muted)">(added; not in the source slides)</span></h4>
+      <ul style="font-size:.9rem"><li><b>Extrapolation:</b> predict only within the range of x values in the data; far outside it the line may not hold.</li>
+      <li><b>Correlation ≠ causation:</b> a strong r shows association, not that X causes Y; r measures only <i>linear</i> relationships.</li></ul></div>
+    <h3>🧠 Practice Questions</h3>
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">1</span> A store manager finds the regression line y′ = 21.1 − 0.317x, where x = employee age and y = sick days per year. Predict the sick days for age 47:</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> 20</div>
+        <div class="opt" data-correct="true"><span class="key">B</span> 6.2</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> 23</div>
+        <div class="opt" data-correct="false"><span class="key">D</span> 12</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! y′ = 21.1 − 0.317(47) ≈ 6.2" data-fb-no="Use y′ = 21.1 − 0.317(47)."></div>
+    </div>
+
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">2</span> For each extra year of age, sick days:</div>
+      <div class="opts">
+        <div class="opt" data-correct="true"><span class="key">A</span> decreases by 0.317 on average</div>
+        <div class="opt" data-correct="false"><span class="key">B</span> increases by 0.317 on average</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> increases by 21.1 on average</div>
+        <div class="opt" data-correct="false"><span class="key">D</span> decreases by 21.1 on average</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! b = −0.317 means a decrease of 0.317 per unit." data-fb-no="Look at the slope b = −0.317."></div>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">3</span> For y′ = 21.1 − 0.317x, the slope of the regression line is:</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> 21.1</div>
+        <div class="opt" data-correct="true"><span class="key">B</span> −0.317</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> 0.317</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! The slope is the coefficient of x." data-fb-no="The slope b is the coefficient of x; the constant 21.1 is the intercept a."></div>
+    </div>
+
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">4</span> Which linear regression equation represents the graph below?</div>
+      <div class="plot-box"><div id="plotGraphQ"></div></div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> y = 0.5 − x</div>
+        <div class="opt" data-correct="false"><span class="key">B</span> y = −1.5 + x</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> y = −2.5 + x</div>
+        <div class="opt" data-correct="true"><span class="key">D</span> y = −2.5 − x</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! Intercept = −2.5 and slope = −1 → negative." data-fb-no="We need intercept −2.5 and a negative slope."></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 9: SPSS & SUMMARY ========== -->
+<section class="slide" data-title="SPSS &amp; Summary">
+  <div class="card primary">
+    <h2 class="slide-title">SPSS Output &amp; Summary <span class="badge">Slide 9</span></h2>
+    <p class="subtitle">Putting it all together · <span class="ar">الخلاصة</span></p>
+
+    <h3>📊 SPSS Regression Output</h3>
+    <table class="data">
+      <tr><th>Model</th><th>B</th><th>Std. Error</th><th>Beta</th><th>t</th><th>Sig.</th></tr>
+      <tr><td>(Constant)</td><td>6.584</td><td>.402</td><td></td><td>16.391</td><td>.000</td></tr>
+      <tr><td>Advertising spending</td><td>−1.071</td><td>.100</td><td>−.916</td><td>−10.703</td><td>.000</td></tr>
+    </table>
+    <p style="font-size:.85rem;color:var(--muted)">Dependent Variable: Detrended sales</p>
+    <p style="font-size:.82rem;color:var(--muted)">Note: the source slide prints Beta = .916 and t = 10.703. Because B is negative, both should carry a negative sign (t = B ÷ Std. Error = −1.071 ÷ 0.100 ≈ −10.7); they are corrected here.</p>
+
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div class="c">Regression equation: <b>y′ = 6.584 − 1.071 x</b></div></div>
+      <div class="step"><div class="n">2</div><div class="c">Comment: X = advertising spending, Y = detrended sales. When X increases by 1 unit, Y <b>decreases</b> by 1.071 on average.</div></div>
+    </div>
+
+    <h3>📋 Summary Table</h3>
+    <div class="summary-grid">
+      <div class="sum-card">
+        <h4>Scatter Plot</h4>
+        <p>Visual tool to see the shape of the relationship.</p>
+      </div>
+      <div class="sum-card">
+        <h4>Correlation r</h4>
+        <p>Number between −1 and +1 measuring strength &amp; direction.</p>
+      </div>
+      <div class="sum-card">
+        <h4>Regression Line</h4>
+        <p>y′ = a + bx, the best-fit line by least squares.</p>
+      </div>
+      <div class="sum-card">
+        <h4>Prediction</h4>
+        <p>Substitute x into the equation to predict y.</p>
+      </div>
+      <div class="sum-card">
+        <h4>Sign Rule</h4>
+        <p>sign(r) = sign(b) always.</p>
+      </div>
+      <div class="sum-card">
+        <h4>Key Formulas</h4>
+        <p>r = [nΣxy − ΣxΣy] / √{[nΣx² − (Σx)²][nΣy² − (Σy)²]}<br>b = [nΣxy − ΣxΣy] / [nΣx² − (Σx)²]<br>a = [ΣyΣx² − ΣxΣxy] / [nΣx² − (Σx)²]</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent">
+    <h3>🎓 Final Challenge</h3>
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">1</span> r = 0.02 indicates:</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> Strong positive</div>
+        <div class="opt" data-correct="false"><span class="key">B</span> Strong negative</div>
+        <div class="opt" data-correct="true"><span class="key">C</span> Very weak / no linear relationship</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! r ≈ 0 → no linear relationship." data-fb-no="r close to 0 means weak or no linear relationship."></div>
+    </div>
+
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">2</span> If b = 2.4, then when X increases by 1, Y:</div>
+      <div class="opts">
+        <div class="opt" data-correct="true"><span class="key">A</span> Increases by 2.4 on average</div>
+        <div class="opt" data-correct="false"><span class="key">B</span> Decreases by 2.4 on average</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> Stays the same</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! Positive slope → increase." data-fb-no="Positive b means Y increases when X increases."></div>
+    </div>
+
+    <div class="quiz" data-quiz>
+      <div class="q"><span class="qnum">3</span> A perfect negative linear relationship has r = ?</div>
+      <div class="opts">
+        <div class="opt" data-correct="false"><span class="key">A</span> +1</div>
+        <div class="opt" data-correct="true"><span class="key">B</span> −1</div>
+        <div class="opt" data-correct="false"><span class="key">C</span> 0</div>
+      </div>
+      <div class="feedback" data-fb-ok="Correct! r = −1 → perfect negative." data-fb-no="Perfect negative → r = −1."></div>
+    </div>
+  </div>
+
+  <div class="card primary" style="text-align:center">
+    <h2 style="color:var(--primary-dark);margin:6px 0">🎉 Well done!</h2>
+    <p>You completed Chapter 11 — Simple Linear Regression &amp; Correlation.</p>
+    <p style="font-size:1.05rem"><b>Final Score: <span id="finalScore">0</span> / <span id="maxScore">0</span></b> &nbsp;·&nbsp; <b>Best Streak: <span id="finalStreak">0</span></b></p>
+    <p class="ar" style="margin-top:10px">أحسنت! لقد أكملت المحاضرة التفاعلية بنجاح.</p>
+    <p><button class="btn ghost" onclick="resetQuizzes()">🔄 Retry all quizzes</button> <button class="btn primary" onclick="goTo(9)">📝 Take the Final Exam</button></p>
+  </div>
+</section>
+
+<section class="slide" data-title="Final Exam">
+  <div class="card primary"><h2 class="slide-title">Final Exam <span class="badge">Slide 10</span></h2>
+    <p class="subtitle">25 new questions · <span class="ar">اختبار نهائي</span></p>
+    <div id="exam"></div></div>
+</section>
+</main>
+
+<!-- ================= FOOTER NAV ================= -->
+<div class="slide-nav">
+  <div class="inner">
+    <button class="btn ghost" id="prevBtn">◀ Previous</button>
+    <div class="pos" id="posLabel">Slide 1 of 10</div>
+    <button class="btn primary" id="nextBtn">Next ▶</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Correct! +10 points</div>
+
+<script>
+/* ================= STATE ================= */
+let current = 0;
+let score = 0;
+let streak = 0;
+let bestStreak = 0;
+const slides = Array.from(document.querySelectorAll('.slide'));
+const tabsNav = document.getElementById('tabs');
+
+/* ================= BUILD TABS ================= */
+slides.forEach((s, i) => {
+  const t = document.createElement('button');
+  t.className = 'tab' + (i === 0 ? ' active' : '');
+  t.innerHTML = `<span class="num">${i+1}</span>${s.dataset.title}`;
+  t.addEventListener('click', () => goTo(i));
+  tabsNav.appendChild(t);
+});
+
+/* ================= NAVIGATION ================= */
+function goTo(i){
+  if(i < 0 || i >= slides.length) return;
+  slides[current].classList.remove('active');
+  current = i;
+  slides[current].classList.add('active');
+  document.querySelectorAll('.tab').forEach((t, k) => t.classList.toggle('active', k === current));
+  document.getElementById('posLabel').textContent = `Slide ${current+1} of ${slides.length}`;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === slides.length - 1;
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
+document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+
+function updateProgress(){
+  const pct = ((current + 1) / slides.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+updateProgress();
+document.getElementById('prevBtn').disabled = true;
+
+/* ================= QUIZZES ================= */
+document.querySelectorAll('[data-quiz]').forEach(quiz => {
+  const opts = quiz.querySelectorAll('.opt');
+  const fb = quiz.querySelector('.feedback');
+  opts.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if(opt.classList.contains('disabled')) return;
+      const isCorrect = opt.dataset.correct === 'true';
+      opts.forEach(o => o.classList.add('disabled'));
+      opt.classList.add(isCorrect ? 'correct' : 'wrong');
+      if(!isCorrect){
+        // highlight correct one
+        opts.forEach(o => { if(o.dataset.correct === 'true') o.classList.add('correct'); });
+      }
+      fb.classList.add('show');
+      if(isCorrect){
+        fb.classList.add('ok'); fb.classList.remove('no');
+        fb.textContent = fb.dataset.fbOk || 'Correct!';
+        streak++;
+        bestStreak = Math.max(bestStreak, streak);
+        addScore(10);
+        showToast('Correct! +10 points', false);
+      } else {
+        fb.classList.add('no'); fb.classList.remove('ok');
+        fb.textContent = fb.dataset.fbNo || 'Not quite. Look at the highlighted answer.';
+        streak = 0;
+        updateStreak();
+      }
+    });
+  });
+});
+
+function addScore(n){
+  score += n;
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalStreak').textContent = bestStreak;
+  updateStreak();
+}
+function updateStreak(){
+  document.getElementById('streakVal').textContent = streak;
+}
+
+/* ================= TOAST ================= */
+let toastTimer;
+function showToast(msg, bad){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('bad', !!bad);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* ================= SCATTER PLOT FEEDBACK ================= */
+function showPlotFeedback(type){
+  const map = {
+    positive: 'This is a POSITIVE relationship (⬆️⬆️) — as X increases, Y increases.',
+    negative: 'This is a NEGATIVE relationship (⬆️⬇️) — as X increases, Y decreases.',
+    none: 'This shows NO relationship — points are scattered randomly.'
+  };
+  showToast(map[type], false);
+}
+
+/* ================= FINAL SCORE SYNC ================= */
+document.getElementById('finalScore').textContent = score;
+document.getElementById('finalStreak').textContent = bestStreak;
+
+
+/* ================= SCATTER HELPER ================= */
+function drawScatter(id, pts, o){
+  const el = document.getElementById(id); if(!el) return;
+  const W=400,H=230,L=52,R=14,T=14,B=44;
+  const sx=v=>L+(v-o.x[0])/(o.x[1]-o.x[0])*(W-L-R), sy=v=>H-B-(v-o.y[0])/(o.y[1]-o.y[0])*(H-B-T);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%">`;
+  for(let v=o.x[0];v<=o.x[1]+1e-9;v+=o.x[2]) s+=`<line x1="${sx(v)}" y1="${T}" x2="${sx(v)}" y2="${H-B}" stroke="#e2e8f0"/><text x="${sx(v)}" y="${H-B+14}" font-size="10" text-anchor="middle" fill="#334e68">${+v.toFixed(2)}</text>`;
+  for(let v=o.y[0];v<=o.y[1]+1e-9;v+=o.y[2]) s+=`<line x1="${L}" y1="${sy(v)}" x2="${W-R}" y2="${sy(v)}" stroke="#e2e8f0"/><text x="${L-6}" y="${sy(v)+3}" font-size="10" text-anchor="end" fill="#334e68">${+v.toFixed(2)}</text>`;
+  s+=`<rect x="${L}" y="${T}" width="${W-L-R}" height="${H-B-T}" fill="none" stroke="#334e68" stroke-width="1.5"/>`;
+  s+=`<text x="${(L+W-R)/2}" y="${H-6}" font-size="12" text-anchor="middle" fill="#334e68">${o.xl||''}</text>`;
+  s+=`<text x="13" y="${(T+H-B)/2}" font-size="12" text-anchor="middle" fill="#334e68" transform="rotate(-90 13 ${(T+H-B)/2})">${o.yl||''}</text>`;
+  let ab=o.line;
+  if(o.fit){
+    const n=pts.length, mx=pts.reduce((p,c)=>p+c[0],0)/n, my=pts.reduce((p,c)=>p+c[1],0)/n;
+    const b=pts.reduce((p,c)=>p+(c[0]-mx)*(c[1]-my),0)/pts.reduce((p,c)=>p+(c[0]-mx)**2,0);
+    ab=[my-b*mx,b];
+  }
+  if(ab){
+    const lx=o.lx||o.x;
+    s+=`<line x1="${sx(lx[0])}" y1="${sy(ab[0]+ab[1]*lx[0])}" x2="${sx(lx[1])}" y2="${sy(ab[0]+ab[1]*lx[1])}" stroke="#0b63c5" stroke-width="3"/>`;
+    if(o.fit) pts.forEach(p=>{s+=`<line x1="${sx(p[0])}" y1="${sy(p[1])}" x2="${sx(p[0])}" y2="${sy(ab[0]+ab[1]*p[0])}" stroke="#e53935" stroke-dasharray="4 3"/>`;});
+  }
+  pts.forEach(p=>{s+=`<circle cx="${sx(p[0])}" cy="${sy(p[1])}" r="5" fill="#06b6d4" stroke="#0b63c5"/>`;});
+  el.innerHTML=s+'</svg>';
+  return ab;
+}
+/* data read from the lecture figures (approximate where the figure has no labels) */
+drawScatter('plotWater',[[75,16],[83,20],[85,27],[85,25],[92,32],[97,48],[99,48]],{x:[70,110,10],y:[0,60,10],xl:'Temperature (F)',yl:'Water Consumption (oz)'});
+drawScatter('plotXY',[[1,5],[2,8],[3,2],[4,7],[5,5],[6,3],[7,8]],{x:[0,8,2],y:[0,10,2],xl:'x',yl:'y'});
+const regFit=drawScatter('plotReg',[[1,2],[2,3],[3,3.5],[4,5.5],[5,5],[6,7]],{x:[0,7,1],y:[0,8,2],xl:'x (independent)',yl:'y (dependent)',fit:true});
+document.getElementById('regEq').textContent='y′ = '+regFit[0].toFixed(2)+' + '+regFit[1].toFixed(2)+'x';
+drawScatter('plotGraphQ',[[-1.2,-1.5],[-0.9,-1.7],[-0.9,-2.3],[-0.4,-2.6],[0,-2.5],[0.3,-2.3],[0.3,-3.4],[0.8,-3],[1.3,-3.8]],{x:[-3,3,1],y:[-4,1,1],xl:'x',yl:'y',line:[-2.5,-1],lx:[-1.4,1.4]});
+
+/* ================= EXPLORE r ================= */
+const ZZ=(()=>{
+  let sd=7; const rnd=()=>(sd=sd*16807%2147483647)/2147483647;
+  const st=z=>{const m=z.reduce((p,c)=>p+c)/z.length,s=Math.sqrt(z.reduce((p,c)=>p+(c-m)**2,0)/z.length);return z.map(c=>(c-m)/s);};
+  let a=[],b=[];
+  for(let i=0;i<30;i++){const u=rnd(),v=rnd(),m=Math.sqrt(-2*Math.log(u));a.push(m*Math.cos(2*Math.PI*v));b.push(m*Math.sin(2*Math.PI*v));}
+  a=st(a); b=st(b);
+  const c=a.reduce((p,x,i)=>p+x*b[i],0)/a.length;
+  b=st(b.map((x,i)=>x-c*a[i]));
+  return [a,b];
+})();
+function drawR(r){
+  const k=Math.sqrt(Math.max(0,1-r*r));
+  drawScatter('rPlot',ZZ[0].map((x,i)=>[x,r*x+k*ZZ[1][i]]),{x:[-4,4,2],y:[-4,4,2],xl:'x (standardized)',yl:'y (standardized)',line:[0,r]});
+  const ar=Math.abs(r), str=ar>0.999?'Perfect':ar>=0.7?'Strong':ar>=0.3?'Moderate':'Weak';
+  document.getElementById('rLabel').textContent='r = '+r.toFixed(2)+'  →  '+(ar<0.001?'No linear relationship':str+(r>0?' positive':' negative')+' linear relationship');
+}
+function setR(v){document.getElementById('rSlider').value=v;drawR(+v);}
+document.getElementById('rSlider').addEventListener('input',e=>drawR(+e.target.value));
+drawR(0.9);
+
+/* ================= RESET QUIZZES ================= */
+document.getElementById('maxScore').textContent=document.querySelectorAll('[data-quiz]').length*10;
+function resetQuizzes(){
+  document.querySelectorAll('[data-quiz]').forEach(q=>{
+    q.querySelectorAll('.opt').forEach(o=>o.classList.remove('correct','wrong','disabled'));
+    const f=q.querySelector('.feedback'); f.classList.remove('show','ok','no');
+  });
+  score=0;streak=0;bestStreak=0;
+  document.getElementById('scoreVal').textContent=0;
+  document.getElementById('finalScore').textContent=0;
+  document.getElementById('finalStreak').textContent=0;
+  updateStreak(); goTo(0);
+}
+
+/* ================= FINAL EXAM (25 new questions) ================= */
+const EXAM=[
+["A researcher predicts a worker's salary from years of experience. The independent variable (X) is:",["Salary","Years of experience","The researcher","Both variables"],1,"X is the predictor (explanatory) variable; salary is the response Y."],
+["In a study of how rainfall affects crop yield, the dependent variable is:",["Rainfall","Season","Crop yield","Soil type"],2,"The outcome (response) variable is Y: crop yield."],
+["Which tool gives the EQUATION describing how Y changes with X?",["Scatter plot only","Regression","Correlation coefficient","Population mean"],1,"Correlation measures strength and direction; regression gives y′ = a + bx."],
+["For a fixed distance, a car's speed and its travel time have a:",["Positive relationship","Negative relationship","No relationship","Perfect positive relationship"],1,"Higher speed means less time: as X increases, Y decreases."],
+["A line fitted to employees aged 20–60 is used to predict the value at age 100. This is:",["Reliable, because the line is straight","Risky extrapolation beyond the observed range of x","Interpolation","Exactly correct"],1,"Predictions outside the range of the data are unreliable."],
+["Ice-cream sales and drowning incidents are strongly positively correlated. The best conclusion is:",["Ice cream causes drowning","Correlation alone does not prove causation; a third factor (hot weather) may explain both","r must be wrong","There is no relationship"],1,"Correlation measures association, not cause and effect."],
+["Which correlation indicates the STRONGEST linear relationship?",["r = 0.70","r = −0.85","r = 0.30","r = −0.60"],1,"Strength depends on |r|, not on the sign; |−0.85| is the largest."],
+["If r = 0, the best conclusion is:",["X and Y are unrelated in every way","There is no LINEAR relationship (a curved one may still exist)","Perfect negative relationship","The data are wrong"],1,"r measures only linear association."],
+["The symbol for the POPULATION correlation coefficient is:",["r","ρ","b","β₀"],1,"r is the sample coefficient; ρ is the population coefficient."],
+["Changing the unit of X from centimetres to inches will:",["Change r to a new value","Leave r unchanged (r has no units)","Make r negative","Make r = 1"],1,"r is unit-free; a positive linear rescaling does not change it."],
+["Data: x = 1,2,3,4,5 and y = 2,4,5,4,5, so n = 5, Σx = 15, Σy = 20, Σxy = 66, Σx² = 55, Σy² = 86. The numerator nΣxy − ΣxΣy equals:",["30","−30","66","330"],0,"5(66) − 15(20) = 330 − 300 = 30."],
+["For the same data, r is approximately:",["0.35","0.77","0.95","−0.77"],1,"Brackets: 5(55) − 15² = 50 and 5(86) − 20² = 30, so r = 30/√(50×30) = 30/38.73 ≈ 0.775."],
+["For the same data, the slope b is:",["0.6","1.67","2.2","0.5"],0,"b = 30/50 = 0.6."],
+["For the same data, the intercept a is:",["0.6","2.2","3.1","20"],1,"a = [(20)(55) − (15)(66)] / 50 = (1100 − 990)/50 = 2.2."],
+["Using y′ = 2.2 + 0.6x, the predicted y when x = 6 is:",["5.8","6.6","3.6","8.2"],0,"2.2 + 0.6(6) = 5.8."],
+["If nΣxy − (Σx)(Σy) is negative, then:",["r is positive","r is negative","r = 0","r > 1"],1,"The denominator is positive, so the numerator decides the sign of r (and of b)."],
+["A student computes r = 1.3. This means:",["A very strong relationship","A calculation error, since r must lie between −1 and +1","A perfect relationship","A weak relationship"],1,"−1 ≤ r ≤ +1 always."],
+["The least-squares line is the line that:",["Passes through the most points","Minimizes the sum of squared vertical distances to the points","Always has slope 1","Minimizes the sum of the x-values"],1,"That is the definition of 'best fit' in the lecture."],
+["A residual is the vertical distance between:",["Two points on the line","An observed y and its predicted y′","x and the mean of x","a and b"],1,"Residual = observed value − predicted value."],
+["In y′ = a + bx, the intercept a is the predicted y when:",["x = 1","x = 0","y = 0","x equals its mean"],1,"Substitute x = 0 and y′ = a."],
+["For y′ = 3 + 2x, the predicted y at x = 4 is:",["9","11","14","24"],1,"3 + 2(4) = 11."],
+["If b = −0.8, when X increases by one unit, Y:",["Increases by 0.8 on average","Decreases by 0.8 on average","Decreases by 8 on average","Does not change"],1,"A negative slope means Y falls by |b| per unit of X, on average."],
+["Which regression equation must come from data with a POSITIVE correlation?",["y′ = 10 − 0.5x","y′ = −3 + 1.5x","y′ = 7 − 2x","y′ = 4 − 0.1x"],1,"sign(r) = sign(b), and only the second equation has b > 0."],
+["In SPSS output, Sig. = .000 for the slope (below 0.05) suggests the slope is:",["Not different from zero","Statistically significant","Exactly zero","Negative"],1,"p < 0.05 means the slope differs significantly from 0 (SPSS prints very small p-values as .000)."],
+["Slide 9 SPSS table: Constant B = 6.584 and Advertising B = −1.071. Predicted sales when advertising spending = 0 is:",["−1.071","6.584","5.513","0"],1,"y′ = 6.584 − 1.071(0) = 6.584."]
+];
+let ei=0,ex=0,exWrong=[];
+function startExam(){ei=0;ex=0;exWrong=[];renderExam();}
+function renderExam(){
+  const box=document.getElementById('exam');
+  if(ei>=EXAM.length){
+    const p=Math.round(ex/EXAM.length*100);
+    const msg=p>=85?'Excellent! ممتاز':p>=70?'Good. جيد':p>=50?'Fair. Review the topics below. يحتاج مراجعة':'Please review the lecture and retry. أعد المراجعة';
+    box.innerHTML=`<div style="text-align:center"><h2 style="margin:6px 0">Result: ${ex} / ${EXAM.length} (${p}%)</h2><p>${msg}</p></div>`+
+      (exWrong.length?'<h3>Review your mistakes</h3>'+exWrong.map(w=>`<div class="reveal" style="display:block"><b>${w.n}. ${w.q}</b><br>✔ ${w.a}<br>${w.e}</div>`).join(''):'')+
+      '<p style="text-align:center"><button class="btn primary" onclick="startExam()">🔄 Retake</button></p>';
+    return;
+  }
+  const [q,o,c,e]=EXAM[ei];
+  box.innerHTML=`<p style="color:var(--muted)">Question ${ei+1} of ${EXAM.length} · Score ${ex}</p><div class="quiz"><div class="q"><span class="qnum">${ei+1}</span><span>${q}</span></div><div class="opts">${o.map((t,i)=>`<div class="opt" data-i="${i}"><span class="key">${'ABCD'[i]}</span>${t}</div>`).join('')}</div><div class="feedback" id="exFb"></div></div><button class="btn primary" id="exNext" style="display:none">${ei===EXAM.length-1?'Finish':'Next ▶'}</button>`;
+  const opts=box.querySelectorAll('.opt'), fb=document.getElementById('exFb');
+  opts.forEach(el=>el.addEventListener('click',()=>{
+    const i=+el.dataset.i, ok=i===c;
+    opts.forEach(x=>x.classList.add('disabled'));
+    el.classList.add(ok?'correct':'wrong'); opts[c].classList.add('correct');
+    if(ok) ex++; else exWrong.push({n:ei+1,q:q,a:o[c],e:e});
+    fb.className='feedback show '+(ok?'ok':'no'); fb.textContent=(ok?'Correct! ':'Not quite. ')+e;
+    const nb=document.getElementById('exNext'); nb.style.display='inline-block';
+    nb.onclick=()=>{ei++;renderExam();};
+  }));
+}
+startExam();
+
+/* ================= KEYBOARD NAV ================= */
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight') goTo(current + 1);
+  if(e.key === 'ArrowLeft') goTo(current - 1);
+});
+</script>
+
+</body>
+</html>
