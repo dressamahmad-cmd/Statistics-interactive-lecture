@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 2 — Methods for Describing Sets of Data | Interactive Lecture</title>
+<style>
+  :root{
+    --primary:#0b63c5;
+    --primary-dark:#084a94;
+    --accent:#06b6d4;
+    --accent-soft:#cffafe;
+    --bg:#f2f9ff;
+    --card:#ffffff;
+    --text:#123047;
+    --muted:#5b7189;
+    --ok:#0f9d58;
+    --bad:#e53935;
+    --warn:#f59e0b;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(11,99,197,.10);
+    --shadow-lg:0 14px 36px rgba(11,99,197,.16);
+    font-size:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",Arial,sans-serif;
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #e0f2fe 0%, transparent 60%),
+      radial-gradient(900px 400px at 110% 0%, #cffafe 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    line-height:1.75;
+    min-height:100vh;
+  }
+
+  /* ============ HEADER ============ */
+  header.topbar{
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary) 45%,var(--accent));
+    color:#fff;
+    box-shadow:0 6px 22px rgba(8,74,148,.35);
+  }
+  .topbar-inner{
+    max-width:1150px;margin:0 auto;padding:12px 18px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.02rem}
+  .brand .logo{
+    width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.18);
+    display:grid;place-items:center;font-size:1.1rem;border:1px solid rgba(255,255,255,.35)
+  }
+  .brand small{display:block;font-weight:400;opacity:.85;font-size:.72rem}
+  .spacer{flex:1}
+  .chip{
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+    padding:5px 12px;border-radius:999px;font-size:.82rem;display:flex;align-items:center;gap:6px
+  }
+  .chip b{font-size:.95rem}
+  .chip.streak{background:rgba(255,214,102,.25);border-color:rgba(255,214,102,.6)}
+
+  .progress-wrap{
+    max-width:1150px;margin:0 auto;padding:0 18px 12px;
+  }
+  .progress-track{
+    height:9px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden
+  }
+  .progress-fill{
+    height:100%;width:0%;border-radius:999px;
+    background:linear-gradient(90deg,#67e8f9,#a7f3d0);
+    transition:width .45s cubic-bezier(.2,.8,.3,1);
+  }
+
+  /* ============ NAV TABS ============ */
+  nav.tabs{
+    max-width:1150px;margin:14px auto 0;padding:0 18px;
+    display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;
+  }
+  nav.tabs::-webkit-scrollbar{height:6px}
+  nav.tabs::-webkit-scrollbar-thumb{background:#bae6fd;border-radius:99px}
+  .tab{
+    flex:0 0 auto;border:1px solid #cfe4f7;background:#fff;color:var(--muted);
+    padding:8px 14px;border-radius:999px;font-size:.84rem;font-weight:600;cursor:pointer;
+    transition:.2s;white-space:nowrap
+  }
+  .tab:hover{border-color:var(--accent);color:var(--primary)}
+  .tab.active{background:linear-gradient(120deg,var(--primary),var(--accent));color:#fff;border-color:transparent;box-shadow:var(--shadow)}
+  .tab .num{
+    display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;
+    background:rgba(255,255,255,.28);font-size:.72rem;margin-right:6px
+  }
+  .tab:not(.active) .num{background:#e6f3ff;color:var(--primary)}
+
+  /* ============ LAYOUT ============ */
+  main{max-width:1150px;margin:0 auto;padding:22px 18px 90px}
+  section.slide{display:none;animation:fadeUp .4s ease}
+  section.slide.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .card{
+    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:22px 24px;margin-bottom:18px;border:1px solid #e3effa;
+  }
+  .card.accent{border-left:6px solid var(--accent)}
+  .card.primary{border-left:6px solid var(--primary)}
+
+  h2.slide-title{
+    font-size:1.45rem;margin:0 0 6px;color:var(--primary-dark);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap
+  }
+  h2.slide-title .badge{
+    font-size:.7rem;background:var(--accent-soft);color:#0e7490;border:1px solid #a5f3fc;
+    padding:3px 10px;border-radius:999px;font-weight:700;letter-spacing:.4px
+  }
+  .subtitle{color:var(--muted);font-size:.9rem;margin:0 0 18px}
+
+  h3{color:var(--primary);margin:18px 0 8px;font-size:1.08rem}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 22px;padding:0}
+  li{margin:6px 0}
+  .ar{
+    font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif;
+    color:#0e7490;font-weight:600;direction:rtl;display:inline-block
+  }
+  .term{
+    background:#e8f4ff;color:var(--primary-dark);border-bottom:2px solid #bae0ff;
+    padding:0 6px;border-radius:6px;font-weight:700
+  }
+  .hl{background:linear-gradient(transparent 60%,#a5f3fc 60%);font-weight:700}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+
+  /* ============ FLIP CARDS ============ */
+  .flip{
+    perspective:1000px;height:170px;cursor:pointer;
+  }
+  .flip-inner{
+    position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d;
+  }
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;
+    display:grid;place-items:center;text-align:center;padding:16px;
+    box-shadow:var(--shadow);border:1px solid #d9ecfb
+  }
+  .flip-front{background:linear-gradient(140deg,#e0f2fe,#cffafe);color:var(--primary-dark);font-weight:700;font-size:1.02rem}
+  .flip-back{background:linear-gradient(140deg,var(--primary),var(--accent));color:#fff;transform:rotateY(180deg);font-size:.9rem;line-height:1.6}
+  .flip-hint{position:absolute;bottom:8px;right:12px;font-size:.7rem;opacity:.7}
+
+  /* ============ QUIZ ============ */
+  .quiz{background:#f8fcff;border:1px dashed #bae0ff;border-radius:14px;padding:16px 18px;margin:14px 0}
+  .quiz .q{font-weight:700;color:var(--primary-dark);margin-bottom:10px;display:flex;gap:8px}
+  .quiz .q .qnum{
+    flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--primary);color:#fff;
+    display:grid;place-items:center;font-size:.8rem
+  }
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{
+    background:#fff;border:1.5px solid #d7e8f8;border-radius:10px;padding:10px 14px;
+    cursor:pointer;transition:.18s;font-size:.92rem;display:flex;align-items:center;gap:10px
+  }
+  .opt:hover{border-color:var(--accent);transform:translateX(3px)}
+  .opt .key{
+    width:26px;height:26px;border-radius:50%;background:#eaf5ff;color:var(--primary);
+    display:grid;place-items:center;font-weight:700;font-size:.8rem;flex:0 0 auto
+  }
+  .opt.correct{background:#e7f9ef;border-color:var(--ok);color:#0b6b3a}
+  .opt.correct .key{background:var(--ok);color:#fff}
+  .opt.wrong{background:#fdecea;border-color:var(--bad);color:#a3271f}
+  .opt.wrong .key{background:var(--bad);color:#fff}
+  .opt.disabled{pointer-events:none;opacity:.85}
+  .feedback{margin-top:10px;font-size:.88rem;font-weight:600;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{color:var(--ok)}
+  .feedback.no{color:var(--bad)}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    border:none;border-radius:999px;padding:10px 20px;font-weight:700;cursor:pointer;
+    font-size:.9rem;transition:.2s;font-family:inherit
+  }
+  .btn.primary{background:linear-gradient(120deg,var(--primary),var(--accent));color:#fff;box-shadow:var(--shadow)}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+  .btn.ghost{background:#fff;color:var(--primary);border:1.5px solid #bae0ff}
+  .btn.ghost:hover{background:#eaf5ff}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+  /* ============ REVEAL ============ */
+  .reveal{
+    background:#fff7e6;border:1px dashed #f5c56b;border-radius:12px;padding:12px 16px;margin:10px 0;
+  }
+  .reveal summary{cursor:pointer;font-weight:700;color:#9a6400;list-style:none;display:flex;align-items:center;gap:8px}
+  .reveal summary::-webkit-details-marker{display:none}
+  .reveal summary::before{content:"💡";font-size:1.1rem}
+  .reveal[open] summary{margin-bottom:8px}
+  .reveal .body{color:#6b4a00;font-size:.92rem}
+
+  /* ============ SCATTER PLOT ============ */
+  .plot-box{background:#fff;border-radius:14px;padding:12px;border:1px solid #e3effa;text-align:center}
+  .plot-box svg{max-width:100%;height:auto}
+  .plot-box .cap{font-size:.82rem;color:var(--muted);margin-top:6px}
+  .plot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:760px){.plot-grid{grid-template-columns:1fr}}
+
+  /* ============ FORMULA ============ */
+  .formula{
+    background:linear-gradient(140deg,#eaf6ff,#f0fdff);border:1px solid #bae0ff;
+    border-radius:14px;padding:16px 18px;margin:12px 0;text-align:center;
+    font-size:1.02rem;overflow-x:auto
+  }
+  .formula .frac{
+    display:inline-block;vertical-align:middle;text-align:center;margin:0 6px
+  }
+  .formula .frac .top{border-bottom:2px solid var(--primary);padding:0 8px 3px}
+  .formula .frac .bot{padding:3px 8px 0}
+  .formula .sqrt{display:inline-block;border-top:2px solid var(--primary);padding-top:2px}
+
+  /* ============ STEP BY STEP ============ */
+  .steps{counter-reset:step}
+  .step{
+    display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed #dbeafe
+  }
+  .step:last-child{border-bottom:none}
+  .step .n{
+    flex:0 0 auto;width:32px;height:32px;border-radius:10px;
+    background:linear-gradient(140deg,var(--primary),var(--accent));color:#fff;
+    display:grid;place-items:center;font-weight:700
+  }
+  .step .c{flex:1;font-size:.93rem}
+  .step .c b{color:var(--primary-dark)}
+
+  /* ============ TABLE ============ */
+  table.data{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+  table.data th,table.data td{border:1px solid #d9ecfb;padding:8px 10px;text-align:center}
+  table.data th{background:#eaf5ff;color:var(--primary-dark)}
+  table.data tr:nth-child(even) td{background:#f8fcff}
+
+  /* ============ THINK-PAIR-SHARE ============ */
+  .tps{
+    background:linear-gradient(140deg,#fff7e6,#fffbeb);border:1px solid #fcd34d;
+    border-radius:14px;padding:16px 18px;margin:14px 0
+  }
+  .tps h4{margin:0 0 8px;color:#92400e;display:flex;align-items:center;gap:8px}
+  .tps .phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+  @media(max-width:700px){.tps .phases{grid-template-columns:1fr}}
+  .phase{background:#fff;border-radius:10px;padding:10px;border:1px solid #fde68a}
+  .phase b{display:block;color:#b45309;font-size:.85rem;margin-bottom:4px}
+  .phase span{font-size:.83rem;color:#6b4a00}
+
+  /* ============ TIMER ============ */
+  .timer{
+    display:inline-flex;align-items:center;gap:8px;background:#eaf5ff;border:1px solid #bae0ff;
+    padding:6px 14px;border-radius:999px;font-weight:700;color:var(--primary-dark)
+  }
+  .timer button{
+    border:none;background:var(--primary);color:#fff;border-radius:50%;width:26px;height:26px;
+    cursor:pointer;font-size:.9rem;line-height:1;display:grid;place-items:center
+  }
+  .timer button:hover{background:var(--accent)}
+
+  /* ============ FOOTER NAV ============ */
+  .slide-nav{
+    position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);
+    backdrop-filter:blur(8px);border-top:1px solid #d9ecfb;
+    padding:10px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:40
+  }
+  .slide-nav .inner{max-width:1150px;margin:0 auto;width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .slide-nav .pos{font-size:.85rem;color:var(--muted);font-weight:600}
+
+  /* ============ OBJECTIVES ============ */
+  .obj-list{list-style:none;margin:0;padding:0}
+  .obj-list li{
+    display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;
+    background:#f8fcff;border:1px solid #e3effa;margin-bottom:8px
+  }
+  .obj-list li .icon{
+    flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:var(--accent-soft);
+    color:#0e7490;display:grid;place-items:center;font-weight:700;font-size:.9rem
+  }
+
+  /* ============ SUMMARY ============ */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .sum-card{
+    background:linear-gradient(140deg,#f0f9ff,#e0f7ff);border:1px solid #bae0ff;border-radius:14px;
+    padding:14px
+  }
+  .sum-card h4{margin:0 0 6px;color:var(--primary-dark);font-size:.95rem}
+  .sum-card p{margin:0;font-size:.85rem;color:#334e68}
+
+  .toast{
+    position:fixed;top:80px;right:20px;z-index:100;
+    background:linear-gradient(120deg,var(--ok),#34d399);color:#fff;
+    padding:12px 20px;border-radius:12px;font-weight:700;box-shadow:var(--shadow-lg);
+    transform:translateX(140%);transition:transform .4s cubic-bezier(.2,.8,.3,1)
+  }
+  .toast.show{transform:translateX(0)}
+  .toast.bad{background:linear-gradient(120deg,var(--bad),#f87171)}
+
+  .kbd{
+    background:#eaf5ff;border:1px solid #bae0ff;border-bottom-width:3px;border-radius:6px;
+    padding:1px 7px;font-size:.82rem;font-weight:700;color:var(--primary-dark)
+  }
+
+  /* ============ EXTRA (Chapter 2) ============ */
+  .explain,.tipbox,.warnbox,.srcnote{direction:rtl;text-align:right;border-radius:14px;padding:12px 16px;margin:12px 0;font-size:.95rem;line-height:1.9;
+    font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif}
+  .explain{background:linear-gradient(140deg,#ecfdf5,#f0fdfa);border:1px solid #99f6e4;border-right:6px solid #14b8a6;color:#134e4a}
+  .explain .h{color:#0f766e}
+  .tipbox{background:#fffbeb;border:1px solid #fde68a;border-right:6px solid #f59e0b;color:#713f12}
+  .warnbox{background:#fef2f2;border:1px solid #fecaca;border-right:6px solid #ef4444;color:#7f1d1d}
+  .srcnote{background:#eef2ff;border:1px solid #c7d2fe;border-right:6px solid #6366f1;color:#312e81;font-size:.88rem;line-height:1.8}
+  .srcnote.added{background:#f5f3ff;border-color:#ddd6fe;border-right-color:#8b5cf6;color:#4c1d95}
+  .explain b,.tipbox b,.warnbox b,.srcnote b{font-weight:800}
+  .explain .en,.tipbox .en,.warnbox .en{direction:ltr;unicode-bidi:embed;display:inline-block;font-weight:700}
+
+  .widget{background:#fff;border:1.5px solid #cfe4f7;border-radius:14px;padding:14px 16px;margin:14px 0;box-shadow:var(--shadow)}
+  .widget h4{margin:0 0 8px;color:var(--primary-dark);font-size:1rem}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+  .seg button{border:1.5px solid #bae0ff;background:#fff;color:var(--primary);border-radius:999px;padding:6px 14px;font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;transition:.15s}
+  .seg button:hover{background:#eaf5ff}
+  .seg button.on{background:linear-gradient(120deg,var(--primary),var(--accent));color:#fff;border-color:transparent}
+  .cells{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0}
+  .cell{min-width:40px;padding:6px 9px;text-align:center;border:1.5px solid #d7e8f8;border-radius:8px;background:#fff;font-weight:700;transition:.15s}
+  .cell.hl{background:var(--accent-soft);border-color:var(--accent);transform:scale(1.1)}
+  .cell.sel{background:#fde68a;border-color:#f59e0b}
+  .cell.out{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+  input.num,textarea.num{border:1.5px solid #bae0ff;border-radius:8px;padding:7px 10px;font:inherit;width:100%;background:#fff;color:var(--text)}
+  input.num:focus,textarea.num:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .row input.num{flex:1;min-width:140px}
+  .calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:8px 0}
+  .calc-grid label{font-size:.8rem;color:var(--muted);font-weight:700;display:block;margin-bottom:3px}
+  .out{background:#f0f9ff;border:1px solid #bae0ff;border-radius:10px;padding:8px 12px;font-weight:700;color:var(--primary-dark);text-align:center}
+  .out small{display:block;font-weight:600;color:var(--muted);font-size:.74rem}
+  .readout{margin:8px 0;padding:10px 14px;background:#f8fcff;border:1px dashed #bae0ff;border-radius:10px;font-size:.92rem}
+  pre.stem{background:#0f2a43;color:#e6f6ff;border-radius:12px;padding:12px 18px;font-size:1.05rem;line-height:1.7;display:inline-block;text-align:left;margin:8px auto;direction:ltr}
+  .stem-key{font-size:.82rem;color:var(--muted);margin-top:4px}
+  svg text{font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+  .bar:hover,.dotc:hover{opacity:.8;cursor:pointer}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:.82rem;margin-top:6px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .quiz.numq .row{margin-top:2px}
+  .quiz.numq .chk{padding:8px 18px}
+  .quiz.numq.done input{background:#e7f9ef;border-color:var(--ok)}
+  .roadmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:10px 0}
+  .roadmap button{text-align:left;border:1.5px solid #bae0ff;background:#fff;border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer;transition:.15s}
+  .roadmap button:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .roadmap button b{color:var(--primary-dark);display:block;font-size:.92rem}
+  .roadmap button span{font-size:.78rem;color:var(--muted)}
+  .roadmap button.nocontent{opacity:.7;border-style:dashed}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+  .big{font-size:1.7rem;font-weight:800;color:var(--accent)}
+  .mono{font-family:Consolas,"Courier New",monospace}
+  .pill{display:inline-block;background:var(--accent-soft);color:#0e7490;border:1px solid #a5f3fc;border-radius:999px;padding:1px 10px;font-weight:700;font-size:.82rem}
+  .ex-q{font-weight:700;color:var(--primary-dark);margin:8px 0 2px}
+  table.data td.l,table.data th.l{text-align:left}
+  @media(max-width:560px){main{padding:16px 12px 90px}.card{padding:16px 14px}.tab{padding:7px 11px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><div class="logo">📈</div><div>Chapter 2 — Methods for Describing Sets of Data<small>Interactive Lecture · based on the slides of Dr. Jumanah Ahmed Darwish</small></div></div>
+    <div class="spacer"></div>
+    <div class="chip">🏆 Score: <b id="scoreVal">0</b></div>
+    <div class="chip streak">🔥 Streak: <b id="streakVal">0</b></div>
+  </div>
+  <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<main id="main">
+<section class="slide active" data-title="Introduction">
+<div class="card primary"><h2 class="slide-title">Chapter 2 — Methods for Describing Sets of Data <span class="badge">Slide 1</span></h2><p class="subtitle">Describing data with tables, graphs and numbers · <span class="ar">طرق وصف مجموعات البيانات</span></p>
+    <p>Chapter 2 answers one practical question:</p>
+    <div class="formula" style="font-size:1.1rem"><b>How can we turn a pile of raw data into something we can read and understand?</b><br>
+      <span class="ar">كيف نحوّل البيانات الخام إلى جداول ورسوم وأرقام نفهمها؟</span></div>
+    <div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الفصل كله يدور حول <b>الإحصاء الوصفي</b>: نأخذ بيانات كثيرة ونختصرها بثلاث طرق:
+      <b>(1) جداول</b> (توزيع تكراري)، <b>(2) رسوم</b> (أعمدة، دائرة، مدرج…)، <b>(3) أرقام</b> تلخّص البيانات (الوسط، التشتت، الأرباع…).
+      أي أنك بعد هذا الفصل تستطيع أن تنظر إلى مئات القيم وتقول بثقة: "أين مركزها؟ وكم تتباعد؟ وهل فيها قيمة غريبة؟"</div><h3>🧭 Roadmap — click a section <span class="ar">(خريطة الفصل)</span></h3><div class="roadmap"><button type="button" onclick="goTo(1)"><b>2.1 Describing Qualitative Data</b><span>Slides 2–4 · tables, bar, pie, Pareto</span></button><button type="button" onclick="goTo(4)"><b>2.2 Graphical Methods (Quantitative)</b><span>Slides 5–6 · grouped tables, dot plot, stem-and-leaf, histogram</span></button><button type="button" onclick="goTo(6)"><b>2.9 The Time Series Plot</b><span>Slide 7</span></button><button type="button" onclick="goTo(7)"><b>2.3 Measures of Central Tendency</b><span>Slides 8–10 · mean, median, mode, shapes</span></button><button type="button" onclick="goTo(10)"><b>2.4 Measures of Variability</b><span>Slide 11 · range, variance, standard deviation</span></button><button type="button" onclick="goTo(11)"><b>2.6 Measures of Relative Standing</b><span>Slide 12 · quartiles, percentiles, z-score</span></button><button type="button" onclick="goTo(12)"><b>2.7 Detecting Outliers</b><span>Slide 13 · box plots and z-scores</span></button><button type="button" class="nocontent" onclick="showToast('2.5 is listed in the outline, but the lecture file has no slides for it')"><b>2.5 Using the Mean and Standard Deviation</b><span>Listed in the outline · no slides in the file</span></button></div><h3>🎯 Learning Objectives <span class="ar">(أهداف المحاضرة)</span></h3>
+    <ul class="obj-list">
+      <li><span class="icon">1</span><div>Organize qualitative data in a <span class="term">frequency distribution</span> (frequency, relative frequency, percentage).</div></li>
+      <li><span class="icon">2</span><div>Draw and read <span class="term">bar graphs, pie charts and Pareto diagrams</span>.</div></li>
+      <li><span class="icon">3</span><div>Build grouped tables (class limits and boundaries), <span class="term">dot plots, stem-and-leaf displays, histograms</span> and time series plots.</div></li>
+      <li><span class="icon">4</span><div>Compute and compare the <span class="term">mean, median and mode</span>, and recognise the shape of a distribution.</div></li>
+      <li><span class="icon">5</span><div>Measure variability: <span class="term">range, variance, standard deviation</span>.</div></li>
+      <li><span class="icon">6</span><div>Use <span class="term">quartiles, percentiles and z-scores</span> to locate a value inside a data set.</div></li>
+      <li><span class="icon">7</span><div>Detect outliers with <span class="term">box plots (IQR rule)</span> and z-scores.</div></li>
+    </ul></div>
+<div class="card accent"><h3>🧭 How this lecture works</h3>
+    <p>Every slide follows the lecture file (examples, exercises and solutions with the same numbers). In addition you will find:</p>
+    <ul>
+      <li><b>💡 Simple explanation boxes</b> in Arabic: the idea in plain words.</li>
+      <li><b>🧠 Memory tips</b> and <b>⚠️ common mistakes</b>.</li>
+      <li><b>Interactive widgets</b>: tally, calculators, charts you can change, live mean/median, box-plot builder.</li>
+      <li><b>Instant-feedback quizzes</b> (+10 points each) and a <b>25-question Final Exam</b> in the last tab.</li>
+      <li><b>📝 Notes on the source</b> where a printed number needed correcting, and <b>➕ additions</b> that are not in the original slides.</li>
+    </ul>
+    <p style="font-size:.82rem;color:var(--muted)">Content adapted from the Chapter 2 slides by Dr. Jumanah Ahmed Darwish. Charts marked "approximate" were re-drawn from the figures in the slides.</p></div>
+<div class="tps"><h4>🤝 Think–Pair–Share <span class="ar">(فكّر – ناقش – شارك)</span></h4>
+    <p>Before we start: <b>name one qualitative variable and one quantitative variable</b> from your daily life.</p>
+    <div class="phases"><div class="phase"><b>1. Think (30s)</b><span>Write both examples alone.</span></div>
+    <div class="phase"><b>2. Pair (60s)</b><span>Compare with your neighbour.</span></div>
+    <div class="phase"><b>3. Share (30s)</b><span>One example to the class.</span></div></div></div>
+    <div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>البيانات الوصفية (Qualitative)</b> تُعبّر عن <b>صفة أو فئة</b> غير رقمية: فصيلة الدم، لون العين، نوع السيارة.
+      <b>البيانات الكمية (Quantitative)</b> هي <b>أرقام</b> لها معنى حسابي: الطول، الدرجة، عدد العواصف.
+      القاعدة السريعة: هل يمكنني حساب <b>متوسط</b> لها؟ إن نعم فهي كمية.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>Which of the following is a <b>qualitative</b> variable?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Number of storms per year</div><div class="opt" data-correct="true"><span class="key">B</span> Blood type</div><div class="opt" data-correct="false"><span class="key">C</span> Exam score</div><div class="opt" data-correct="false"><span class="key">D</span> Years in practice</div></div><div class="feedback" data-fb-ok="Correct! Blood type is a category (A, B, AB, O), not a number." data-fb-no="Qualitative = categories. Blood type is the only category here."></div></div>
+</section>
+<section class="slide" data-title="Frequency Distribution">
+<div class="card primary"><h2 class="slide-title">Frequency Distributions <span class="badge">Slide 2</span></h2><p class="subtitle">Section 2.1 · <span class="ar">التوزيع التكراري للبيانات الوصفية</span></p><p><span class="pill">raw data</span> data collected in its original form &nbsp;→&nbsp; organized &nbsp;→&nbsp; <span class="pill">frequency distribution</span></p>
+  <div class="formula"><b>Frequency distribution</b> is the organizing of raw data in <b>table</b> form, using <b>classes</b> and <b>frequencies</b>.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>البيانات الخام تشبه كومة أوراق مبعثرة. <b>جدول التوزيع التكراري</b> يرتّبها في جدول من عمودين: <b>الفئة (Class)</b> و<b>التكرار (Frequency)</b>،
+      أي: كم مرة ظهرت كل فئة؟</div><h3>Qualitative data and its vocabulary</h3><table class="data"><tr><th>Term</th><th>Meaning (from the lecture)</th></tr><tr><td>Qualitative data</td><td>Non-numerical; the value can be classified only into categories called <b>classes</b>.</td></tr><tr><td>Class</td><td>One of the categories into which the data can be classified.</td></tr><tr><td>Class frequency (f)</td><td>The number of observations falling into a particular class.</td></tr><tr><td>Class relative frequency</td><td>class frequency ÷ total number of observations (n).</td></tr><tr><td>Class percentage</td><td>class relative frequency × 100.</td></tr></table><div class="formula">class relative frequency = <span class="frac"><span class="top">class frequency</span><span class="bot">n</span></span> &nbsp;&nbsp;·&nbsp;&nbsp; class percentage = (class relative frequency) × 100</div><h3>Types of frequency distributions</h3><div class="two"><div class="plot-box" style="text-align:left"><h4 style="margin:2px 0;color:var(--primary)">Categorical frequency distributions</h4><p style="font-size:.9rem">Used for data that can be placed in specific categories, such as <b>nominal- or ordinal-level</b> data. <span class="ar">(هذه الشريحة)</span></p></div><div class="plot-box" style="text-align:left"><h4 style="margin:2px 0;color:var(--primary)">Grouped frequency distributions</h4><p style="font-size:.9rem">Used when the <b>range of values is very large</b>. The data are grouped into classes that are <b>more than one unit in width</b>. <span class="ar">(الشريحة 5)</span></p></div></div></div>
+<div class="card accent"><h3>🧪 Try it — turn raw data into a frequency table</h3><div class="widget"><h4>Raw data (18 values) — click a class to see its tally</h4>
+    <div class="cells" id="tallyRaw"></div>
+    <div class="seg" id="tallyClasses"></div>
+    <div class="readout" id="tallyOut">Click a value above (for example <b>5</b>) to highlight every occurrence.</div>
+    <button class="btn ghost" type="button" id="tallyBuild">Build the frequency table</button>
+    <div id="tallyTable"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>اضغط على أي رقم: ستُظلَّل كل مرة ظهر فيها، والعدد هو <b>التكرار</b>. الجدول النهائي هو الجدول الذي يعرضه المصدر (الفئة 8 تكرارها 3، والفئة 7 تكرارها 2، وهكذا).</div></div>
+<div class="card primary"><h3>Example — blood types of 25 army inductees</h3><p>25 army inductees were given a blood test to determine their blood type. The data set is:</p><div class="widget"><h4>Raw data — click a blood type</h4><div class="cells" id="tallyBlood"></div><div class="seg" id="bloodClasses"></div><div class="readout" id="bloodOut">Select a blood type to count it.</div></div><p><b>Create the frequency distribution.</b></p><div class="two"><div><table class="data"><tr><th>Class</th><th>Frequency (f)</th></tr><tr><td>A</td><td>5</td></tr><tr><td>B</td><td>7</td></tr><tr><td>O</td><td>9</td></tr><tr><td>AB</td><td>4</td></tr><tr><td><b>Total</b></td><td><b>25</b></td></tr></table></div><div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>هذا يُسمّى <b>Categorical frequency distribution</b>.<br>
+      حجم العينة: <b>n = Σf = 5 + 7 + 9 + 4 = 25</b> (الرمز Σ يعني "المجموع").<br>
+      الفئة الأولى (First class) = A، والفئة الثانية (Second class) = B.</div></div></div><div class="warnbox" dir="rtl"><b>⚠️ خطأ شائع</b><br>تأكد دائمًا أن <b>مجموع التكرارات = حجم العينة n</b>. إذا لم يتساوَيا فهناك قيمة نسيتها أو عددتها مرتين.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>In the blood-type table, the sample size n is found by:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Counting the classes (4)</div><div class="opt" data-correct="true"><span class="key">B</span> Adding all the frequencies (Σf = 25)</div><div class="opt" data-correct="false"><span class="key">C</span> Taking the largest frequency (9)</div><div class="opt" data-correct="false"><span class="key">D</span> Adding the class names</div></div><div class="feedback" data-fb-ok="Correct! n = Σf = 25." data-fb-no="n is the total number of observations = the sum of all frequencies."></div></div><div class="quiz numq" data-numq data-answer="9" data-tol="0"><div class="q"><span class="qnum">✎</span><span>What is the frequency of blood type <b>O</b> (count it in the raw data above)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! O appears 9 times." data-fb-no="Count again: highlight O in the widget above."></div></div></div>
+</section>
+<section class="slide" data-title="Relative Frequency">
+<div class="card primary"><h2 class="slide-title">Relative Frequency and Percentage <span class="badge">Slide 3</span></h2><p class="subtitle">Section 2.1 · <span class="ar">التكرار النسبي والنسبة المئوية</span></p><div class="formula">relative frequency = <span class="frac"><span class="top">f</span><span class="bot">n</span></span> &nbsp;·&nbsp; percentage = relative frequency × 100</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>التكرار النسبي</b> = "ما <b>حصة</b> هذه الفئة من الكل؟" وهو كسر بين 0 و1. إذا ضربناه في 100 صار <b>نسبة مئوية</b>.
+      مثال: فئة تكرارها 5 من 25 → 5 ÷ 25 = 0.20 → 20%.</div><div class="tipbox" dir="rtl"><b>🧠 للحفظ</b><br>مجموع كل التكرارات النسبية = <b>1</b> دائمًا، ومجموع كل النسب المئوية = <b>100%</b>. استخدمهما كاختبار ذاتي لحلّك.</div><h3>Example — blood types: answer the questions</h3><p>Using the frequency table (A 5, B 7, O 9, AB 4; total 25):</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. The relative frequency for the <b>second class</b> (blood type B) is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 0.20</div><div class="opt" data-correct="true"><span class="key">B</span> 0.28</div><div class="opt" data-correct="false"><span class="key">C</span> 0.36</div><div class="opt" data-correct="false"><span class="key">D</span> 0.16</div></div><div class="feedback" data-fb-ok="Correct! 7 ÷ 25 = 0.28." data-fb-no="The second class is B (f = 7), so 7 ÷ 25 = 0.28."></div></div><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> الشريحة الأصلية كتبت <b>0.2</b> لهذا السؤال، وهي قيمة الفئة الأولى A (5÷25). الفئة الثانية هي B وتكرارها 7، فالصحيح <b>0.28</b>.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. The percentage for blood type AB is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 4%</div><div class="opt" data-correct="true"><span class="key">B</span> 16%</div><div class="opt" data-correct="false"><span class="key">C</span> 25%</div><div class="opt" data-correct="false"><span class="key">D</span> 36%</div></div><div class="feedback" data-fb-ok="Correct! 4 ÷ 25 × 100 = 16%." data-fb-no="4 ÷ 25 = 0.16 → 16%."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>3. The total number of observations (frequencies) is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 4</div><div class="opt" data-correct="false"><span class="key">B</span> 9</div><div class="opt" data-correct="true"><span class="key">C</span> 25</div><div class="opt" data-correct="false"><span class="key">D</span> 100</div></div><div class="feedback" data-fb-ok="Correct! 5 + 7 + 9 + 4 = 25." data-fb-no="Add all the frequencies."></div></div></div>
+<div class="card accent"><h3>Example — the 40 best-paid CEOs</h3><p>Observing that 4 of the 40 best-paid CEOs did not obtain a college degree, 17 obtained bachelor’s degrees, 9 MBAs, 3 master’s degrees, 2 PhDs, and 5 law degrees. (1) Obtain the relative frequencies for all classes. (2) Obtain the percentage for all classes.</p><div class="widget"><h4>🧮 Calculator — change a frequency and watch everything update</h4><div id="ceoCalc"></div></div><details class="reveal"><summary>Show the lecture solution (relative frequencies)</summary><div class="body">Bachelor’s: 17/40 = .425 · Law: 5/40 = .125 · Master’s: 3/40 = .075 · MBA: 9/40 = .225 · None: 4/40 = .10 · PhD: 2/40 = .05 → total = 1</div></details><details class="reveal"><summary>Show the lecture solution (percentages)</summary><div class="body">Bachelor’s 42.5% · Law 12.5% · Master’s <b>7.5%</b> · MBA 22.5% · None 10% · PhD 5% → total = 100%</div></details><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> في الشريحة الأصلية كُتب ناتج الماجستير <b>75%</b>، والصحيح <b>7.5%</b> (3÷40×100). والدليل أن المجموع لا يصبح 100% إلا بالقيمة الصحيحة: 42.5 + 12.5 + 7.5 + 22.5 + 10 + 5 = 100.</div><div class="quiz numq" data-numq data-answer="22.5" data-tol="0.01"><div class="q"><span class="qnum">✎</span><span>What is the percentage for <b>MBA</b> (9 out of 40)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 22.5" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 9 ÷ 40 × 100 = 22.5%." data-fb-no="9 ÷ 40 = 0.225, then × 100."></div></div></div>
+<div class="card primary"><h3>Example — reading a Megastat (software) output</h3><p>Comment on the following output.</p><table class="data"><tr><th>Blood Type</th><th>frequency</th><th>percent</th></tr><tr><td>A</td><td>5</td><td>20.0</td></tr><tr><td>B</td><td>7</td><td>28.0</td></tr><tr><td>AB</td><td>4</td><td>16.0</td></tr><tr><td>O</td><td>9</td><td>36.0</td></tr><tr><td><b>Total</b></td><td><b>25</b></td><td><b>100.0</b></td></tr></table><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>عند قراءة مخرجات البرنامج اذكر بالترتيب: <b>(1)</b> عدد كل فئة والمجموع، <b>(2)</b> أعلى فئة، <b>(3)</b> أقل فئة، <b>(4)</b> مقارنة بين فئتين.</div><details class="reveal"><summary>Show the lecture comments</summary><div class="body"><ol><li>There are 5 people with blood type A, <b>7</b> with type B, 4 with type AB and 9 with type O. The total number of people is 25.</li>
+      <li>20% of the sample have blood type A.</li><li>The largest number of people have blood type O, with 36%.</li>
+      <li>The lowest rate among observations is AB, with 16%.</li><li>The percentage of blood type O is about 2.25 times the percentage of blood type AB (36 ÷ 16).</li></ol></div></details><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> الشريحة الأصلية ذكرت في التعليق الأول أن عدد فصيلة B هو 5، لكن الجدول (والمنطق: 25 − 5 − 4 − 9) يعطي <b>7</b>. كما أن عبارة "almost double" تعني فعليًا أكثر من الضعف قليلًا (2.25).</div></div>
+<div class="card accent"><h3>Exercise — three classes X, Y, Z (20 units)</h3><p>A qualitative variable with three classes (X, Y, and Z) is measured for each of 20 units randomly sampled from a target population. The data are:</p><div class="widget"><h4>Raw data — click a class</h4><div class="cells" id="tallyXYZ"></div><div class="seg" id="xyzClasses"></div><div class="readout" id="xyzOut">Select X, Y or Z.</div></div><p><b>a.</b> Compute the frequency for each of the three classes. &nbsp; <b>b.</b> Compute the relative frequency for each class.</p><details class="reveal"><summary>Show solution</summary><div class="body"><table class="data"><tr><th>Class</th><th>Frequency</th><th>Relative Frequency</th></tr><tr><td>X</td><td>8</td><td>.40</td></tr><tr><td>Y</td><td>9</td><td>.45</td></tr><tr><td>Z</td><td>3</td><td>.15</td></tr><tr><td><b>Total</b></td><td><b>20</b></td><td><b>1.00</b></td></tr></table></div></details><div class="quiz numq" data-numq data-answer="0.45" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>Relative frequency of class <b>Y</b> (9 out of 20)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 0.45" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 9 ÷ 20 = 0.45." data-fb-no="9 ÷ 20 = ?"></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>A class has frequency 12 in a sample of n = 48. Its relative frequency is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 0.12</div><div class="opt" data-correct="true"><span class="key">B</span> 0.25</div><div class="opt" data-correct="false"><span class="key">C</span> 4</div><div class="opt" data-correct="false"><span class="key">D</span> 0.40</div></div><div class="feedback" data-fb-ok="Correct! 12 ÷ 48 = 0.25 (25%)." data-fb-no="12 ÷ 48 = 0.25."></div></div></div>
+</section>
+<section class="slide" data-title="Bar, Pie & Pareto">
+<div class="card primary"><h2 class="slide-title">Graphs for Qualitative Data <span class="badge">Slide 4</span></h2><p class="subtitle">Section 2.1 · <span class="ar">الأعمدة والدائرة ومخطط باريتو</span></p><p>Graphical descriptive methods for <b>qualitative</b> data: <span class="pill">Bar graph</span> <span class="pill">Pie chart</span> <span class="pill">Pareto diagram</span></p><div class="widget"><h4>🎛️ Chart builder — choose the data, the chart and the unit</h4>
+    <div class="seg" id="gbData"></div><div class="seg" id="gbType"></div><div class="seg" id="gbUnit"></div>
+    <div id="gbChart"></div><div id="gbTable"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>جرّب التبديل بين الأنواع: <b>الأعمدة</b> تقارن الفئات، <b>الدائرة</b> تُظهر حصة كل جزء من الكل، و<b>باريتو</b> هو أعمدة مرتبة من الأعلى إلى الأقل.
+      لاحظ أن شكل الأعمدة لا يتغير عند تغيير الوحدة (تكرار/نسبي/%)، وإنما يتغير فقط الرقم على المحور.</div></div>
+<div class="card accent"><h3>Bar graph <span class="ar">(الأعمدة البيانية)</span></h3><div class="formula">A <b>bar graph</b> represents the data using vertical or horizontal bars whose heights or lengths represent the <b>frequencies</b>, <b>relative frequencies</b> or <b>percentages</b> of the classes. Used with qualitative or categorical data.</div><div class="two"><div class="plot-box"><div id="spendV"></div></div><div class="plot-box"><div id="spendH"></div></div></div><p class="cap" style="font-size:.8rem;color:var(--muted)">First-Year College Student Spending — values read approximately from the figure in the slide.</p><h3>Example — CEO degrees as a bar graph</h3><div class="plot-box"><div id="ceoBar"></div></div><details class="reveal"><summary>Show the lecture comments</summary><div class="body"><ol><li>We have 6 classes, with a total number of observations = 4 + 17 + 9 + 3 + 2 + 5 = 40 people.</li><li>The highest number of frequencies was in the Bachelor degree with 17 people.</li><li>The lowest was PhD with 2 people.</li></ol></div></details><div class="warnbox" dir="rtl"><b>⚠️ خطأ شائع</b><br>في الأعمدة البيانية تكون <b>الأعمدة منفصلة</b> (بينها فراغات) لأن الفئات وصفية. أما <b>المدرج التكراري</b> للبيانات الكمية فأعمدته متلاصقة (الشريحة 6).</div></div>
+<div class="card primary"><h3>Exercise — vehicles sold last month at Whitner Autoplex</h3><div class="plot-box"><div id="carBar"></div></div><p>Using the graph, answer:</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. What type of graph is used to describe the data?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Pie chart</div><div class="opt" data-correct="true"><span class="key">B</span> Bar chart</div><div class="opt" data-correct="false"><span class="key">C</span> Histogram</div><div class="opt" data-correct="false"><span class="key">D</span> Time series plot</div></div><div class="feedback" data-fb-ok="Correct! A bar chart." data-fb-no="Separate bars for categories → bar chart."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. How many classes are in the graph?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 1</div><div class="opt" data-correct="true"><span class="key">B</span> 2 (Foreign and Domestic)</div><div class="opt" data-correct="false"><span class="key">C</span> 30</div><div class="opt" data-correct="false"><span class="key">D</span> 80</div></div><div class="feedback" data-fb-ok="Correct! Foreign and Domestic." data-fb-no="Count the bars."></div></div><div class="quiz numq" data-numq data-answer="80" data-tol="0"><div class="q"><span class="qnum">✎</span><span>3. What is the total number of frequencies? (30 + 50)</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 30 + 50 = 80." data-fb-no="Add the two bar heights."></div></div><div class="quiz numq" data-numq data-answer="0.375" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>4. Relative frequency of the <b>Foreign</b> class (30 out of 80)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 0.375" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 30 ÷ 80 = 0.375." data-fb-no="30 ÷ 80 = ?"></div></div><div class="quiz numq" data-numq data-answer="62.5" data-tol="0.01"><div class="q"><span class="qnum">✎</span><span>5. Percentage of the <b>Domestic</b> class (50 out of 80)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 62.5" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 50 ÷ 80 × 100 = 62.5%." data-fb-no="50 ÷ 80 × 100 = ?"></div></div></div>
+<div class="card accent"><h3>Pie graph <span class="ar">(الدائرة النسبية)</span></h3><div class="formula">A <b>pie graph</b> is a circle divided into sections (wedges) according to the percentage of frequencies in each category. Purpose: show the relationship of the <b>parts to the whole</b>. Used for nominal or categorical variables.</div><div class="formula">% = <span class="frac"><span class="top">f</span><span class="bot">n</span></span> × 100 &nbsp;&nbsp;·&nbsp;&nbsp; Degree = <span class="frac"><span class="top">f</span><span class="bot">n</span></span> × 360°</div><div class="plot-box"><div id="maritalPie"></div><div class="cap">Marital status of employees at Brown’s Department Store (percentages from the slide).</div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الدائرة كلها = 360°. إذن زاوية القطاع = <b>التكرار النسبي × 360</b>. مثال: فئة 25% تأخذ 0.25 × 360 = 90°.</div><h3>Example — CEO degrees as a pie chart</h3><table class="data"><tr><th>Class</th><th>Frequency</th><th>Percentage</th><th>Degree = f/n × 360</th></tr><tr><td>Bachelor</td><td>17</td><td>42.5%</td><td>153°</td></tr><tr><td>MBA</td><td>9</td><td>22.5%</td><td>81°</td></tr><tr><td>Law</td><td>5</td><td>12.5%</td><td>45°</td></tr><tr><td>None</td><td>4</td><td>10%</td><td>36°</td></tr><tr><td>Master</td><td>3</td><td>7.5%</td><td>27°</td></tr><tr><td>PhD</td><td>2</td><td>5%</td><td>18°</td></tr><tr><td><b>Total</b></td><td><b>40</b></td><td><b>100%</b></td><td><b>360°</b></td></tr></table><div class="plot-box"><div id="ceoPie"></div></div><details class="reveal"><summary>Show the lecture comments</summary><div class="body"><ol><li>We have 6 classes.</li><li>The highest was Bachelor with 42%, followed by 22% for MBA.</li><li>The lowest class was PhD, with 5%.</li><li>The percentage of Bachelor is almost double the percentage of MBA.</li></ol></div></details></div>
+<div class="card primary"><h3>Exercise — blood types for army inductees (pie chart)</h3><div class="plot-box"><div id="bloodPie"></div></div><p>Using the graph, answer:</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. What type of graph is used?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Bar chart</div><div class="opt" data-correct="true"><span class="key">B</span> Pie chart</div><div class="opt" data-correct="false"><span class="key">C</span> Pareto diagram</div><div class="opt" data-correct="false"><span class="key">D</span> Histogram</div></div><div class="feedback" data-fb-ok="Correct! A pie chart." data-fb-no="A circle divided into wedges."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. How many classes are in the graph?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 2</div><div class="opt" data-correct="false"><span class="key">B</span> 3</div><div class="opt" data-correct="true"><span class="key">C</span> 4</div><div class="opt" data-correct="false"><span class="key">D</span> 25</div></div><div class="feedback" data-fb-ok="Correct! A, B, AB and O." data-fb-no="Count the wedges."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>3. Which class has the highest number of observations?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Type A</div><div class="opt" data-correct="false"><span class="key">B</span> Type B</div><div class="opt" data-correct="false"><span class="key">C</span> Type AB</div><div class="opt" data-correct="true"><span class="key">D</span> Type O</div></div><div class="feedback" data-fb-ok="Correct! O has the largest slice (36%)." data-fb-no="Find the biggest wedge."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>4. Which class has the lowest number of observations?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Type A</div><div class="opt" data-correct="false"><span class="key">B</span> Type B</div><div class="opt" data-correct="true"><span class="key">C</span> Type AB</div><div class="opt" data-correct="false"><span class="key">D</span> Type O</div></div><div class="feedback" data-fb-ok="Correct! AB is the smallest (16%)." data-fb-no="Find the smallest wedge."></div></div><div class="quiz numq" data-numq data-answer="72" data-tol="0.01"><div class="q"><span class="qnum">✎</span><span>5. Compute the <b>degree</b> for blood type A (20%).</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="degrees" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 0.20 × 360 = 72°." data-fb-no="Degree = relative frequency × 360."></div></div><div class="quiz numq" data-numq data-answer="0.36" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>6. Compute the <b>relative frequency</b> for blood type O (36%).</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 0.36" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 36% = 0.36." data-fb-no="Percentage ÷ 100."></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> الشريحة الأصلية تعرض هذا التمرين دون حل؛ الإجابات أعلاه محسوبة من النسب الظاهرة في الرسم.</div></div>
+<div class="card accent"><h3>Pareto chart <span class="ar">(مخطط باريتو)</span></h3><div class="formula">A <b>Pareto chart</b> represents a frequency distribution of a categorical variable; the frequencies are displayed by the heights of vertical bars <b>arranged in order from highest to lowest</b>.</div><div class="widget"><h4>How People Get to Work — press the button to arrange the bars</h4><div id="paretoChart"></div><div class="row" style="margin-top:6px"><button class="btn primary" type="button" id="paretoBtn">Sort from highest to lowest</button><button class="btn ghost" type="button" id="paretoReset">Unsorted</button></div></div><p style="font-size:.8rem;color:var(--muted)">Heights read approximately from the figure in the slide.</p><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>باريتو = أعمدة بيانية <b>مرتّبة تنازليًا</b>. فائدته: تعرف فورًا أي الفئات هي الأكثر تأثيرًا (الأطول أولًا).</div><h3>📌 Summary — graphical methods for qualitative data</h3><table class="data"><tr><th>Method</th><th>How the classes are shown</th></tr><tr><td>Bar graph</td><td>Bars; the height is the class frequency, relative frequency or percentage.</td></tr><tr><td>Pie chart</td><td>Slices of a circle; slice size is proportional to the class relative frequency.</td></tr><tr><td>Pareto diagram</td><td>A bar graph with the bars arranged by height in <b>descending</b> order from left to right.</td></tr></table><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>Which graph arranges the bars from the tallest to the shortest?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Bar graph</div><div class="opt" data-correct="false"><span class="key">B</span> Pie chart</div><div class="opt" data-correct="true"><span class="key">C</span> Pareto diagram</div><div class="opt" data-correct="false"><span class="key">D</span> Dot plot</div></div><div class="feedback" data-fb-ok="Correct! Pareto diagram." data-fb-no="The Pareto diagram is the ordered bar graph."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>To show how <b>parts make up a whole</b> (percent of each category), the best choice is:</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> Pie chart</div><div class="opt" data-correct="false"><span class="key">B</span> Dot plot</div><div class="opt" data-correct="false"><span class="key">C</span> Time series plot</div><div class="opt" data-correct="false"><span class="key">D</span> Stem-and-leaf</div></div><div class="feedback" data-fb-ok="Correct! The pie chart compares parts to the whole." data-fb-no="Parts-to-whole → pie chart."></div></div></div>
+</section>
+<section class="slide" data-title="Grouped Distributions">
+<div class="card primary"><h2 class="slide-title">Grouped Frequency Distributions <span class="badge">Slide 5</span></h2><p class="subtitle">Section 2.2 · <span class="ar">التوزيع التكراري ذو الفئات (حدود الفئات والحدود الفعلية)</span></p><p>When the range of values is very large, we group the data into <b>classes wider than one unit</b>:</p><div class="widget"><h4>Blood glucose levels (50 people) — grouped frequency distribution</h4><div class="seg" id="grpMode"></div><div id="grpTable"></div><div class="readout" id="grpOut">Click a row to see its limits and boundaries.</div></div><h3>Terms associated with a grouped frequency distribution</h3><table class="data"><tr><th>Term</th><th>Meaning</th><th>First class (58–64)</th></tr><tr><td><b>Class limits</b></td><td>The smallest and largest data values that can be included in a class.</td><td>58 and 64</td></tr><tr><td>Lower class limit</td><td>The smallest data value in the class.</td><td>58</td></tr><tr><td>Upper class limit</td><td>The largest data value in the class.</td><td>64</td></tr><tr><td><b>Class boundaries</b></td><td>Used to separate the classes so that there is <b>no gap</b> in the frequency distribution.</td><td>57.5 – 64.5</td></tr></table><div class="formula">Lower boundary = lower limit − 0.5 &nbsp;&nbsp;·&nbsp;&nbsp; Upper boundary = upper limit + 0.5</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>لو كانت البيانات أعدادًا صحيحة فهناك "فجوة" بين <b>64</b> و<b>65</b> (حيث ينتهي صف ويبدأ التالي). الحدود الفعلية (Boundaries) تسدّ هذه الفجوة بوضع الفاصل في المنتصف: <b>64.5</b>.
+      لذلك نطرح 0.5 من الحد الأدنى ونضيف 0.5 إلى الحد الأعلى. (العرض الفعلي لكل فئة هنا = 64.5 − 57.5 = 7.)</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> عرض الفئة (class width) = الفرق بين الحدين الفعليين للفئة، وهنا 7 لكل الفئات.</div></div>
+<div class="card accent"><h3>🧪 Boundaries calculator</h3><div class="widget"><h4>Type the class limits of any class</h4>
+    <div class="calc-grid"><div><label>Lower class limit</label><input class="num" id="bcLo" type="text" inputmode="decimal" value="20"></div>
+    <div><label>Upper class limit</label><input class="num" id="bcHi" type="text" inputmode="decimal" value="25"></div></div>
+    <div class="calc-grid"><div class="out" id="bcLB"></div><div class="out" id="bcUB"></div><div class="out" id="bcW"></div></div>
+    <div id="bcLine"></div></div><h3>Example — the class interval 20–25</h3><p>Answer the following questions for the class 20–25:</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. What are the lower and upper boundaries of the class?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 20 – 25</div><div class="opt" data-correct="true"><span class="key">B</span> 19.5 – 25.5</div><div class="opt" data-correct="false"><span class="key">C</span> 20.5 – 24.5</div><div class="opt" data-correct="false"><span class="key">D</span> 19 – 26</div></div><div class="feedback" data-fb-ok="Correct! 19.5 – 25.5." data-fb-no="Subtract 0.5 from 20 and add 0.5 to 25."></div></div><div class="quiz numq" data-numq data-answer="25.5" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>2. What is the <b>upper boundary</b> of the class?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 25.5" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 25 + 0.5 = 25.5." data-fb-no="Upper limit + 0.5."></div></div><div class="quiz numq" data-numq data-answer="19.5" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>3. What is the <b>lower boundary</b> of the class?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 19.5" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 20 − 0.5 = 19.5." data-fb-no="Lower limit − 0.5."></div></div><div class="quiz numq" data-numq data-answer="20" data-tol="0"><div class="q"><span class="qnum">✎</span><span>4. What is the <b>lower limit</b> of the class?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 20." data-fb-no="It is the first number written in the class."></div></div><div class="quiz numq" data-numq data-answer="25" data-tol="0"><div class="q"><span class="qnum">✎</span><span>5. What is the <b>upper limit</b> of the class?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 25." data-fb-no="It is the last number written in the class."></div></div><div class="warnbox" dir="rtl"><b>⚠️ خطأ شائع</b><br>لا تخلط بين <b>الحد (Limit)</b> و<b>الحد الفعلي (Boundary)</b>: الحد = كما هو مكتوب (20–25)، والحد الفعلي = بعد ±0.5 (19.5–25.5).</div></div>
+<div class="card primary"><h3>Exercise — complete the table</h3><p>Grade on Business Statistics Exam (200 students):</p><table class="data"><tr><th>Grade</th><th>Frequency</th><th>Relative Frequency</th></tr><tr><td>A: 90–100</td><td>?</td><td>.08</td></tr><tr><td>B: 80–89</td><td>36</td><td>?</td></tr><tr><td>C: 65–79</td><td>90</td><td>?</td></tr><tr><td>D: 50–64</td><td>30</td><td>?</td></tr><tr><td>F: Below 50</td><td>28</td><td>?</td></tr><tr><td><b>Total</b></td><td><b>200</b></td><td><b>1.00</b></td></tr></table><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>لإيجاد التكرار المفقود: <b>f = التكرار النسبي × n</b>، أي 0.08 × 200. ولإيجاد التكرار النسبي: <b>f ÷ n</b> (حيث n = 200).</div><div class="quiz numq" data-numq data-answer="16" data-tol="0"><div class="q"><span class="qnum">✎</span><span>Frequency of grade <b>A</b> (relative frequency .08 × 200)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 0.08 × 200 = 16." data-fb-no="f = relative frequency × n."></div></div><div class="quiz numq" data-numq data-answer="0.18" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>Relative frequency of grade <b>B</b> (36 ÷ 200)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 0.18" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 36 ÷ 200 = .18." data-fb-no="36 ÷ 200 = ?"></div></div><div class="quiz numq" data-numq data-answer="0.45" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>Relative frequency of grade <b>C</b> (90 ÷ 200)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 0.45" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! .45." data-fb-no="90 ÷ 200 = ?"></div></div><details class="reveal"><summary>Show the completed table</summary><div class="body"><table class="data"><tr><th>Grade</th><th>Frequency</th><th>Relative Frequency</th></tr><tr><td>A: 90–100</td><td>16</td><td>.08</td></tr><tr><td>B: 80–89</td><td>36</td><td>.18</td></tr><tr><td>C: 65–79</td><td>90</td><td>.45</td></tr><tr><td>D: 50–64</td><td>30</td><td>.15</td></tr><tr><td>F: Below 50</td><td>28</td><td>.14</td></tr><tr><td><b>Total</b></td><td><b>200</b></td><td><b>1.00</b></td></tr></table></div></details><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> الشريحة الأصلية لا تتضمن حلًّا لهذا التمرين؛ الحل أعلاه محسوب: 16 + 36 + 90 + 30 + 28 = 200 ومجموع التكرارات النسبية = 1.00.</div></div>
+</section>
+<section class="slide" data-title="Dot, Stem & Histogram">
+<div class="card primary"><h2 class="slide-title">Graphs for Quantitative Data <span class="badge">Slide 6</span></h2><p class="subtitle">Section 2.2 · <span class="ar">مخطط النقاط، الساق والورقة، والمدرج التكراري</span></p><p>Graphical descriptive methods for <b>quantitative</b> data: <span class="pill">Dot plot</span> <span class="pill">Stem-and-leaf display</span> <span class="pill">Histogram</span></p><h3>1. Dot plot <span class="ar">(مخطط النقاط)</span></h3><div class="formula">A <b>dotplot</b> is a statistical graph in which each data value is plotted as a point (dot) above the horizontal axis. If a value occurs more than once, the dots are plotted above one another.</div><p>Dotplots show how the data are distributed and whether there are any <b>extremely high or low values</b> — called <b>outliers</b>.</p><h3>Example — named storms per year (last 40 years)</h3><p>Construct and analyze a dotplot for the data.</p><div class="cells" id="stormCells"></div><div class="widget"><h4>Dot plot — click a dot</h4><div id="stormDot"></div><div class="readout" id="stormOut">Click any dot (or hover) to read the value and how many years had it.</div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>كل سنة = نقطة، والقيمة المتكررة تتكدّس رأسيًا. من الرسم نرى فورًا أين تتركز البيانات (حول 6 – 16 عاصفة) وأن القيمة <b>28</b> بعيدة عن البقية.</div><details class="reveal"><summary>➕ Analysis (added)</summary><div class="body">Most years had between 6 and 16 named storms; the most common value is <b>12</b> (5 years). The data range from 4 to 28. The value <b>28</b> lies far from the rest, so it is an <b>outlier</b>.</div></details><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>A dot plot is especially useful for:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Showing parts of a whole</div><div class="opt" data-correct="true"><span class="key">B</span> Seeing how values are distributed and spotting extreme values</div><div class="opt" data-correct="false"><span class="key">C</span> Showing a trend over time</div><div class="opt" data-correct="false"><span class="key">D</span> Ranking categories</div></div><div class="feedback" data-fb-ok="Correct! Distribution + outliers." data-fb-no="Dots show where values cluster and which are far away."></div></div></div>
+<div class="card accent"><h3>2. Stem-and-leaf plot <span class="ar">(الساق والورقة)</span></h3><div class="formula">A <b>stem-and-leaf plot</b> uses part of a data value as the <b>stem</b> and part as the <b>leaf</b> to form groups or classes. It is a combination of <b>sorting and graphing</b>.</div><table class="data"><tr><th>Value</th><th>Stem</th><th>Leaf</th></tr><tr><td>24 is shown as →</td><td>2</td><td>4</td></tr><tr><td>41 is shown as →</td><td>4</td><td>1</td></tr></table><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الساق = الخانات الأولى (العشرات)، والورقة = آخر خانة (الآحاد). العدد 24 → ساق 2 وورقة 4. الميزة: ترى شكل البيانات <b>وتحتفظ بالقيم الأصلية</b> في الوقت نفسه (بعكس المدرج).</div><div class="widget"><h4>🧪 Build a stem-and-leaf plot step by step</h4><div class="seg" id="slData"></div><div class="seg" id="slOrder"></div>
+     <div class="cells" id="slRaw"></div>
+     <div class="row" style="justify-content:center"><button class="btn primary" type="button" id="slAdd">Add next value</button><button class="btn ghost" type="button" id="slAll">Add all</button><button class="btn ghost" type="button" id="slReset">Reset</button></div>
+     <div style="text-align:center"><pre class="stem" id="slOut"></pre></div><div class="stem-key" id="slKey" style="text-align:center"></div></div><h3>Example — display 324, 327, 330, 332, 335, 341, 345</h3><details class="reveal"><summary>Show the solution</summary><div class="body"><pre class="stem">32 | 4 7
+33 | 0 2 5
+34 | 1 5</pre></div></details><h3>Exercise</h3><div style="text-align:center"><pre class="stem">5 | 1
+4 | 4 5 7
+3 | 0 0 0 3 6
+2 | 1 1 3 4 5 9 9
+1 | 2 2 4 8
+0 | 0 1 2</pre></div><p>According to the plot, answer:</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. What is the name of the plot used to present the data?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Dot plot</div><div class="opt" data-correct="true"><span class="key">B</span> Stem-and-leaf plot</div><div class="opt" data-correct="false"><span class="key">C</span> Histogram</div><div class="opt" data-correct="false"><span class="key">D</span> Pie chart</div></div><div class="feedback" data-fb-ok="Correct! Stem-and-leaf." data-fb-no="It has stems (left) and leaves (right)."></div></div><div class="quiz numq" data-numq data-answer="23" data-tol="0"><div class="q"><span class="qnum">✎</span><span>2. How many observations were in the original raw data? (count all the leaves)</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 1 + 3 + 5 + 7 + 4 + 3 = 23." data-fb-no="Count every leaf: 1 + 3 + 5 + 7 + 4 + 3."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>3. Name another type of graph that can be used with quantitative data.</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> Dot plot</div><div class="opt" data-correct="false"><span class="key">B</span> Pie chart</div><div class="opt" data-correct="false"><span class="key">C</span> Pareto diagram</div><div class="opt" data-correct="false"><span class="key">D</span> Bar chart of categories</div></div><div class="feedback" data-fb-ok="Correct! A dot plot (a histogram also works)." data-fb-no="Pie, Pareto and categorical bars are for qualitative data."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>In a stem-and-leaf plot, the value 63 is written as:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> stem 3, leaf 6</div><div class="opt" data-correct="true"><span class="key">B</span> stem 6, leaf 3</div><div class="opt" data-correct="false"><span class="key">C</span> stem 63, no leaf</div><div class="opt" data-correct="false"><span class="key">D</span> stem 0, leaf 63</div></div><div class="feedback" data-fb-ok="Correct! 6 | 3." data-fb-no="The stem is the tens digit (6); the leaf is the last digit (3)."></div></div></div>
+<div class="card primary"><h3>3. Histogram <span class="ar">(المدرج التكراري)</span></h3><div class="formula">A <b>histogram</b> uses the <b>class boundaries</b> on the horizontal axis and the <b>frequencies or relative frequencies</b> of the classes on the vertical axis.</div><div class="widget"><h4>Histogram for runners’ times — click a bar</h4><div class="seg" id="histUnit"></div><div id="runnersHist"></div><div class="readout" id="histOut">Click a bar to read its class and relative frequency.</div></div><p style="font-size:.8rem;color:var(--muted)">Relative frequencies read approximately from the figure in the slide (they add up to 1).</p><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>في المدرج تكون الأعمدة <b>متلاصقة</b> لأن الفئات متصلة (الحد الفعلي الأعلى لفئة = الحد الفعلي الأدنى للتالية، مثل 10.5).
+      الارتفاع يمكن أن يكون <b>تكرارًا</b> أو <b>تكرارًا نسبيًا</b> (كما في الشكل). ما يتغير هو الرقم على المحور فقط.</div><h3>📌 Summary — graphical methods for quantitative data</h3><table class="data"><tr><th>Method</th><th>How it works</th></tr><tr><td>Dot plot</td><td>Each value is a dot on a horizontal scale; repeated values are stacked vertically.</td></tr><tr><td>Stem-and-leaf display</td><td>Each value is split into a stem and a leaf; stems are listed in order in a column and the leaves of each stem are written in increasing order.</td></tr><tr><td>Histogram</td><td>Values are partitioned into class intervals of equal width; a bar over each class boundary has height equal to the class frequency or relative frequency.</td></tr></table><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>On the horizontal axis of a histogram we put:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> The class names</div><div class="opt" data-correct="true"><span class="key">B</span> The class boundaries</div><div class="opt" data-correct="false"><span class="key">C</span> The percentages</div><div class="opt" data-correct="false"><span class="key">D</span> The dates</div></div><div class="feedback" data-fb-ok="Correct! Class boundaries." data-fb-no="Boundaries make the bars touch with no gap."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>Which graph keeps every original data value visible?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Histogram</div><div class="opt" data-correct="true"><span class="key">B</span> Stem-and-leaf plot</div><div class="opt" data-correct="false"><span class="key">C</span> Pie chart</div><div class="opt" data-correct="false"><span class="key">D</span> Pareto diagram</div></div><div class="feedback" data-fb-ok="Correct! The leaves are the actual last digits." data-fb-no="A histogram only shows counts per class."></div></div></div>
+</section>
+<section class="slide" data-title="Time Series">
+<div class="card primary"><h2 class="slide-title">The Time Series Plot <span class="badge">Slide 7</span></h2><p class="subtitle">Section 2.9 · <span class="ar">رسم السلسلة الزمنية واختيار الرسم المناسب</span></p><p>Another type of plot — Section 2.9</p><div class="formula"><b>Time series data:</b> data that are produced and monitored over time.<br><b>Time series plot:</b> a graph that represents data that occur over a specific period of time. Also called a <b>run chart</b>.</div><div class="widget"><h4>Monthly sales over two years (illustrative)</h4><div id="tsChart"></div></div><p style="font-size:.8rem;color:var(--muted)">Illustrative values re-drawn from the shape of the figure in the slide (sales vs. time, two years).</p><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الاختلاف الجوهري: في السلسلة الزمنية <b>الزمن هو المحور الأفقي</b> وتُوصل النقاط بخط لنرى <b>الاتجاه العام</b> (يزيد أم ينقص؟) وأي <b>تكرار موسمي</b> (قمم كل صيف مثلًا). لا يمكن لأي رسم آخر في هذا الفصل أن يُظهر ذلك.</div></div>
+<div class="card accent"><h3>Exercise — which graph?</h3><p>Fill in the blanks using one of: <b>Time series, Pie chart, Histogram</b>. What type of graph (or plot) should be used to:</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. Represent the percentage of car brands.</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Time series</div><div class="opt" data-correct="true"><span class="key">B</span> Pie chart</div><div class="opt" data-correct="false"><span class="key">C</span> Histogram</div></div><div class="feedback" data-fb-ok="Correct! Percentages of categories → pie chart." data-fb-no="Parts of a whole."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. Represent the data collected from the years 2005 to 2009.</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> Time series</div><div class="opt" data-correct="false"><span class="key">B</span> Pie chart</div><div class="opt" data-correct="false"><span class="key">C</span> Histogram</div></div><div class="feedback" data-fb-ok="Correct! Data over a period of time." data-fb-no="Data over time → time series plot."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>3. Represent the sales of cars in Toyota company (as in the lecture’s answer key).</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Time series</div><div class="opt" data-correct="false"><span class="key">B</span> Pie chart</div><div class="opt" data-correct="true"><span class="key">C</span> Histogram</div></div><div class="feedback" data-fb-ok="Correct (lecture answer): Histogram." data-fb-no="The lecture’s answer is Histogram."></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> السؤال 3 في المصدر غير محدّد زمنيًا؛ الإجابة المعتمدة في الشريحة هي Histogram. لو كانت المبيعات مسجلة عبر الزمن لكان Time series هو الأنسب.</div></div>
+<div class="card primary"><h3>🧭 Which graph should I use?</h3><table class="data"><tr><th>My data are…</th><th>Use</th><th>Why</th></tr><tr><td>Categories (qualitative), compare sizes</td><td>Bar graph</td><td>Bar height = frequency / % of each class</td></tr><tr><td>Categories, parts of a whole</td><td>Pie chart</td><td>Slice = share of the whole (degree = RF × 360)</td></tr><tr><td>Categories, rank by importance</td><td>Pareto diagram</td><td>Bars sorted from highest to lowest</td></tr><tr><td>Numbers, small set, find outliers</td><td>Dot plot</td><td>One dot per value; stacked repeats</td></tr><tr><td>Numbers, keep the actual values</td><td>Stem-and-leaf</td><td>Stem + leaf = the original value</td></tr><tr><td>Numbers, many values, shape of distribution</td><td>Histogram</td><td>Bars over class boundaries</td></tr><tr><td>Numbers recorded over time</td><td>Time series plot</td><td>Time on the horizontal axis</td></tr></table><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> هذا الجدول تلخيص مني لما سبق، وليس شريحة في الملف الأصلي.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>Daily temperature measured every day for a month is best shown with a:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Pie chart</div><div class="opt" data-correct="true"><span class="key">B</span> Time series plot</div><div class="opt" data-correct="false"><span class="key">C</span> Pareto diagram</div><div class="opt" data-correct="false"><span class="key">D</span> Bar graph of categories</div></div><div class="feedback" data-fb-ok="Correct! Values over time." data-fb-no="The data are ordered in time."></div></div></div>
+</section>
+<section class="slide" data-title="Mean">
+<div class="card primary"><h2 class="slide-title">Central Tendency and the Mean <span class="badge">Slide 8</span></h2><p class="subtitle">Section 2.3 · <span class="ar">مقاييس النزعة المركزية — الوسط الحسابي</span></p><div class="formula"><b>Central tendency:</b> the tendency of the data to <b>cluster, or center,</b> about certain numerical values.</div><p>Three measures of central tendency: <span class="pill">Mean</span> <span class="pill">Median</span> <span class="pill">Mode</span></p><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>مقاييس النزعة المركزية تجيب عن سؤال واحد: <b>"أين مركز البيانات؟"</b> أي ما القيمة التي تمثّل المجموعة كلها. هناك ثلاث طرق: الوسط الحسابي، والوسيط، والمنوال، ولكل منها حالة يكون فيها الأنسب.</div><h3>1. Mean (Average) <span class="ar">(الوسط الحسابي)</span></h3><div class="formula">The <b>mean</b> of a set of quantitative data is the <b>sum of the measurements divided by the number of measurements</b>.</div><div class="two"><div class="plot-box"><div class="big">x̄</div><div>Sample mean</div></div><div class="plot-box"><div class="big">μ</div><div>Population mean</div></div></div><div class="formula">x̄ = <span class="frac"><span class="top">Σ<sub>i=1</sub><sup>n</sup> x<sub>i</sub></span><span class="bot">n</span></span> &nbsp;&nbsp; where &nbsp; Σ x<sub>i</sub> = (x<sub>1</sub> + x<sub>2</sub> + … + x<sub>n</sub>)</div><h3>Example — the mean of five measurements: 5, 3, 8, 5, 6</h3><div class="formula">x̄ = <span class="frac"><span class="top">5 + 3 + 8 + 5 + 6</span><span class="bot">5</span></span> = <span class="frac"><span class="top">27</span><span class="bot">5</span></span> = <b>5.4</b></div><div class="tipbox" dir="rtl"><b>🧠 للحفظ</b><br>الرمز <b>Σ</b> (سيجما) يعني "اجمع". الوسط = <b>المجموع ÷ العدد</b>. نستخدم x̄ للعيّنة وμ للمجتمع.</div></div>
+<div class="card accent"><h3>🧪 Live mean / median / mode</h3><div class="widget"><h4>Type your own data (separated by commas) — the center updates instantly</h4>
+    <input class="num" id="mmInput" type="text" value="5, 3, 8, 5, 6" aria-label="data">
+    <div class="row" style="margin:8px 0"><button class="btn ghost" type="button" id="mmOut100">+ add an outlier (100)</button><button class="btn ghost" type="button" id="mmRemove">remove last</button><button class="btn ghost" type="button" id="mmReset">Reset (5, 3, 8, 5, 6)</button></div>
+    <div id="mmLine"></div>
+    <div class="calc-grid"><div class="out" id="mmN"></div><div class="out" id="mmSum"></div><div class="out" id="mmMean"></div><div class="out" id="mmMed"></div><div class="out" id="mmMode"></div></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>جرّب زرّ <b>+ add an outlier</b>: سيقفز <b>الوسط</b> إلى مكان بعيد عن معظم البيانات، بينما <b>الوسيط</b> يكاد لا يتحرك. هذا هو معنى أن الوسط <b>يتأثر بالقيم المتطرفة</b>.
+      تخيّل الوسط كنقطة توازن لأرجوحة: قيمة بعيدة جدًا تسحب نقطة التوازن نحوها.</div><h3>📝 Note that:</h3><ol><li>The mean is the most common measure of central tendency.</li><li>The result is a <b>unique</b> value.</li><li>It is <b>affected by extreme values</b> (outliers).</li></ol><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>The mean of the measurements 2, 4, 9 is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 4</div><div class="opt" data-correct="true"><span class="key">B</span> 5</div><div class="opt" data-correct="false"><span class="key">C</span> 6</div><div class="opt" data-correct="false"><span class="key">D</span> 15</div></div><div class="feedback" data-fb-ok="Correct! (2 + 4 + 9) ÷ 3 = 15 ÷ 3 = 5." data-fb-no="Sum = 15, n = 3 → 15 ÷ 3 = 5."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>Which statement about the mean is correct?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> It is not affected by outliers</div><div class="opt" data-correct="false"><span class="key">B</span> It can have several values</div><div class="opt" data-correct="true"><span class="key">C</span> It is affected by extreme values</div><div class="opt" data-correct="false"><span class="key">D</span> It is the middle value after sorting</div></div><div class="feedback" data-fb-ok="Correct! A very large or very small value pulls the mean." data-fb-no="The mean uses every value, so extreme values change it."></div></div><div class="quiz numq" data-numq data-answer="12" data-tol="0"><div class="q"><span class="qnum">✎</span><span>Five numbers add up to 60. What is their mean?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 60 ÷ 5 = 12." data-fb-no="Mean = sum ÷ n."></div></div></div>
+</section>
+<section class="slide" data-title="Median & Mode">
+<div class="card primary"><h2 class="slide-title">Median and Mode <span class="badge">Slide 9</span></h2><p class="subtitle">Section 2.3 · <span class="ar">الوسيط والمنوال</span></p><h3>2. Median <span class="ar">(الوسيط)</span></h3><div class="formula">The <b>median</b> of a quantitative data set is the <b>middle number</b> when the measurements are arranged in ascending (or descending) order. <b>m</b> = sample median (50% of the data below, 50% above).</div><table class="data"><tr><th>Calculating a sample median, m</th><th></th></tr><tr><td>Step 1</td><td>Arrange the n measurements from smallest to largest.</td></tr><tr><td>If n is odd</td><td>m is the middle number.</td></tr><tr><td>If n is even</td><td>m is the mean of the middle two numbers.</td></tr></table><h3>🧪 Find the median step by step</h3><div class="widget"><h4>Choose an example from the lecture</h4><div class="seg" id="medSeg"></div><div id="medOut"></div></div><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> في الشريحة الأصلية كتبت القائمة المرتّبة "596" بينما البيانات المعطاة تحتوي <b>595</b>. المنتصف 401 لا يتأثر بهذا الخطأ.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>الوسيط = القيمة التي تقسم البيانات المرتبة نصفين.</b> الخطوة الأولى دائمًا <b>الترتيب</b>! إن كان العدد فرديًا فالوسيط هو العنصر الأوسط، وإن كان زوجيًا فنأخذ <b>متوسط العنصرين الأوسطين</b>.</div><div class="warnbox" dir="rtl"><b>⚠️ خطأ شائع</b><br>نسيان الترتيب قبل اختيار الوسط أكثر خطأ شيوعًا. لا تأخذ العنصر الأوسط من القائمة الأصلية غير المرتبة.</div><h3>📝 Note that:</h3><ol><li>The median is easy to obtain.</li><li>The median can be used with outlier data, because it is <b>less affected</b> by outliers compared with the mean.</li></ol></div>
+<div class="card accent"><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>The median of 1, 9, 3, 7, 5 is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 3</div><div class="opt" data-correct="true"><span class="key">B</span> 5</div><div class="opt" data-correct="false"><span class="key">C</span> 7</div><div class="opt" data-correct="false"><span class="key">D</span> 5.0 only if sorted differently</div></div><div class="feedback" data-fb-ok="Correct! Sorted: 1, 3, 5, 7, 9 → the middle is 5." data-fb-no="Sort first: 1, 3, 5, 7, 9; the middle value is 5."></div></div><div class="quiz numq" data-numq data-answer="5" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>The median of 2, 4, 6, 8 (even n: average the middle two) is:</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 5" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! (4 + 6) ÷ 2 = 5." data-fb-no="Average the 2 middle numbers 4 and 6."></div></div><h3>3. Mode <span class="ar">(المنوال)</span></h3><div class="formula">The <b>mode</b> is the measurement that occurs <b>most frequently</b> in the data set.</div><table class="data"><tr><th>Data</th><th>Mode</th></tr><tr><td>10, 12, 10, 4, 8</td><td>10</td></tr><tr><td>10, 12, 10, 4, 8, 8, 16, 9</td><td>10 and 8 (two modes)</td></tr><tr><td>Red, blue, red, white</td><td>Red (qualitative data)</td></tr></table><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>المنوال = <b>الأكثر تكرارًا</b>. يمكن ألا يوجد منوال (كل القيم مختلفة)، أو منوال واحد (unimodal)، أو اثنان (bimodal)، أو عدة مناويل. وهو المقياس الوحيد الذي يصلح أيضًا للبيانات <b>الوصفية</b> (مثل الألوان).</div><h3>📝 Note that:</h3><ol><li>The mode is <b>not affected by extreme values</b>.</li><li>There may be no mode, one mode (unimodal), two modes (bimodal) or several modes.</li><li>The mode can be used for quantitative or qualitative data.</li></ol><h3>Exercise — where is the mode?</h3><div class="plot-box"><div id="modeBar"></div></div><p style="font-size:.8rem;color:var(--muted)">Number of responses read approximately from the figure in the slide.</p><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>According to the chart, the mode is the category:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Amor</div><div class="opt" data-correct="true"><span class="key">B</span> Lamoure</div><div class="opt" data-correct="false"><span class="key">C</span> Soothing</div><div class="opt" data-correct="false"><span class="key">D</span> Far Out</div></div><div class="feedback" data-fb-ok="Correct! Lamoure has the tallest bar (most responses)." data-fb-no="The mode is the most frequent category = the tallest bar."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>The data 3, 3, 5, 5, 7 have:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> No mode</div><div class="opt" data-correct="false"><span class="key">B</span> One mode: 3</div><div class="opt" data-correct="true"><span class="key">C</span> Two modes: 3 and 5</div><div class="opt" data-correct="false"><span class="key">D</span> Mode = 5 only</div></div><div class="feedback" data-fb-ok="Correct! Both 3 and 5 appear twice (bimodal)." data-fb-no="Check which values have the highest count."></div></div></div>
+</section>
+<section class="slide" data-title="Shapes">
+<div class="card primary"><h2 class="slide-title">Shapes of Distributions <span class="badge">Slide 10</span></h2><p class="subtitle">Section 2.3 · <span class="ar">شكل التوزيع: متماثل وملتوٍ</span></p><h3>Shapes of distributions</h3><div class="formula">A data set is <b>skewed</b> if one tail of the distribution has more extreme observations than the other tail.</div><div class="widget"><h4>🧪 Choose a shape — the mean, median and mode move</h4><div class="seg" id="skewSeg"></div><div id="skewChart"></div><div class="readout" id="skewOut"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>الالتواء</b> يعني أن أحد الذيلين أطول. اسم الالتواء يتبع <b>جهة الذيل الطويل</b>:<br>
+      • ذيل نحو اليمين ← <b>موجب (Right-skewed)</b>: الوسط الأكبر (لأن القيم الكبيرة تسحبه)، والمنوال الأصغر.<br>
+      • ذيل نحو اليسار ← <b>سالب (Left-skewed)</b>: الوسط الأصغر والمنوال الأكبر.<br>
+      • متماثل ← الثلاثة متساوية تقريبًا.</div><table class="data"><tr><th>Shape</th><th>Relation</th><th>Comment</th></tr><tr><td>1. Symmetric (no skewness)</td><td>x̄ = m = mode</td><td>Zero skewness</td></tr><tr><td>2. Positively skewed (right-skewed)</td><td>Mean &gt; m &gt; Mode</td><td>The mean is the largest statistic, while the mode is the smallest</td></tr><tr><td>3. Negatively skewed (left-skewed)</td><td>Mean &lt; m &lt; Mode</td><td>The mean is less than the median and they are both less than the mode</td></tr></table><div class="tipbox" dir="rtl"><b>🧠 للحفظ</b><br>الوسط "يتبع الذيل": يتجه نحو الطرف الطويل. لذلك في الالتواء الموجب (ذيل يمين) يقع الوسط على يمين الوسيط.</div></div>
+<div class="card accent"><h3>Exercise — compare the mean with the median</h3><p>Describe how the mean compares to the median for a distribution that is:</p><div class="quiz" data-quiz><div class="q"><span class="qnum">a</span><span>a. Skewed to the left</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> Mean is less than the median</div><div class="opt" data-correct="false"><span class="key">B</span> Mean is greater than the median</div><div class="opt" data-correct="false"><span class="key">C</span> Mean equals the median</div></div><div class="feedback" data-fb-ok="Correct! Left skew → mean &lt; median." data-fb-no="The long left tail pulls the mean down."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">b</span><span>b. Skewed to the right</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Mean is less than the median</div><div class="opt" data-correct="true"><span class="key">B</span> Mean is greater than the median</div><div class="opt" data-correct="false"><span class="key">C</span> Mean equals the median</div></div><div class="feedback" data-fb-ok="Correct! Right skew → mean &gt; median." data-fb-no="The long right tail pulls the mean up."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">c</span><span>c. Symmetric</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Mean is less than the median</div><div class="opt" data-correct="false"><span class="key">B</span> Mean is greater than the median</div><div class="opt" data-correct="true"><span class="key">C</span> Mean and median are equal</div></div><div class="feedback" data-fb-ok="Correct! They coincide." data-fb-no="In a symmetric distribution the center is the same for both."></div></div><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> في نص الحل الأصلي لعبارة (a) سقطت كلمة <b>mean</b> ("the is less than the median")؛ الصحيح: the <b>mean</b> is less than the median.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>A data set has mean 52 and median 60. It is most likely:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Skewed to the right</div><div class="opt" data-correct="false"><span class="key">B</span> Symmetric</div><div class="opt" data-correct="true"><span class="key">C</span> Skewed to the left</div><div class="opt" data-correct="false"><span class="key">D</span> Without any mode</div></div><div class="feedback" data-fb-ok="Correct! Mean &lt; median → left-skewed." data-fb-no="Mean below the median points to a left (negative) skew."></div></div></div>
+</section>
+<section class="slide" data-title="Variability">
+<div class="card primary"><h2 class="slide-title">Measures of Variability <span class="badge">Slide 11</span></h2><p class="subtitle">Section 2.4 · <span class="ar">مقاييس التشتت: المدى والتباين والانحراف المعياري</span></p><div class="formula"><b>Variability (spread):</b> the spread of the data. Measures of variability: <span class="pill">Range</span> <span class="pill">Variance</span> <span class="pill">Standard Deviation</span></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>النزعة المركزية تخبرك أين المركز، أما <b>التشتت</b> فيخبرك <b>كم تتباعد القيم عن بعضها</b>. مجموعتان قد يكون لهما نفس الوسط تمامًا ويختلفان كثيرًا في التشتت (تابع مثال الدهان أدناه).</div><div class="tipbox" dir="rtl"><b>🧠 للحفظ</b><br><b>الأصغر هو الأفضل:</b> البيانات الأقل تشتتًا (قيمة مقياس التشتت أصغر) تكون أكثر انتظامًا واعتمادية عند المقارنة بين مجموعتين.</div><h3>1. Range <span class="ar">(المدى)</span></h3><div class="formula"><b>Range</b> = Largest value − Smallest value</div><h3>Example — two brands of outdoor paint (months before fading)</h3><p>Six cans of each brand were tested. (1) Find the range of each group. (2) Which brand do you want to buy?</p><div class="two"><div><table class="data"><tr><th>Brand A</th><th>Brand B</th></tr><tr><td>10</td><td>35</td></tr><tr><td>60</td><td>45</td></tr><tr><td>50</td><td>30</td></tr><tr><td>30</td><td>35</td></tr><tr><td>40</td><td>40</td></tr><tr><td>20</td><td>25</td></tr></table></div><div class="plot-box"><div id="paintDots"></div></div></div><div class="quiz numq" data-numq data-answer="50" data-tol="0"><div class="q"><span class="qnum">✎</span><span>1a. Range of Brand A (largest − smallest)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 60 − 10 = 50." data-fb-no="Largest 60, smallest 10."></div></div><div class="quiz numq" data-numq data-answer="20" data-tol="0"><div class="q"><span class="qnum">✎</span><span>1b. Range of Brand B?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 45 − 25 = 20." data-fb-no="Largest 45, smallest 25."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. Which brand do you want to buy?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Brand A (range 50)</div><div class="opt" data-correct="true"><span class="key">B</span> Brand B (range 20)</div><div class="opt" data-correct="false"><span class="key">C</span> Both are the same</div><div class="opt" data-correct="false"><span class="key">D</span> Cannot decide</div></div><div class="feedback" data-fb-ok="Correct! Brand B has the smaller spread, so its lifetime is more predictable." data-fb-no="The smaller range means more consistent lifetimes."></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> مجموع كل علامة = 210، أي أن <b>متوسط كل علامة = 35 شهرًا</b>. إذن الوسط متساوٍ تمامًا والفرق بينهما في <b>التشتت فقط</b>؛ وهذا ما يوضح فائدة مقاييس التشتت.</div></div>
+<div class="card accent"><h3>2. Variance and standard deviation <span class="ar">(التباين والانحراف المعياري)</span></h3><table class="data"><tr><th>Sample</th><th>Population</th></tr><tr><td>s² = sample variance</td><td>σ² = population variance</td></tr><tr><td>s = sample standard deviation</td><td>σ = population standard deviation</td></tr></table><div class="formula"><b>Sample variance:</b> &nbsp; s² = <span class="frac"><span class="top">Σ(x<sub>i</sub> − x̄)²</span><span class="bot">n − 1</span></span></div><div class="formula"><b>Shortcut formula:</b> &nbsp; s² = <span class="frac"><span class="top">Σx² − <span class="frac"><span class="top">(Σx)²</span><span class="bot">n</span></span></span><span class="bot">n − 1</span></span> &nbsp;&nbsp;·&nbsp;&nbsp; <b>Standard deviation:</b> s = √s²</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>التباين</b> هو "متوسط" مربعات انحرافات القيم عن وسطها (نقسم على n − 1 للعيّنة). ولأن التربيع يغيّر الوحدة، نأخذ الجذر التربيعي فنحصل على <b>الانحراف المعياري</b> بنفس وحدة البيانات.
+      <br>للحساب السريع استخدم <b>صيغة الاختصار</b>: تحتاج فقط n وΣx وΣx².</div><div class="widget"><h4>🧮 Calculator — from the sums (shortcut formula)</h4>
+    <div class="calc-grid"><div><label>n</label><input class="num" id="vN" type="text" inputmode="decimal" value="5"></div>
+    <div><label>Σx</label><input class="num" id="vSx" type="text" inputmode="decimal" value="8.1"></div>
+    <div><label>Σx²</label><input class="num" id="vSxx" type="text" inputmode="decimal" value="15.63"></div></div>
+    <div class="calc-grid"><div class="out" id="vMean"></div><div class="out" id="vVar"></div><div class="out" id="vSd"></div></div>
+    <div class="readout" id="vSteps"></div></div><div class="widget"><h4>🧮 Calculator — from raw data</h4><input class="num" id="vRaw" type="text" value="2, 4, 6" aria-label="raw data"><div class="calc-grid" style="margin-top:8px"><div class="out" id="rN"></div><div class="out" id="rMean"></div><div class="out" id="rVar"></div><div class="out" id="rSd"></div></div></div><div class="warnbox" dir="rtl"><b>⚠️ خطأ شائع</b><br>الخطأ الشائع: الخلط بين <b>Σx²</b> (نربّع كل قيمة ثم نجمع) و<b>(Σx)²</b> (نجمع ثم نربّع). العددان مختلفان تمامًا!</div><h3>Examples</h3><div class="quiz numq" data-numq data-answer="4" data-tol="0"><div class="q"><span class="qnum">✎</span><span>Find the standard deviation when the variance is equal to 16.</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! s = √16 = 4." data-fb-no="s = √(variance)."></div></div><p>Let the sample size be 5, Σx = 8.1, Σx² = 15.63. Calculate:</p><div class="quiz numq" data-numq data-answer="1.62" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>1. The mean (Σx ÷ n)</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 1.62" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 8.1 ÷ 5 = 1.62." data-fb-no="8.1 ÷ 5 = ?"></div></div><details class="reveal"><summary>2. The variance — show the steps</summary><div class="body">s² = [15.63 − 8.1²/5] / (5 − 1) = [15.63 − 13.122] / 4 = 2.508 / 4 = <b>0.627</b></div></details><div class="quiz numq" data-numq data-answer="0.792" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>3. The standard deviation (√0.627)</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 0.792" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! √0.627 ≈ 0.792." data-fb-no="Take the square root of 0.627."></div></div><div class="widget"><h4>➕ How does the standard deviation change the picture?</h4><div class="row"><label for="sdSlider" style="font-weight:700">Standard deviation: <span id="sdVal">1.5</span></label><input id="sdSlider" type="range" min="1" max="4" step="0.25" value="1.5" style="flex:1;min-width:160px"></div><div id="sdChart"></div><div class="readout">The mean is fixed at 0. A <b>larger</b> standard deviation gives a wider, flatter curve (more spread); a <b>smaller</b> one gives a narrow, tall curve (values close to the mean).</div></div></div>
+<div class="card primary"><h3>Reading computer output (MINITAB)</h3><h4>Exercise 1 — Descriptive Statistics: YRSPRAC (years in practice)</h4><table class="data"><tr><th>Variable</th><th>N</th><th>Mean</th><th>Minimum</th><th>Median</th><th>Maximum</th><th>Mode</th></tr><tr><td>YRSPRAC</td><td>112</td><td>14.598</td><td>1.000</td><td>14.000</td><td>40.000</td><td>14, 20, 25</td></tr></table><details class="reveal"><summary>Show the lecture comments</summary><div class="body"><ul><li>The name of the variable is YRSPRAC.</li><li>The number of observations is 112.</li><li>The mean is 14.598 years.</li><li>The median is 14, which means half of the physicians have been in practice less than 14 years and half longer than 14 years.</li><li>There are 3 modes: 14, 20 and 25 — the most frequent years in practice.</li></ul></div></details><h4>Exercise 2 — the same variable</h4><table class="data"><tr><th>Variable</th><th>N</th><th>N*</th><th>Mean</th><th>StDev</th><th>Variance</th><th>Range</th></tr><tr><td>YRSPRAC</td><td>112</td><td>6</td><td>14.598</td><td>9.161</td><td>83.918</td><td>39.000</td></tr></table><div class="quiz numq" data-numq data-answer="39" data-tol="0"><div class="q"><span class="qnum">✎</span><span>Comment on the difference between the largest and the smallest years in practice: which measure is it, and what is its value?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="value" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! It is the Range = 39 years." data-fb-no="Range = largest − smallest = 40 − 1 = 39 (shown in the output)."></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>في مخرجات البرامج: <b>N</b> عدد القيم المستخدمة، و<b>Mean</b> الوسط، و<b>StDev</b> الانحراف المعياري، و<b>Variance</b> التباين. ويمكن التحقق: 9.161² ≈ 83.9 (وهو التباين). والفرق بين أكبر وأصغر قيمة = <b>المدى</b> (40 − 1 = 39). (N* هو عدد القيم المفقودة.)</div><h4>Exercise 3 — the wheels data (histogram, MINITAB)</h4><div class="plot-box"><div id="wheelsHist"></div></div><p style="font-size:.8rem;color:var(--muted)">Bar heights read approximately from the figure.</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. What is the type of the plot?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Dot plot</div><div class="opt" data-correct="true"><span class="key">B</span> Histogram</div><div class="opt" data-correct="false"><span class="key">C</span> Pareto diagram</div><div class="opt" data-correct="false"><span class="key">D</span> Box plot</div></div><div class="feedback" data-fb-ok="Correct! Touching bars over a numeric axis → histogram." data-fb-no="Bars of frequencies over numeric classes."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. What is the shape of the distribution?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Skewed to the left</div><div class="opt" data-correct="false"><span class="key">B</span> Symmetric</div><div class="opt" data-correct="true"><span class="key">C</span> Skewed to the right</div><div class="opt" data-correct="false"><span class="key">D</span> Uniform</div></div><div class="feedback" data-fb-ok="Correct! The long tail is on the right." data-fb-no="Look at the side where the few extreme bars (6 and 8) lie."></div></div><div class="quiz numq" data-numq data-answer="8" data-tol="0"><div class="q"><span class="qnum">✎</span><span>3. How many classes are there?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 8 classes (1 to 8)." data-fb-no="Count the positions on the horizontal axis."></div></div></div>
+</section>
+<section class="slide" data-title="Relative Standing">
+<div class="card primary"><h2 class="slide-title">Measures of Relative Standing <span class="badge">Slide 12</span></h2><p class="subtitle">Section 2.6 · <span class="ar">مقاييس الموقع النسبي: الأرباع والمئينات والدرجة المعيارية</span></p><p>Measures of relative standing: <span class="pill">Percentile</span> <span class="pill">Quartile</span> <span class="pill">Z-score</span></p><h3>1. Quartiles and percentiles <span class="ar">(الأرباع والمئينات)</span></h3><div class="formula">The <b>lower quartile (Q<sub>L</sub>)</b> is the 25th percentile of a data set. The <b>middle quartile (Q<sub>M</sub>)</b> is the median, or 50th percentile. The <b>upper quartile (Q<sub>U</sub>)</b> is the 75th percentile.</div><table class="data"><tr><th>Name</th><th>Also called</th><th>Percentile</th></tr><tr><td>Lower quartile</td><td>First quartile = Q<sub>L</sub> = Q<sub>1</sub></td><td>P<sub>25</sub></td></tr><tr><td>Middle quartile</td><td>Second quartile = median = Q<sub>M</sub> = Q<sub>2</sub> = m</td><td>P<sub>50</sub></td></tr><tr><td>Upper quartile</td><td>Third quartile = Q<sub>U</sub> = Q<sub>3</sub></td><td>P<sub>75</sub></td></tr></table><p><b>Quartiles divide the data set into 4 equal groups.</b></p><div class="plot-box"><div style="display:flex;max-width:560px;margin:10px auto 2px"><div style="flex:1;background:#bae6fd;padding:10px 0;font-weight:700">25%</div><div style="flex:1;background:#7dd3fc;padding:10px 0;font-weight:700">25%</div><div style="flex:1;background:#38bdf8;padding:10px 0;font-weight:700">25%</div><div style="flex:1;background:#0ea5e9;color:#fff;padding:10px 0;font-weight:700">25%</div></div><div style="display:flex;max-width:560px;margin:0 auto;font-weight:700;color:var(--primary-dark)"><div style="flex:1;text-align:left">smallest</div><div style="width:0"><span style="position:relative;left:-14px">Q<sub>1</sub></span></div><div style="flex:1"></div><div style="width:0"><span style="position:relative;left:-14px">Q<sub>2</sub></span></div><div style="flex:1"></div><div style="width:0"><span style="position:relative;left:-14px">Q<sub>3</sub></span></div><div style="flex:1;text-align:right">largest</div></div></div><p>The median (m) is the same as P<sub>50</sub> or Q<sub>2</sub>.</p><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> الشريحة الأصلية كتبت: "Deciles are denoted Q<sub>1</sub>, Q<sub>2</sub> and Q<sub>3</sub> with the corresponding percentiles P<sub>25</sub>, P<sub>50</sub>, P<sub>75</sub>". الرموز Q1,Q2,Q3 تخص <b>الأرباع (Quartiles)</b> وليس الأعشار؛ أما الأعشار (Deciles) فتقسم البيانات إلى 10 أجزاء (P10, P20, …, P90).</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>المئين (Percentile)</b> رقم k يعني أن k% من البيانات أقل منه أو يساويه. و<b>الأرباع</b> هي المئين 25 و50 و75، فتقسم البيانات المرتبة إلى أربعة أجزاء متساوية. أي أن <b>الوسيط = Q2 = P50</b>.</div><div class="widget"><h4>🧪 Quartile finder (the lecture’s method: median of the lower half, median of the upper half)</h4>
+    <input class="num" id="qInput" type="text" value="5, 6, 12, 13, 15, 18, 22, 50" aria-label="data">
+    <div class="cells" id="qCells"></div><div class="calc-grid"><div class="out" id="qQ1"></div><div class="out" id="qQ2"></div><div class="out" id="qQ3"></div><div class="out" id="qIQR"></div></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>The 50th percentile is the same as:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Q1</div><div class="opt" data-correct="true"><span class="key">B</span> The median (Q2)</div><div class="opt" data-correct="false"><span class="key">C</span> Q3</div><div class="opt" data-correct="false"><span class="key">D</span> The range</div></div><div class="feedback" data-fb-ok="Correct! P50 = Q2 = median." data-fb-no="Half of the data lie below the median."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>Quartiles divide an ordered data set into:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 2 equal parts</div><div class="opt" data-correct="false"><span class="key">B</span> 3 equal parts</div><div class="opt" data-correct="true"><span class="key">C</span> 4 equal parts</div><div class="opt" data-correct="false"><span class="key">D</span> 10 equal parts</div></div><div class="feedback" data-fb-ok="Correct! Four parts of 25% each." data-fb-no="Quartile → quarter → 4 parts."></div></div></div>
+<div class="card accent"><h3>2. Z-score <span class="ar">(الدرجة المعيارية)</span></h3><div class="formula"><b>Sample z-score:</b> z = <span class="frac"><span class="top">x − x̄</span><span class="bot">s</span></span> &nbsp;&nbsp;·&nbsp;&nbsp; <b>Population z-score:</b> z = <span class="frac"><span class="top">x − μ</span><span class="bot">σ</span></span></div><div class="formula">z = <span class="frac"><span class="top">value − mean</span><span class="bot">standard deviation</span></span></div><div class="formula">The z-score represents the <b>number of standard deviations</b> that the data value falls <b>above or below</b> the mean.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الدرجة المعيارية تحوّل أي قيمة إلى سؤال واحد: <b>كم انحرافًا معياريًا تبعد هذه القيمة عن الوسط؟</b>
+      • z موجبة ← فوق الوسط، وz سالبة ← تحت الوسط، وz = 0 ← تساوي الوسط تمامًا.
+      <br>وهي تسمح بمقارنة قيم من مجموعات مختلفة (درجة 80 في اختبار صعب قد تكون أفضل من 90 في اختبار سهل).</div><h3>Example — GMAT</h3><p>A random sample of 2,000 students who sat for the GMAT has mean x̄ = 540 points and standard deviation s = 100. Kara Smith scored x = 440. What is Kara’s sample z-score? Comment on the result.</p><div class="quiz numq" data-numq data-answer="-1" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>Kara’s z-score:</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. -1" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! z = (440 − 540) ÷ 100 = −1." data-fb-no="z = (x − x̄) ÷ s = (440 − 540) ÷ 100."></div></div><details class="reveal"><summary>Show the lecture comment</summary><div class="body">z = (440 − 540) / 100 = −100 / 100 = <b>−1</b>. This z-score indicates that an observation of 440 is 1 standard deviation <b>below</b> the mean.</div></details><div class="widget"><h4>🧪 z-score calculator</h4><div class="calc-grid"><div><label>x (the value)</label><input class="num" id="zX" type="text" inputmode="decimal" value="440"></div><div><label>mean (x̄)</label><input class="num" id="zM" type="text" inputmode="decimal" value="540"></div><div><label>standard deviation (s)</label><input class="num" id="zS" type="text" inputmode="decimal" value="100"></div></div>
+    <div class="out" id="zOut"></div><div id="zLine"></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>A score with z = +2 is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 2 points above the mean</div><div class="opt" data-correct="true"><span class="key">B</span> 2 standard deviations above the mean</div><div class="opt" data-correct="false"><span class="key">C</span> 2 standard deviations below the mean</div><div class="opt" data-correct="false"><span class="key">D</span> Exactly at the mean</div></div><div class="feedback" data-fb-ok="Correct! z counts standard deviations, not raw points." data-fb-no="z is measured in standard deviations."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>A student scored x = 60 where the mean is 70 and s = 5. The z-score is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> +2</div><div class="opt" data-correct="true"><span class="key">B</span> −2</div><div class="opt" data-correct="false"><span class="key">C</span> −10</div><div class="opt" data-correct="false"><span class="key">D</span> +0.5</div></div><div class="feedback" data-fb-ok="Correct! (60 − 70) ÷ 5 = −2." data-fb-no="(x − mean) ÷ s = (60 − 70) ÷ 5."></div></div></div>
+</section>
+<section class="slide" data-title="Outliers">
+<div class="card primary"><h2 class="slide-title">Detecting Outliers: Box Plots and z-Scores <span class="badge">Slide 13</span></h2><p class="subtitle">Section 2.7 · <span class="ar">اكتشاف القيم الشاذة: مخطط الصندوق والدرجة المعيارية</span></p><div class="formula">An <b>outlier</b> is an observation (measurement) that is <b>unusually large or small</b> relative to the other values in a data set.</div><p>Outliers are typically attributable to one of the following causes:</p><ol><li>The measurement is observed, recorded, or entered into the computer <b>incorrectly</b>.</li><li>The measurement comes from a <b>different population</b>.</li><li>The measurement is correct but represents a <b>rare (chance) event</b>.</li></ol><p>Two useful methods for detecting outliers: <span class="pill">1. Graphical: box plots</span> <span class="pill">2. Numerical: z-scores</span></p><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>القيمة الشاذة هي قيمة "غريبة" بعيدة عن بقية البيانات. قد تكون خطأ إدخال (مثل كتابة 500 بدل 50)، أو من مجتمع مختلف، أو حدثًا نادرًا لكنه صحيح. لا نحذفها مباشرة؛ نكتشفها أولًا ثم نبحث عن سببها.</div><h3>Box plot <span class="ar">(مخطط الصندوق)</span></h3><div class="formula"><b>Procedure for constructing a box plot:</b><br>1. Find the <b>five-number summary</b> (min, Q<sub>1</sub>, median, Q<sub>3</sub>, max).<br>2. Draw a horizontal axis with a scale that includes the maximum and minimum data values.<br>3. Draw a box whose vertical sides go through Q<sub>1</sub> and Q<sub>3</sub>, and draw a vertical line through the median.<br>4. Draw a line from the minimum value to the left side of the box and a line from the maximum value to the right side of the box.</div><div class="plot-box"><div id="boxGeneric"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الصندوق يحتوي على <b>50% من البيانات الوسطى</b> (من Q1 إلى Q3)، والخط داخله هو الوسيط، والعارضتان تمتدان إلى أصغر وأكبر قيمة. وطول الصندوق = <b>المدى الربيعي IQR = Q3 − Q1</b>.</div><h4>Right-skewed (+ve) and left-skewed (−ve) box plots</h4><div class="two"><div class="plot-box"><div id="boxRight"></div><div class="cap"><b>Right skewed</b> (+ve skewed): long right whisker</div></div><div class="plot-box"><div id="boxLeft"></div><div class="cap"><b>Left skewed</b> (−ve skewed): long left whisker</div></div></div></div>
+<div class="card accent"><h3>Example — reading a box plot</h3><div class="plot-box"><div id="boxEx1"></div></div><p>Using the plot, answer:</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. Name the type of plot.</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Histogram</div><div class="opt" data-correct="true"><span class="key">B</span> Box plot</div><div class="opt" data-correct="false"><span class="key">C</span> Dot plot</div><div class="opt" data-correct="false"><span class="key">D</span> Time series plot</div></div><div class="feedback" data-fb-ok="Correct! Box plot." data-fb-no="A box with whiskers."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. What is the shape of the distribution (lecture answer)?</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> Right skewed</div><div class="opt" data-correct="false"><span class="key">B</span> Left skewed</div><div class="opt" data-correct="false"><span class="key">C</span> Symmetric</div></div><div class="feedback" data-fb-ok="Correct (lecture answer): right skewed — the right whisker is much longer." data-fb-no="The right whisker (275 → 420) is much longer than the left (40 → 67.5)."></div></div><div class="quiz numq" data-numq data-answer="200" data-tol="0"><div class="q"><span class="qnum">✎</span><span>3a. The median</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! m = 200." data-fb-no="The line inside the box."></div></div><div class="quiz numq" data-numq data-answer="67.5" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>3b. The first quartile Q₁</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! Q₁ = 67.5." data-fb-no="The left side of the box."></div></div><div class="quiz numq" data-numq data-answer="275" data-tol="0"><div class="q"><span class="qnum">✎</span><span>3c. The third quartile Q₃</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! Q₃ = 275." data-fb-no="The right side of the box."></div></div><div class="quiz numq" data-numq data-answer="380" data-tol="0"><div class="q"><span class="qnum">✎</span><span>4. The range of the data (max − min)</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 420 − 40 = 380." data-fb-no="Range = largest − smallest."></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> هنا الوسيط (200) أقرب إلى Q3 داخل الصندوق، لكن الحكم "ملتوٍ لليمين" في إجابة المصدر مبني على العارضة اليمنى الأطول بكثير. عند الشك انظر إلى <b>الذيل الأطول</b>.</div></div>
+<div class="card primary"><h3>1. Check the outliers using a box plot (the IQR rule)</h3><div class="formula"><b>Procedure for identifying outliers:</b><br>Step 1: Arrange the data in order and find Q<sub>1</sub> and Q<sub>3</sub>.<br>Step 2: Find the interquartile range IQR = Q<sub>3</sub> − Q<sub>1</sub>.<br>Step 3: Multiply the IQR by 1.5.<br>Step 4: Subtract the value from step 3 from Q<sub>1</sub>, and add it to Q<sub>3</sub>.<br>Step 5: Any data value smaller than Q<sub>1</sub> − 1.5(IQR) or larger than Q<sub>3</sub> + 1.5(IQR) is an outlier.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>الحاجز</b> (fence) = حدّ مسموح به. الحاجز الأدنى = Q1 − 1.5×IQR، والحاجز الأعلى = Q3 + 1.5×IQR. أي قيمة خارج المجال بين الحاجزين فهي <b>قيمة شاذة</b>.</div><div class="widget"><h4>🧪 Box-plot builder — type your own data</h4><input class="num" id="bxInput" type="text" value="15, 13, 6, 5, 12, 50, 22, 18" aria-label="data"><div id="bxChart"></div>
+    <div class="calc-grid"><div class="out" id="bxQ1"></div><div class="out" id="bxQ3"></div><div class="out" id="bxIQR"></div><div class="out" id="bxLo"></div><div class="out" id="bxHi"></div></div><div class="readout" id="bxOut"></div></div><h4>Example — check the data set 15, 13, 6, 5, 12, 50, 22, 18 for outliers</h4><details class="reveal"><summary>Show the lecture solution</summary><div class="body"><div class="steps"><div class="step"><div class="n">1</div><div class="c">Arrange: 5, 6, 12, 13, 15, 18, 22, 50. The median is m = Q<sub>2</sub> = 14. Q<sub>1</sub> = median of 5, 6, 12, 13 = <b>9</b>; Q<sub>3</sub> = median of 15, 18, 22, 50 = <b>20</b>.</div></div><div class="step"><div class="n">2</div><div class="c">IQR = Q<sub>3</sub> − Q<sub>1</sub> = 20 − 9 = <b>11</b>.</div></div><div class="step"><div class="n">3</div><div class="c">1.5(11) = <b>16.5</b>.</div></div><div class="step"><div class="n">4</div><div class="c">9 − 16.5 = <b>−7.5</b> and 20 + 16.5 = <b>36.5</b>.</div></div><div class="step"><div class="n">5</div><div class="c">Any value outside the interval from −7.5 to 36.5 is an outlier. The value <b>50</b> is outside, so it is considered an outlier.</div></div></div></div></details><div class="quiz numq" data-numq data-answer="36.5" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>The upper fence Q₃ + 1.5(IQR) for Q₃ = 20 and IQR = 11 is:</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 36.5" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 20 + 16.5 = 36.5." data-fb-no="20 + 1.5 × 11."></div></div><div class="warnbox" dir="rtl"><b>⚠️ خطأ شائع</b><br>عند حساب Q1 وQ3 رتّب البيانات أولًا، ثم قسّمها إلى نصفين (النصف الأدنى والنصف الأعلى) واحسب وسيط كل نصف. إذا كان n فرديًا فالوسيط نفسه يُستبعد من النصفين.</div></div>
+<div class="card accent"><h3>2. Check the outliers using z-scores</h3><div class="formula">Observations with z-scores greater than 3 in absolute value are considered outliers: &nbsp; <b>|z| &gt; 3</b></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>نحسب z لكل قيمة؛ إذا كانت أكبر من +3 أو أصغر من −3 فالقيمة تبعد أكثر من 3 انحرافات معيارية عن الوسط، فنعدّها شاذة.</div><div class="widget"><h4>🧪 z-score outlier checker (the lecture’s example: x̄ = 57, s = 11)</h4><div class="calc-grid"><div><label>x̄</label><input class="num" id="zoM" type="text" value="57"></div><div><label>s</label><input class="num" id="zoS" type="text" value="11"></div><div><label>values</label><input class="num" id="zoV" type="text" value="65, 21, 72, 98"></div></div><div id="zoOut"></div></div><details class="reveal"><summary>Show the lecture solution</summary><div class="body"><table class="data"><tr><th></th><th>x</th><th>z = (x − 57) / 11</th><th>Decision</th></tr><tr><td>a</td><td>65</td><td>0.727</td><td>less than 3 → not an outlier</td></tr><tr><td>b</td><td>21</td><td>−3.273</td><td>|z| &gt; 3 → outlier</td></tr><tr><td>c</td><td>72</td><td>1.364</td><td>not an outlier</td></tr><tr><td>d</td><td>98</td><td>3.727</td><td>|z| &gt; 3 → outlier</td></tr></table></div></details><div class="quiz numq" data-numq data-answer="3.727" data-tol="0.001"><div class="q"><span class="qnum">✎</span><span>The z-score for x = 98 (x̄ = 57, s = 11):</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 3.727" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 41 ÷ 11 = 3.727 &gt; 3 → outlier." data-fb-no="(98 − 57) ÷ 11."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>A value with z = −3.273 is:</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> An outlier (|z| > 3)</div><div class="opt" data-correct="false"><span class="key">B</span> Not an outlier</div><div class="opt" data-correct="false"><span class="key">C</span> Above the mean</div><div class="opt" data-correct="false"><span class="key">D</span> Equal to the mean</div></div><div class="feedback" data-fb-ok="Correct! |−3.273| &gt; 3." data-fb-no="Compare the absolute value with 3."></div></div></div>
+<div class="card primary"><h3>Exercise — consider the box plot below</h3><div class="plot-box"><div id="boxEx2"></div></div><p style="font-size:.8rem;color:var(--muted)">Values read approximately from the figure (the asterisks are the outliers).</p><div class="quiz numq" data-numq data-answer="4" data-tol="0.01"><div class="q"><span class="qnum">✎</span><span>1. What is the median of the data set?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! Median = 4." data-fb-no="The line inside the box."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. The lower and upper quartiles (approximately) are:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Q₁ = 2, Q₃ = 8</div><div class="opt" data-correct="true"><span class="key">B</span> Q₁ = 3, Q₃ = 6</div><div class="opt" data-correct="false"><span class="key">C</span> Q₁ = 4, Q₃ = 10</div><div class="opt" data-correct="false"><span class="key">D</span> Q₁ = 3, Q₃ = 5</div></div><div class="feedback" data-fb-ok="Correct! Lower quartile = 3 and upper quartile = 6." data-fb-no="The box runs from about 3 to 6."></div></div><div class="quiz numq" data-numq data-answer="3" data-tol="0.01"><div class="q"><span class="qnum">✎</span><span>3. What is the interquartile range (Q₃ − Q₁)?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 6 − 3 = 3." data-fb-no="6 − 3."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>4. Is the data set skewed to the left, skewed to the right, or symmetric?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Skewed to the left</div><div class="opt" data-correct="true"><span class="key">B</span> Skewed to the right</div><div class="opt" data-correct="false"><span class="key">C</span> Symmetric</div></div><div class="feedback" data-fb-ok="Correct! Skewed to the right (long right tail with outliers)." data-fb-no="The long tail and the outliers are on the right."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>5. Identify any outliers in the data.</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> None</div><div class="opt" data-correct="true"><span class="key">B</span> 12, 13 and 16</div><div class="opt" data-correct="false"><span class="key">C</span> 3 and 6</div><div class="opt" data-correct="false"><span class="key">D</span> 0 only</div></div><div class="feedback" data-fb-ok="Correct! 12, 13 and 16." data-fb-no="The asterisks mark the outliers."></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>للتأكد بقاعدة IQR: الحاجز الأعلى = 6 + 1.5×3 = <b>10.5</b>؛ كل القيم الأكبر منه (12 و13 و16) شاذة، وهذا يتوافق مع النجوم في الرسم.</div></div>
+</section>
+<section class="slide" data-title="Summary">
+<div class="card primary"><h2 class="slide-title">Summary and Formulas <span class="badge">Slide 14</span></h2><p class="subtitle">Putting it all together · <span class="ar">الخلاصة وملخص القوانين</span></p><h3>📋 Formulas from the lecture</h3><table class="data"><tr><th>Quantity</th><th>Formula</th></tr><tr><td>Relative frequency</td><td>f ÷ Σf (= f ÷ n)</td></tr><tr><td>Percentage</td><td>Relative frequency × 100</td></tr><tr><td>Degree (pie chart)</td><td>Relative frequency × 360</td></tr><tr><td>Class boundaries</td><td>lower limit − 0.5 , upper limit + 0.5</td></tr><tr><td>Mean</td><td>x̄ = Σx ÷ n</td></tr><tr><td>Variance</td><td>s² = [Σx² − (Σx)²/n] ÷ (n − 1)</td></tr><tr><td>Standard deviation</td><td>s = √s²</td></tr><tr><td>Range</td><td>largest − smallest</td></tr><tr><td>Z-score</td><td>z = (x − x̄) ÷ s</td></tr><tr><td>Interquartile range</td><td>IQR = Q₃ − Q₁</td></tr><tr><td>Outlier fences</td><td>Q₁ − 1.5(IQR)  and  Q₃ + 1.5(IQR)</td></tr></table><h3>📌 Summary</h3><div class="summary-grid"><div class="sum-card"><h4>Qualitative data</h4><p>Frequency table → relative frequency → percentage. Graphs: bar, pie, Pareto.</p></div><div class="sum-card"><h4>Quantitative graphs</h4><p>Grouped table (limits/boundaries), dot plot, stem-and-leaf, histogram, time series plot.</p></div><div class="sum-card"><h4>Center</h4><p>Mean (affected by outliers), median (resistant), mode (most frequent; also for categories).</p></div><div class="sum-card"><h4>Shape</h4><p>Right skew: mean &gt; median &gt; mode. Left skew: mean &lt; median &lt; mode. Symmetric: equal.</p></div><div class="sum-card"><h4>Spread</h4><p>Range, variance, standard deviation: the smaller, the more consistent.</p></div><div class="sum-card"><h4>Relative standing</h4><p>Quartiles Q1, Q2 (median), Q3; z-score = number of SDs from the mean.</p></div><div class="sum-card"><h4>Outliers</h4><p>Box plot (IQR rule) and |z| &gt; 3.</p></div></div></div>
+<div class="card accent"><h3>🎓 Final Challenge</h3><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>A frequency of 9 in a sample of 36 gives a percentage of:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 9%</div><div class="opt" data-correct="true"><span class="key">B</span> 25%</div><div class="opt" data-correct="false"><span class="key">C</span> 36%</div><div class="opt" data-correct="false"><span class="key">D</span> 4%</div></div><div class="feedback" data-fb-ok="Correct! 9 ÷ 36 = 0.25 → 25%." data-fb-no="9 ÷ 36 × 100."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>Which measure of center is least affected by one extremely large value?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Mean</div><div class="opt" data-correct="true"><span class="key">B</span> Median</div><div class="opt" data-correct="false"><span class="key">C</span> Sum</div><div class="opt" data-correct="false"><span class="key">D</span> Variance</div></div><div class="feedback" data-fb-ok="Correct! The median." data-fb-no="The median depends on the middle position, not on how big the extreme is."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>Two data sets have the same mean. The one with the smaller standard deviation is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> More spread out</div><div class="opt" data-correct="true"><span class="key">B</span> More consistent (values closer to the mean)</div><div class="opt" data-correct="false"><span class="key">C</span> Always larger</div><div class="opt" data-correct="false"><span class="key">D</span> Skewed</div></div><div class="feedback" data-fb-ok="Correct! Smaller SD = values closer to the mean." data-fb-no="Smaller spread = more consistent."></div></div></div>
+<div class="card primary" style="text-align:center">
+    <h2 style="color:var(--primary-dark);margin:6px 0">🎉 Well done!</h2>
+    <p>You completed Chapter 2 — Methods for Describing Sets of Data.</p>
+    <p style="font-size:1.05rem"><b>Final Score: <span id="finalScore">0</span> / <span id="maxScore">0</span></b> &nbsp;·&nbsp; <b>Best Streak: <span id="finalStreak">0</span></b></p>
+    <p class="ar" style="margin-top:10px">أحسنت! لقد أكملت المحاضرة التفاعلية بنجاح.</p>
+    <p><button class="btn ghost" type="button" onclick="resetQuizzes()">🔄 Retry all quizzes</button> <button class="btn primary" type="button" onclick="goTo(slides.length-1)">📝 Take the Final Exam</button></p></div>
+</section>
+<section class="slide" data-title="Final Exam"><div class="card primary"><h2 class="slide-title">Final Exam <span class="badge">Slide 15</span></h2><p class="subtitle">25 new questions covering the whole chapter · <span class="ar">الاختبار النهائي: 25 سؤالًا جديدًا</span></p><p>These questions are different from the ones in the slides. Choose an answer to see the explanation immediately; at the end you will get your score, the list of your mistakes with the correct answers, and a button to retake the exam. This exam does not change the lecture score.</p></div><div id="examRoot"></div></section>
+</main>
+<div class="slide-nav"><div class="inner">
+  <button class="btn ghost" id="prevBtn">◀ Previous</button>
+  <div class="pos" id="posLabel">Slide 1 of 15</div>
+  <button class="btn primary" id="nextBtn">Next ▶</button>
+</div></div>
+<div class="toast" id="toast">Correct! +10 points</div>
+<script>
+/* ================= HELPERS ================= */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const COL = ['#0b63c5', '#06b6d4', '#f59e0b', '#8b5cf6', '#10b981', '#ef4444', '#64748b'];
+const r3 = x => (Math.round(x * 1000) / 1000);
+const fmtN = x => (Number.isInteger(x) ? String(x) : String(r3(x)));
+function parseNums(s) {
+  return (s || '').replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 1632)).replace(/[،;]/g, ',')
+    .split(/[\s,]+/).map(t => t.trim()).filter(t => t !== '').map(Number).filter(v => !isNaN(v));
+}
+const sum = a => a.reduce((p, c) => p + c, 0);
+const mean = a => sum(a) / a.length;
+function median(a) { const s = a.slice().sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; }
+function modes(a) {
+  const c = {}; a.forEach(v => c[v] = (c[v] || 0) + 1);
+  const mx = Math.max(...Object.values(c)); if (mx === 1) return [];
+  return Object.keys(c).filter(k => c[k] === mx).map(Number).sort((x, y) => x - y);
+}
+function quartiles(a) { // median-of-halves method used in the lecture (median excluded when n is odd)
+  const s = a.slice().sort((x, y) => x - y), n = s.length, h = Math.floor(n / 2);
+  const lo = s.slice(0, h), hi = s.slice(n % 2 ? h + 1 : h);
+  return { q1: median(lo), q2: median(s), q3: median(hi), min: s[0], max: s[n - 1], s };
+}
+function niceStep(x) { const p = Math.pow(10, Math.floor(Math.log10(x))), f = x / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+function svgWrap(w, h, inner, title) { return `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="${title || 'chart'}">${inner}</svg>`; }
+const T = (x, y, t, o) => { o = o || {}; return `<text x="${x}" y="${y}" font-size="${o.s || 11}" text-anchor="${o.a || 'middle'}" fill="${o.c || '#334e68'}" font-weight="${o.w || 400}"${o.r ? ` transform="rotate(${o.r} ${x} ${y})"` : ''}>${t}</text>`; };
+
+/* ================= CHART PRIMITIVES ================= */
+function barSVG(c) { // {labels, values, vfmt, colors, yTitle, xTitle, title, horizontal, w, h, max}
+  const W = c.w || 560, H = c.h || 300, L = c.horizontal ? 92 : 56, R = 18, Tp = c.title ? 34 : 18, B = c.horizontal ? 44 : 54;
+  const n = c.values.length, mx0 = c.max || Math.max(...c.values), st = niceStep(mx0 / 5), mx = Math.ceil(mx0 / st - 1e-9) * st;
+  const vf = c.vfmt || fmtN; let s = '';
+  if (c.title) s += T(W / 2, 20, c.title, { s: 13, w: 700 });
+  if (!c.horizontal) {
+    const pw = W - L - R, ph = H - Tp - B, bw = pw / n * 0.62;
+    for (let v = 0; v <= mx + 1e-9; v += st) { const y = Tp + ph - v / mx * ph; s += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#e2e8f0"/>` + T(L - 6, y + 4, vf(v), { a: 'end', s: 10 }); }
+    c.values.forEach((v, i) => {
+      const x = L + pw / n * (i + .5) - bw / 2, h = v / mx * ph, y = Tp + ph - h, col = (c.colors || COL)[i % (c.colors || COL).length];
+      s += `<rect class="bar" x="${x}" y="${y}" width="${bw}" height="${h}" rx="3" fill="${col}"><title>${c.labels[i]}: ${vf(v)}</title></rect>`;
+      s += T(x + bw / 2, y - 5, vf(v), { s: 11, w: 700 }) + T(x + bw / 2, Tp + ph + 16, c.labels[i], { s: 11 });
+    });
+    s += `<line x1="${L}" y1="${Tp}" x2="${L}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/><line x1="${L}" y1="${Tp + ph}" x2="${W - R}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/>`;
+    if (c.xTitle) s += T((L + W - R) / 2, H - 6, c.xTitle, { s: 12 });
+    if (c.yTitle) s += T(14, Tp + ph / 2, c.yTitle, { s: 12, r: -90 });
+  } else {
+    const pw = W - L - R, ph = H - Tp - B, bh = ph / n * 0.62;
+    for (let v = 0; v <= mx + 1e-9; v += st) { const x = L + v / mx * pw; s += `<line x1="${x}" y1="${Tp}" x2="${x}" y2="${Tp + ph}" stroke="#e2e8f0"/>` + T(x, Tp + ph + 15, vf(v), { s: 10 }); }
+    c.values.forEach((v, i) => {
+      const y = Tp + ph / n * (i + .5) - bh / 2, w = v / mx * pw, col = (c.colors || COL)[i % (c.colors || COL).length];
+      s += `<rect class="bar" x="${L}" y="${y}" width="${w}" height="${bh}" rx="3" fill="${col}"><title>${c.labels[i]}: ${vf(v)}</title></rect>` + T(L - 6, y + bh / 2 + 4, c.labels[i], { a: 'end', s: 11 }) + T(L + w + 4, y + bh / 2 + 4, vf(v), { a: 'start', s: 11, w: 700 });
+    });
+    s += `<line x1="${L}" y1="${Tp}" x2="${L}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/>`;
+    if (c.xTitle) s += T((L + W - R) / 2, H - 6, c.xTitle, { s: 12 });
+  }
+  return svgWrap(W, H, s, c.title);
+}
+function pieSVG(c) { // {labels, values(freq), vals text fn, title, deg}
+  const W = 520, H = 330, cx = W / 2, cy = 175, r = 108, tot = sum(c.values); let a0 = -Math.PI / 2, s = '';
+  if (c.title) s += T(W / 2, 20, c.title, { s: 13, w: 700 });
+  c.values.forEach((v, i) => {
+    const a1 = a0 + v / tot * 2 * Math.PI, col = (c.colors || COL)[i % COL.length];
+    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0), x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    const big = (a1 - a0) > Math.PI ? 1 : 0;
+    s += v === tot ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}"/>` :
+      `<path d="M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 ${big} 1 ${x1} ${y1} Z" fill="${col}" stroke="#fff" stroke-width="2"><title>${c.labels[i]}</title></path>`;
+    const am = (a0 + a1) / 2, lx = cx + (r + 26) * Math.cos(am), ly = cy + (r + 26) * Math.sin(am), anc = Math.cos(am) >= 0 ? 'start' : 'end';
+    s += T(cx + (r + 8) * Math.cos(am), cy + (r + 8) * Math.sin(am) + 4, '', {});
+    s += T(lx, ly - 2, c.labels[i], { a: anc, s: 11, w: 700 }) + T(lx, ly + 12, c.sub ? c.sub[i] : '', { a: anc, s: 11, c: '#475569' });
+    a0 = a1;
+  });
+  return svgWrap(W, H, s, c.title);
+}
+function histSVG(c) { // {bounds[], values[], vfmt, yTitle, xTitle, title, h}
+  const W = 580, H = c.h || 300, L = 56, R = 16, Tp = c.title ? 34 : 18, B = 54, n = c.values.length, pw = W - L - R, ph = H - Tp - B;
+  const mx0 = Math.max(...c.values), st = niceStep(mx0 / 5), mx = Math.ceil(mx0 / st - 1e-9) * st, vf = c.vfmt || fmtN; let s = '';
+  if (c.title) s += T(W / 2, 20, c.title, { s: 13, w: 700 });
+  for (let v = 0; v <= mx + 1e-9; v += st) { const y = Tp + ph - v / mx * ph; s += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#e2e8f0"/>` + T(L - 6, y + 4, vf(v), { a: 'end', s: 10 }); }
+  const bw = pw / n;
+  c.values.forEach((v, i) => {
+    const h = v / mx * ph, y = Tp + ph - h;
+    s += `<rect class="bar" data-i="${i}" x="${L + i * bw}" y="${y}" width="${bw}" height="${h}" fill="${c.colors ? c.colors[i % c.colors.length] : COL[i % COL.length]}" fill-opacity=".85" stroke="#fff" stroke-width="1.5"><title>${c.bounds ? c.bounds[i] + ' – ' + c.bounds[i + 1] : c.centers[i]}: ${vf(v)}</title></rect>`;
+    if (v > 0) s += T(L + i * bw + bw / 2, y - 5, vf(v), { s: 10, w: 700 });
+  });
+  if (c.centers) c.centers.forEach((b, i) => { s += T(L + i * bw + bw / 2, Tp + ph + 16, b, { s: 11 }); }); else c.bounds.forEach((b, i) => { s += T(L + i * bw, Tp + ph + 16, b, { s: 10 }); });
+  s += `<line x1="${L}" y1="${Tp}" x2="${L}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/><line x1="${L}" y1="${Tp + ph}" x2="${W - R}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/>`;
+  if (c.xTitle) s += T((L + W - R) / 2, H - 8, c.xTitle, { s: 12 });
+  if (c.yTitle) s += T(14, Tp + ph / 2, c.yTitle, { s: 12, r: -90 });
+  return svgWrap(W, H, s, c.title);
+}
+function dotSVG(data, c) { // c:{min,max,step,xTitle,hl:Set of values to highlight}
+  const W = 620, H = 250, L = 30, R = 20, B = 46, cnt = {}; data.forEach(v => cnt[v] = (cnt[v] || 0) + 1);
+  const mx = Math.max(...Object.values(cnt)), pw = W - L - R, sx = v => L + (v - c.min) / (c.max - c.min) * pw, rad = Math.min(8, (H - B - 14) / (2 * mx + 1)), ay = H - B; let s = '';
+  s += `<line x1="${L - 10}" y1="${ay}" x2="${W - R + 8}" y2="${ay}" stroke="#1e293b" stroke-width="2"/>`;
+  for (let v = c.min; v <= c.max; v++) s += `<line x1="${sx(v)}" y1="${ay}" x2="${sx(v)}" y2="${ay + (v % 5 === 0 ? 8 : 4)}" stroke="#1e293b"/>` + (v % 5 === 0 ? T(sx(v), ay + 22, v, { s: 11 }) : '');
+  Object.keys(cnt).map(Number).forEach(v => {
+    for (let k = 0; k < cnt[v]; k++) s += `<circle class="dotc" data-v="${v}" cx="${sx(v)}" cy="${ay - rad - 3 - k * 2 * rad * 1.05}" r="${rad}" fill="${c.hl && c.hl.has(v) ? '#ef4444' : '#4f8ad6'}" fill-opacity=".9"><title>value ${v}: ${cnt[v]} time(s)</title></circle>`;
+  });
+  if (c.xTitle) s += T((L + W - R) / 2, H - 6, c.xTitle, { s: 12 });
+  return svgWrap(W, H, s, 'dot plot');
+}
+function lineSVG(c) { // {labels, values, title, yTitle, xTitle, tickEvery}
+  const W = 600, H = 290, L = 58, R = 16, Tp = c.title ? 34 : 18, B = 58, n = c.values.length, pw = W - L - R, ph = H - Tp - B;
+  const mx0 = Math.max(...c.values), st = niceStep(mx0 / 5), mx = Math.ceil(mx0 / st - 1e-9) * st; let s = '';
+  if (c.title) s += T(W / 2, 20, c.title, { s: 13, w: 700 });
+  for (let v = 0; v <= mx + 1e-9; v += st) { const y = Tp + ph - v / mx * ph; s += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#e2e8f0"/>` + T(L - 6, y + 4, v, { a: 'end', s: 10 }); }
+  const px = i => L + pw * i / (n - 1), py = v => Tp + ph - v / mx * ph;
+  s += `<polyline fill="none" stroke="#0b63c5" stroke-width="2.5" points="${c.values.map((v, i) => px(i) + ',' + py(v)).join(' ')}"/>`;
+  c.values.forEach((v, i) => { s += `<circle cx="${px(i)}" cy="${py(v)}" r="3.5" fill="#06b6d4" stroke="#0b63c5"><title>${c.labels[i]}: ${v}</title></circle>`; if (i % (c.tickEvery || 1) === 0) s += T(px(i), Tp + ph + 15, c.labels[i], { s: 10 }); });
+  s += `<line x1="${L}" y1="${Tp}" x2="${L}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/><line x1="${L}" y1="${Tp + ph}" x2="${W - R}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/>`;
+  if (c.xTitle) s += T((L + W - R) / 2, H - 6, c.xTitle, { s: 12 });
+  if (c.yTitle) s += T(14, Tp + ph / 2, c.yTitle, { s: 12, r: -90 });
+  return svgWrap(W, H, s, c.title);
+}
+function boxSVG(c) { // {min,q1,med,q3,max,outliers[],axisMin,axisMax,step,labels(bool),fences}
+  const W = 620, H = c.h || 170, L = 30, R = 30, pw = W - L - R, sx = v => L + (v - c.axisMin) / (c.axisMax - c.axisMin) * pw, y0 = 60, bh = 46; let s = '';
+  s += `<line x1="${L}" y1="${H - 40}" x2="${W - R}" y2="${H - 40}" stroke="#334e68" stroke-width="1.5"/>`;
+  for (let v = c.axisMin; v <= c.axisMax + 1e-9; v += c.step) s += `<line x1="${sx(v)}" y1="${H - 40}" x2="${sx(v)}" y2="${H - 34}" stroke="#334e68"/>` + T(sx(v), H - 20, fmtN(v), { s: 10 });
+  if (c.fences) {
+    [c.fences[0], c.fences[1]].forEach(f => { if (f >= c.axisMin && f <= c.axisMax) s += `<line x1="${sx(f)}" y1="${y0 - 28}" x2="${sx(f)}" y2="${H - 40}" stroke="#ef4444" stroke-dasharray="5 4"/>` + T(sx(f), y0 - 32, 'fence ' + fmtN(f), { s: 10, c: '#b91c1c', w: 700 }); });
+  }
+  s += `<line x1="${sx(c.min)}" y1="${y0 + bh / 2}" x2="${sx(c.q1)}" y2="${y0 + bh / 2}" stroke="#1e293b" stroke-width="2"/><line x1="${sx(c.q3)}" y1="${y0 + bh / 2}" x2="${sx(c.max)}" y2="${y0 + bh / 2}" stroke="#1e293b" stroke-width="2"/>`;
+  s += `<line x1="${sx(c.min)}" y1="${y0 + 12}" x2="${sx(c.min)}" y2="${y0 + bh - 12}" stroke="#1e293b" stroke-width="2"/><line x1="${sx(c.max)}" y1="${y0 + 12}" x2="${sx(c.max)}" y2="${y0 + bh - 12}" stroke="#1e293b" stroke-width="2"/>`;
+  s += `<rect x="${sx(c.q1)}" y="${y0}" width="${sx(c.q3) - sx(c.q1)}" height="${bh}" fill="#cffafe" stroke="#0b63c5" stroke-width="2"/><line x1="${sx(c.med)}" y1="${y0}" x2="${sx(c.med)}" y2="${y0 + bh}" stroke="#0b63c5" stroke-width="3"/>`;
+  (c.outliers || []).forEach(o => { s += `<text x="${sx(o)}" y="${y0 + bh / 2 + 6}" font-size="18" text-anchor="middle" fill="#ef4444" font-weight="700">*<title>outlier ${o}</title></text>`; });
+  if (c.labels) {
+    [[c.min, 'min'], [c.q1, 'Q1'], [c.med, 'median'], [c.q3, 'Q3'], [c.max, 'max']].forEach(([v, t], i) => { s += T(sx(v), y0 + bh + 16 + (i % 2) * 0, t + ' ' + fmtN(v), { s: 10, c: '#0b63c5', w: 700 }); });
+  }
+  return svgWrap(W, H, s, 'box plot');
+}
+function numberLineSVG(data, c) { // dots with mean & median markers
+  const W = 620, H = 150, L = 24, R = 24, ay = 98, mn = Math.min(...data, 0), mx = Math.max(...data), span = (mx - mn) || 1, sx = v => L + (v - mn) / span * (W - L - R);
+  let s = `<line x1="${L - 8}" y1="${ay}" x2="${W - R + 8}" y2="${ay}" stroke="#1e293b" stroke-width="2"/>`;
+  const st = niceStep(span / 8);
+  for (let v = Math.ceil(mn / st) * st; v <= mx + 1e-9; v += st) s += `<line x1="${sx(v)}" y1="${ay}" x2="${sx(v)}" y2="${ay + 6}" stroke="#1e293b"/>` + T(sx(v), ay + 20, fmtN(r3(v)), { s: 10 });
+  const cnt = {}; data.forEach(v => { cnt[v] = (cnt[v] || 0) + 1; s += `<circle cx="${sx(v)}" cy="${ay - 10 - (cnt[v] - 1) * 14}" r="6" fill="#4f8ad6"/>`; });
+  const m = mean(data), md = median(data);
+  s += `<path d="M${sx(m)} ${ay - 4} l-7 -14 h14 z" fill="#ef4444" transform="translate(0,${-28})"/>`;
+  s += `<line x1="${sx(m)}" y1="${ay - 46}" x2="${sx(m)}" y2="${ay}" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>` + T(sx(m), 22, 'mean ' + fmtN(r3(m)), { s: 11, c: '#b91c1c', w: 700 });
+  s += `<line x1="${sx(md)}" y1="${ay - 46}" x2="${sx(md)}" y2="${ay}" stroke="#10b981" stroke-width="2.5"/>` + T(sx(md), 36 + 0, '', {});
+  s += `<text x="${sx(md)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="#047857" font-weight="700">median ${fmtN(r3(md))}</text>`;
+  return svgWrap(W, H, s, 'number line');
+}
+
+/* ================= STATE & NAV ================= */
+let current = 0, score = 0, streak = 0, bestStreak = 0;
+const slides = $$('.slide');
+const tabsNav = $('#tabs');
+slides.forEach((s, i) => {
+  const t = document.createElement('button');
+  t.className = 'tab' + (i === 0 ? ' active' : '');
+  t.innerHTML = `<span class="num">${i + 1}</span>${s.dataset.title}`;
+  t.addEventListener('click', () => goTo(i));
+  tabsNav.appendChild(t);
+});
+function goTo(i) {
+  if (i < 0 || i >= slides.length) return;
+  slides[current].classList.remove('active'); current = i; slides[current].classList.add('active');
+  $$('.tab').forEach((t, k) => t.classList.toggle('active', k === current));
+  const act = $$('.tab')[current]; if (act && act.scrollIntoView) act.scrollIntoView({ inline: 'center', block: 'nearest' });
+  $('#posLabel').textContent = `Slide ${current + 1} of ${slides.length}`;
+  $('#prevBtn').disabled = current === 0; $('#nextBtn').disabled = current === slides.length - 1;
+  updateProgress(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$('#prevBtn').addEventListener('click', () => goTo(current - 1));
+$('#nextBtn').addEventListener('click', () => goTo(current + 1));
+function updateProgress() { $('#progressFill').style.width = ((current + 1) / slides.length * 100) + '%'; }
+updateProgress(); $('#prevBtn').disabled = true;
+$('#posLabel').textContent = `Slide 1 of ${slides.length}`;
+
+/* ================= SCORE ================= */
+function addScore(n) { score += n; $('#scoreVal').textContent = score; $('#finalScore').textContent = score; $('#finalStreak').textContent = bestStreak; updateStreak(); }
+function updateStreak() { $('#streakVal').textContent = streak; }
+let toastTimer;
+function showToast(msg, bad) { const t = $('#toast'); t.textContent = msg; t.classList.toggle('bad', !!bad); t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800); }
+function award(ok, fb, quizEl) {
+  fb.classList.add('show');
+  if (ok) { fb.classList.add('ok'); fb.classList.remove('no'); fb.textContent = fb.dataset.fbOk || 'Correct!'; streak++; bestStreak = Math.max(bestStreak, streak); addScore(10); showToast('Correct! +10 points', false); }
+  else { fb.classList.add('no'); fb.classList.remove('ok'); fb.textContent = fb.dataset.fbNo || 'Not quite.'; streak = 0; updateStreak(); }
+}
+
+/* ================= MULTIPLE-CHOICE QUIZZES ================= */
+$$('[data-quiz]:not([data-numq])').forEach(quiz => {
+  const opts = $$('.opt', quiz), fb = $('.feedback', quiz);
+  opts.forEach(opt => opt.addEventListener('click', () => {
+    if (opt.classList.contains('disabled')) return;
+    const ok = opt.dataset.correct === 'true';
+    opts.forEach(o => o.classList.add('disabled')); opt.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) opts.forEach(o => { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+    award(ok, fb, quiz);
+  }));
+});
+/* ================= NUMERIC QUESTIONS ================= */
+$$('[data-numq]').forEach(q => {
+  const inp = $('input', q), fb = $('.feedback', q), btn = $('.chk', q), ans = parseFloat(q.dataset.answer), tol = parseFloat(q.dataset.tol || '0.01');
+  let done = false;
+  const check = () => {
+    if (done) return;
+    const raw = parseNums(inp.value); if (!raw.length) { fb.className = 'feedback show no'; fb.textContent = 'Type a number first.'; return; }
+    const ok = Math.abs(raw[0] - ans) <= tol;
+    if (ok) { done = true; q.classList.add('done'); inp.disabled = true; btn.disabled = true; }
+    award(ok, fb, q);
+  };
+  btn.addEventListener('click', check); inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+  q._reset = () => { done = false; q.classList.remove('done'); inp.disabled = false; btn.disabled = false; inp.value = ''; fb.className = 'feedback'; };
+});
+
+/* ================= KEYBOARD NAV ================= */
+document.addEventListener('keydown', e => {
+  if (/INPUT|TEXTAREA/.test((e.target || {}).tagName || '')) return;
+  if (e.key === 'ArrowRight') goTo(current + 1);
+  if (e.key === 'ArrowLeft') goTo(current - 1);
+});
+/* ================= RESET ================= */
+function resetQuizzes() {
+  $$('[data-quiz],[data-numq]').forEach(q => {
+    $$('.opt', q).forEach(o => o.classList.remove('correct', 'wrong', 'disabled'));
+    if (q._reset) q._reset(); else { const f = $('.feedback', q); f.classList.remove('show', 'ok', 'no'); }
+  });
+  score = 0; streak = 0; bestStreak = 0;
+  $('#scoreVal').textContent = 0; $('#finalScore').textContent = 0; $('#finalStreak').textContent = 0; updateStreak(); goTo(0);
+}
+$('#maxScore').textContent = $$('[data-quiz],[data-numq]').length * 10;
+
+/* ================= WIDGETS (Chapter 2) ================= */
+function mkSeg(id, items, on, cb) {
+  const el = $('#' + id); if (!el) return;
+  el.innerHTML = items.map((it, i) => `<button type="button" class="${i === on ? 'on' : ''}" data-v="${it[0]}">${it[1]}</button>`).join('');
+  $$('button', el).forEach(b => b.addEventListener('click', () => { $$('button', el).forEach(x => x.classList.remove('on')); b.classList.add('on'); cb(b.dataset.v); }));
+  cb(items[on][0]);
+}
+const pct = x => fmtN(r3(x * 100));
+const tallyStr = n => '|'.repeat(n).replace(/(\|{5})/g, '$1 ').trim().replace(/\|{5}/g, m => m);
+
+/* ---------- Slide 2/3: click-to-count cells ---------- */
+function countWidget(cellsId, segId, outId, data, classes, nameFn) {
+  const cells = $('#' + cellsId); if (!cells) return;
+  cells.innerHTML = data.map((v, i) => `<div class="cell" data-v="${v}">${v}</div>`).join('');
+  const out = $('#' + outId);
+  mkSeg(segId, classes.map(c => [c, c]), -1 < 0 ? 0 : 0, () => { });
+  const seg = $('#' + segId); $$('button', seg).forEach(b => b.classList.remove('on'));
+  const sel = v => {
+    $$('.cell', cells).forEach(c => c.classList.toggle('hl', c.dataset.v === String(v)));
+    $$('button', seg).forEach(b => b.classList.toggle('on', b.dataset.v === String(v)));
+    const n = data.filter(x => String(x) === String(v)).length;
+    out.innerHTML = `${nameFn(v)} appears <b>${n}</b> time${n === 1 ? '' : 's'} out of ${data.length}. Tally: <span class="mono">${tallyStr(n)}</span> &nbsp;→&nbsp; frequency f = <b>${n}</b>`;
+  };
+  $$('.cell', cells).forEach(c => c.addEventListener('click', () => sel(c.dataset.v)));
+  $$('button', seg).forEach(b => b.addEventListener('click', () => sel(b.dataset.v)));
+}
+const RAW = [2, 5, 8, 7, 2, 2, 6, 8, 5, 2, 5, 7, 4, 5, 6, 2, 8, 6];
+countWidget('tallyRaw', 'tallyClasses', 'tallyOut', RAW, [2, 4, 5, 6, 7, 8], v => 'The value <b>' + v + '</b>');
+$('#tallyBuild').addEventListener('click', () => {
+  const u = [...new Set(RAW)].sort((a, b) => a - b);
+  $('#tallyTable').innerHTML = '<table class="data"><tr><th>Class (value)</th><th>Tally</th><th>Frequency (f)</th></tr>' +
+    u.map(v => { const n = RAW.filter(x => x === v).length; return `<tr><td>${v}</td><td class="mono">${tallyStr(n)}</td><td>${n}</td></tr>`; }).join('') +
+    `<tr><td><b>Total</b></td><td></td><td><b>${RAW.length}</b></td></tr></table>`;
+});
+const BLOOD = 'A B B AB O O O B AB B B B O A O A O O O AB AB A O B A'.split(' ');
+countWidget('tallyBlood', 'bloodClasses', 'bloodOut', BLOOD, ['A', 'B', 'AB', 'O'], v => 'Blood type <b>' + v + '</b>');
+const XYZ = 'Y X X Z X Y Y Y X X Z X Y Y X Z Y Y Y X'.split(' ');
+countWidget('tallyXYZ', 'xyzClasses', 'xyzOut', XYZ, ['X', 'Y', 'Z'], v => 'Class <b>' + v + '</b>');
+
+/* ---------- Slide 3: CEO calculator ---------- */
+(function () {
+  const el = $('#ceoCalc'); const cls = [['None', 4], ['Bachelor', 17], ['MBA', 9], ['Master', 3], ['PhD', 2], ['Law', 5]];
+  el.innerHTML = '<table class="data"><tr><th>Degree</th><th>Frequency f</th><th>Relative frequency</th><th>Percentage</th><th>Degree (pie)</th></tr>' +
+    cls.map((c, i) => `<tr><td>${c[0]}</td><td><input class="num ceoF" data-i="${i}" type="text" inputmode="numeric" value="${c[1]}" style="width:70px;text-align:center" aria-label="${c[0]} frequency"></td><td id="ceoR${i}"></td><td id="ceoP${i}"></td><td id="ceoD${i}"></td></tr>`).join('') +
+    '<tr><td><b>Total</b></td><td id="ceoT"></td><td id="ceoRT"></td><td id="ceoPT"></td><td id="ceoDT"></td></tr></table>';
+  const upd = () => {
+    const f = $$('.ceoF', el).map(i => Math.max(0, parseFloat(i.value) || 0)), n = sum(f);
+    f.forEach((v, i) => { const r = n ? v / n : 0; $('#ceoR' + i).textContent = fmtN(r3(r)); $('#ceoP' + i).textContent = pct(r) + '%'; $('#ceoD' + i).textContent = fmtN(r3(r * 360)) + '°'; });
+    $('#ceoT').innerHTML = '<b>' + n + '</b>'; $('#ceoRT').innerHTML = '<b>' + (n ? 1 : 0) + '</b>'; $('#ceoPT').innerHTML = '<b>' + (n ? 100 : 0) + '%</b>'; $('#ceoDT').innerHTML = '<b>' + (n ? 360 : 0) + '°</b>';
+  };
+  $$('.ceoF', el).forEach(i => i.addEventListener('input', upd)); upd();
+})();
+
+/* ---------- Slide 4: charts ---------- */
+const CEO = { labels: ['None', 'Bachelor', 'MBA', 'Master', 'PhD', 'Law'], values: [4, 17, 9, 3, 2, 5] };
+$('#spendV').innerHTML = barSVG({ labels: ['Shoes', 'Clothing', 'Dorm decor', 'Electronic'], values: [75, 145, 340, 730], title: 'Average Amount', yTitle: '$', h: 280, w: 420 });
+$('#spendH').innerHTML = barSVG({ labels: ['Electronic', 'Dorm decor', 'Clothing', 'Shoes'], values: [730, 340, 145, 75], title: 'First-Year College Student Spending', horizontal: true, h: 280, w: 420, xTitle: '$' });
+$('#ceoBar').innerHTML = barSVG({ labels: CEO.labels, values: CEO.values, title: 'Bar Chart for Degrees', yTitle: 'Frequency' });
+$('#carBar').innerHTML = barSVG({ labels: ['Foreign', 'Domestic'], values: [30, 50], title: 'Vehicles Sold by Type Last Month at Whitner Autoplex', yTitle: 'Number sold (class frequency)', xTitle: 'Car Type (variable of interest)', colors: ['#10b981', '#f59e0b'], max: 60 });
+$('#maritalPie').innerHTML = pieSVG({ labels: ['Married', 'Single', 'Divorced', 'Widowed'], values: [50, 18, 27, 5], sub: ['50%', '18%', '27%', '5%'], title: 'Marital Status of Employees at Brown’s Department Store' });
+$('#ceoPie').innerHTML = pieSVG({ labels: ['Bachelor', 'MBA', 'Law', 'None', 'Master', 'PhD'], values: [17, 9, 5, 4, 3, 2], sub: ['42.5% · 153°', '22.5% · 81°', '12.5% · 45°', '10% · 36°', '7.5% · 27°', '5% · 18°'], title: 'Degrees of the 40 best-paid CEOs' });
+$('#bloodPie').innerHTML = pieSVG({ labels: ['A', 'B', 'AB', 'O'], values: [20, 28, 16, 36], sub: ['20%', '28%', '16%', '36%'], title: 'Blood types of army inductees' });
+
+(function () { // chart builder
+  const DS = {
+    ceo: { name: 'CEO degrees (n = 40)', labels: CEO.labels, values: CEO.values },
+    blood: { name: 'Blood types (n = 25)', labels: ['A', 'B', 'O', 'AB'], values: [5, 7, 9, 4] },
+    car: { name: 'Vehicles sold (n = 80)', labels: ['Foreign', 'Domestic'], values: [30, 50] }
+  };
+  let ds = 'ceo', type = 'bar', unit = 'f';
+  const draw = () => {
+    let { labels, values } = DS[ds]; const n = sum(values);
+    if (type === 'pareto') { const ord = values.map((v, i) => i).sort((a, b) => values[b] - values[a]); labels = ord.map(i => labels[i]); values = ord.map(i => values[i]); }
+    const conv = v => unit === 'f' ? v : unit === 'r' ? v / n : v / n * 100, unitName = { f: 'Frequency', r: 'Relative frequency', p: 'Percentage (%)' }[unit];
+    const vf = x => unit === 'f' ? fmtN(x) : unit === 'r' ? fmtN(r3(x)) : fmtN(r3(x)) + '%';
+    if (type === 'pie') $('#gbChart').innerHTML = pieSVG({ labels, values, sub: values.map(v => unit === 'f' ? v + ' (' + fmtN(r3(v / n * 360)) + '°)' : vf(conv(v)) + ' (' + fmtN(r3(v / n * 360)) + '°)'), title: DS[ds].name });
+    else $('#gbChart').innerHTML = barSVG({ labels, values: values.map(conv), vfmt: vf, yTitle: unitName, title: (type === 'pareto' ? 'Pareto diagram — ' : 'Bar graph — ') + DS[ds].name });
+    $('#gbTable').innerHTML = '<table class="data"><tr><th>Class</th><th>f</th><th>Relative frequency</th><th>Percentage</th><th>Degree</th></tr>' +
+      labels.map((l, i) => `<tr><td>${l}</td><td>${values[i]}</td><td>${fmtN(r3(values[i] / n))}</td><td>${pct(values[i] / n)}%</td><td>${fmtN(r3(values[i] / n * 360))}°</td></tr>`).join('') +
+      `<tr><td><b>Total</b></td><td><b>${n}</b></td><td><b>1</b></td><td><b>100%</b></td><td><b>360°</b></td></tr></table>`;
+  };
+  mkSeg('gbData', Object.keys(DS).map(k => [k, DS[k].name]), 0, v => { ds = v; draw(); });
+  mkSeg('gbType', [['bar', 'Bar graph'], ['pie', 'Pie chart'], ['pareto', 'Pareto diagram']], 0, v => { type = v; draw(); });
+  mkSeg('gbUnit', [['f', 'Frequency'], ['r', 'Relative frequency'], ['p', 'Percentage']], 0, v => { unit = v; draw(); });
+})();
+
+(function () { // Pareto sort
+  const base = [['Train', 10], ['Auto', 25], ['Walk', 5], ['Bus', 15], ['Trolley', 12]];
+  let sorted = false;
+  const draw = () => { const d = sorted ? base.slice().sort((a, b) => b[1] - a[1]) : base; $('#paretoChart').innerHTML = barSVG({ labels: d.map(x => x[0]), values: d.map(x => x[1]), title: 'How People Get to Work', yTitle: 'Frequency', h: 270, max: 30 }); };
+  $('#paretoBtn').addEventListener('click', () => { sorted = true; draw(); showToast('Pareto: bars sorted from highest to lowest'); });
+  $('#paretoReset').addEventListener('click', () => { sorted = false; draw(); });
+  draw();
+})();
+
+/* ---------- Slide 5: grouped table ---------- */
+(function () {
+  const rows = [[58, 64, 1], [65, 71, 6], [72, 78, 10], [79, 85, 14], [86, 92, 12], [93, 99, 5], [100, 106, 2]];
+  let mode = 'both', pick = 0;
+  const draw = () => {
+    const showL = mode !== 'b', showB = mode !== 'l';
+    $('#grpTable').innerHTML = '<table class="data"><tr>' + (showL ? '<th>Class limits</th>' : '') + (showB ? '<th>Class boundaries</th>' : '') + '<th>Frequency</th></tr>' +
+      rows.map((r, i) => `<tr class="grow" data-i="${i}" style="cursor:pointer;${i === pick ? 'background:#cffafe' : ''}">` + (showL ? `<td>${r[0]}–${r[1]}</td>` : '') + (showB ? `<td>${r[0] - 0.5} – ${r[1] + 0.5}</td>` : '') + `<td>${r[2]}</td></tr>`).join('') +
+      `<tr>${showL ? '<td></td>' : ''}${showB ? '<td></td>' : ''}<td><b>Total ${sum(rows.map(r => r[2]))}</b></td></tr></table>`;
+    $$('.grow').forEach(tr => tr.addEventListener('click', () => { pick = +tr.dataset.i; draw(); }));
+    const r = rows[pick]; $('#grpOut').innerHTML = `Class <b>${r[0]}–${r[1]}</b>: lower limit = <b>${r[0]}</b>, upper limit = <b>${r[1]}</b> → lower boundary = ${r[0]} − 0.5 = <b>${r[0] - 0.5}</b>, upper boundary = ${r[1]} + 0.5 = <b>${r[1] + 0.5}</b>. Class width = ${r[1] + 0.5 - (r[0] - 0.5)}.`;
+  };
+  mkSeg('grpMode', [['l', 'Class limits'], ['b', 'Class boundaries'], ['both', 'Both']], 2, v => { mode = v; draw(); });
+})();
+(function () { // boundaries calculator
+  const upd = () => {
+    const lo = parseFloat($('#bcLo').value), hi = parseFloat($('#bcHi').value);
+    if (isNaN(lo) || isNaN(hi) || hi < lo) { $('#bcLB').textContent = '—'; $('#bcUB').textContent = '—'; $('#bcW').textContent = '—'; $('#bcLine').innerHTML = ''; return; }
+    $('#bcLB').innerHTML = `<small>Lower boundary</small>${fmtN(lo - 0.5)}`; $('#bcUB').innerHTML = `<small>Upper boundary</small>${fmtN(hi + 0.5)}`; $('#bcW').innerHTML = `<small>Class width</small>${fmtN(hi - lo + 1)}`;
+    const a = lo - 3, b = hi + 3, W = 620, L = 20, R = 20, sx = v => L + (v - a) / (b - a) * (W - L - R), ay = 70; let s = `<line x1="${L}" y1="${ay}" x2="${W - R}" y2="${ay}" stroke="#334e68" stroke-width="2"/>`;
+    for (let v = Math.ceil(a); v <= b; v++) s += `<line x1="${sx(v)}" y1="${ay - 4}" x2="${sx(v)}" y2="${ay + 4}" stroke="#334e68"/>` + (b - a <= 30 || v % 5 === 0 ? T(sx(v), ay + 20, v, { s: 10 }) : '');
+    s += `<rect x="${sx(lo - .5)}" y="${ay - 34}" width="${sx(hi + .5) - sx(lo - .5)}" height="30" fill="#cffafe" stroke="#0b63c5" stroke-width="2"/>`;
+    s += `<circle cx="${sx(lo)}" cy="${ay - 19}" r="4" fill="#0b63c5"/><circle cx="${sx(hi)}" cy="${ay - 19}" r="4" fill="#0b63c5"/>` + T(sx(lo), ay - 40, 'lower limit ' + fmtN(lo), { s: 10, c: '#0b63c5', w: 700 }) + T(sx(hi), ay - 40, 'upper limit ' + fmtN(hi), { s: 10, c: '#0b63c5', w: 700 });
+    s += T(sx(lo - .5), ay + 38, fmtN(lo - .5), { s: 11, c: '#b91c1c', w: 700 }) + T(sx(hi + .5), ay + 38, fmtN(hi + .5), { s: 11, c: '#b91c1c', w: 700 });
+    $('#bcLine').innerHTML = svgWrap(W, 110, s, 'class limits and boundaries');
+  };
+  ['#bcLo', '#bcHi'].forEach(i => $(i).addEventListener('input', upd)); upd();
+})();
+
+/* ---------- Slide 6: storms dot plot, stem-and-leaf, histogram ---------- */
+const STORMS = [19, 9, 16, 15, 10, 28, 15, 16, 12, 15, 15, 12, 14, 8, 13, 19, 7, 8, 7, 8, 14, 11, 12, 7, 6, 11, 13, 4, 6, 12, 11, 9, 12, 6, 10, 9, 11, 8, 7, 13];
+$('#stormCells').innerHTML = STORMS.map(v => `<div class="cell" style="min-width:34px;padding:4px 6px;font-size:.85rem">${v}</div>`).join('');
+(function () {
+  $('#stormDot').innerHTML = dotSVG(STORMS, { min: 3, max: 29, hl: new Set([28]), xTitle: 'Number of named storms in a year' });
+  const show = v => { const n = STORMS.filter(x => x === +v).length; $('#stormOut').innerHTML = `Value <b>${v}</b> occurred in <b>${n}</b> year${n === 1 ? '' : 's'} (out of ${STORMS.length}).` + (+v === 28 ? ' <span style="color:#b91c1c;font-weight:700">← far from the rest: an outlier.</span>' : ''); };
+  $$('#stormDot .dotc').forEach(c => c.addEventListener('click', () => show(c.dataset.v)));
+})();
+(function () { // stem-and-leaf builder
+  const DATA = {
+    a: { name: 'Data set A (20 values)', v: [13, 32, 20, 31, 25, 23, 57, 2, 43, 14, 44, 32, 33, 32, 36, 45, 51, 44, 52, 32], div: 10, keyTxt: 'Key: 3 | 2 means 32' },
+    b: { name: '324, 327, … (the lecture example)', v: [324, 327, 330, 332, 335, 341, 345], div: 10, keyTxt: 'Key: 32 | 4 means 324' },
+    c: { name: '➕ Storms (40 values)', v: STORMS, div: 10, keyTxt: 'Key: 1 | 2 means 12' }
+  };
+  let k = 'a', idx = 0, ord = 's';
+  const draw = () => {
+    const d = DATA[k], vals = d.v.slice(0, idx); $('#slRaw').innerHTML = d.v.map((v, i) => `<div class="cell ${i < idx ? 'hl' : ''} ${i === idx ? 'sel' : ''}">${v}</div>`).join('');
+    if (!idx) { $('#slOut').textContent = '(empty — press “Add next value”)'; $('#slKey').textContent = ''; return; }
+    const mn = Math.floor(Math.min(...d.v) / d.div), mx = Math.floor(Math.max(...d.v) / d.div); let out = '';
+    for (let s = mn; s <= mx; s++) { let lv = vals.filter(v => Math.floor(v / d.div) === s).map(v => v % d.div); if (ord === 's') lv.sort((a, b) => a - b); out += String(s).padStart(String(mx).length, ' ') + ' | ' + lv.join(' ') + '\n'; }
+    $('#slOut').textContent = out; $('#slKey').textContent = d.keyTxt + ' · ' + idx + ' of ' + d.v.length + ' values added';
+  };
+  mkSeg('slData', Object.keys(DATA).map(x => [x, DATA[x].name]), 0, v => { k = v; idx = 0; draw(); });
+  mkSeg('slOrder', [['s', 'Leaves in increasing order'], ['e', 'Leaves in order of entry']], 0, v => { ord = v; draw(); });
+  $('#slAdd').addEventListener('click', () => { if (idx < DATA[k].v.length) idx++; draw(); });
+  $('#slAll').addEventListener('click', () => { idx = DATA[k].v.length; draw(); });
+  $('#slReset').addEventListener('click', () => { idx = 0; draw(); });
+})();
+(function () { // histogram of runners
+  const rf = [.05, .10, .15, .25, .20, .15, .10], bounds = [5.5, 10.5, 15.5, 20.5, 25.5, 30.5, 35.5, 40.5]; let unit = 'r';
+  const draw = () => {
+    $('#runnersHist').innerHTML = histSVG({ bounds, values: unit === 'r' ? rf : rf.map(x => x * 100), vfmt: unit === 'r' ? (x => fmtN(r3(x))) : (x => fmtN(r3(x)) + '%'), title: 'Histogram for Runners’ Times', xTitle: 'Miles', yTitle: unit === 'r' ? 'Relative frequency' : 'Percentage' });
+    $$('#runnersHist .bar').forEach(b => b.addEventListener('click', () => { const i = +b.dataset.i; $('#histOut').innerHTML = `Class <b>${bounds[i]} – ${bounds[i + 1]}</b> miles: relative frequency <b>${rf[i]}</b> = <b>${pct(rf[i])}%</b> of the runners.`; }));
+  };
+  mkSeg('histUnit', [['r', 'Relative frequency'], ['p', 'Percentage']], 0, v => { unit = v; draw(); });
+})();
+
+/* ---------- Slide 7: time series ---------- */
+(function () {
+  const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], labels = [], values = [];
+  for (let i = 0; i < 24; i++) { labels.push(mo[i % 12] + (i < 12 ? ' Y1' : ' Y2')); values.push(Math.round(100 + 3 * i + 28 * Math.sin(2 * Math.PI * (i - 3) / 12))); }
+  $('#tsChart').innerHTML = lineSVG({ labels, values, title: 'Monthly sales (illustrative)', yTitle: 'Sales', xTitle: 'Time (months)', tickEvery: 3 });
+})();
+
+/* ---------- Slide 8: live mean / median / mode ---------- */
+(function () {
+  const inp = $('#mmInput');
+  const upd = () => {
+    const d = parseNums(inp.value); if (!d.length) { $('#mmLine').innerHTML = ''; ['mmN', 'mmSum', 'mmMean', 'mmMed', 'mmMode'].forEach(i => $('#' + i).textContent = '—'); return; }
+    $('#mmLine').innerHTML = numberLineSVG(d, {});
+    const md = modes(d);
+    $('#mmN').innerHTML = `<small>n</small>${d.length}`; $('#mmSum').innerHTML = `<small>Σx</small>${fmtN(r3(sum(d)))}`; $('#mmMean').innerHTML = `<small>Mean</small>${fmtN(r3(mean(d)))}`; $('#mmMed').innerHTML = `<small>Median</small>${fmtN(r3(median(d)))}`; $('#mmMode').innerHTML = `<small>Mode</small>${md.length ? md.join(', ') : 'none'}`;
+  };
+  inp.addEventListener('input', upd);
+  $('#mmOut100').addEventListener('click', () => { inp.value = inp.value.trim().replace(/[,\s]+$/, '') + ', 100'; upd(); });
+  $('#mmRemove').addEventListener('click', () => { const d = parseNums(inp.value); d.pop(); inp.value = d.join(', '); upd(); });
+  $('#mmReset').addEventListener('click', () => { inp.value = '5, 3, 8, 5, 6'; upd(); });
+  upd();
+})();
+
+/* ---------- Slide 9: median steps, mode bar ---------- */
+(function () {
+  const EX = {
+    1: { n: 'Odd n = 7', d: [713, 300, 618, 595, 311, 401, 292] }, 2: { n: 'Even n = 8', d: [684, 764, 656, 702, 856, 1133, 1132, 1303] },
+    3: { n: 'Odd n = 7 (5, 7, 4, 5, 20, 6, 2)', d: [5, 7, 4, 5, 20, 6, 2] }, 4: { n: 'Even n = 6 (5, 7, 4, 5, 20, 6)', d: [5, 7, 4, 5, 20, 6] }
+  };
+  mkSeg('medSeg', Object.keys(EX).map(k => [k, EX[k].n]), 0, k => {
+    const d = EX[k].d, s = d.slice().sort((a, b) => a - b), n = s.length, odd = n % 2 === 1, m = median(d);
+    const cells = s.map((v, i) => `<div class="cell ${odd ? (i === (n - 1) / 2 ? 'sel' : '') : (i === n / 2 - 1 || i === n / 2 ? 'sel' : '')}">${v}</div>`).join('');
+    $('#medOut').innerHTML = `<p><b>Step 1.</b> The data: <span class="mono">${d.join(', ')}</span></p><p><b>Step 2.</b> Arrange from smallest to largest:</p><div class="cells">${cells}</div>` +
+      (odd ? `<p><b>Step 3.</b> n = ${n} is odd → the median is the middle number (position ${(n + 1) / 2}): <b>m = ${m}</b></p>` : `<p><b>Step 3.</b> n = ${n} is even → the median is the mean of the middle two numbers (positions ${n / 2} and ${n / 2 + 1}): m = (${s[n / 2 - 1]} + ${s[n / 2]}) ÷ 2 = <b>${fmtN(r3(m))}</b></p>`);
+  });
+  $('#modeBar').innerHTML = barSVG({ labels: ['Amor', 'Lamoure', 'Soothing', 'Smell Nice', 'Far Out'], values: [130, 360, 190, 80, 45], yTitle: 'Number of Responses', h: 280, colors: ['#10b981', '#f59e0b', '#3b82f6', '#fde047', '#fb923c'] });
+})();
+
+/* ---------- Slide 10: skewness ---------- */
+(function () {
+  const SH = { sym: { n: 'Symmetric', a: 4, b: 4, rel: 'mean = median = mode' }, right: { n: 'Right-skewed (positive)', a: 2, b: 5, rel: 'mean > median > mode' }, left: { n: 'Left-skewed (negative)', a: 5, b: 2, rel: 'mean < median < mode' } };
+  mkSeg('skewSeg', Object.keys(SH).map(k => [k, SH[k].n]), 1, k => {
+    const { a, b, rel } = SH[k], f = x => Math.pow(x, a - 1) * Math.pow(1 - x, b - 1), N = 400; let tot = 0, cdf = [], cum = 0;
+    for (let i = 0; i <= N; i++) { const v = f(i / N); tot += v; }
+    for (let i = 0; i <= N; i++) { cum += f(i / N) / tot; cdf.push(cum); }
+    const med = cdf.findIndex(c => c >= .5) / N, mean_ = a / (a + b), mode_ = (a - 1) / (a + b - 2), W = 600, H = 250, L = 30, R = 30, Tp = 40, B = 40, ph = H - Tp - B, pw = W - L - R, mx = Math.max(...Array.from({ length: N + 1 }, (_, i) => f(i / N)));
+    const sx = x => L + x * pw; let s = `<path d="M${sx(0)} ${Tp + ph} ` + Array.from({ length: N + 1 }, (_, i) => `L${sx(i / N)} ${Tp + ph - f(i / N) / mx * ph}`).join(' ') + ` L${sx(1)} ${Tp + ph} Z" fill="#cffafe" stroke="#0b63c5" stroke-width="2.5"/>`;
+    s += `<line x1="${L}" y1="${Tp + ph}" x2="${W - R}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/>`;
+    const items = [[mode_, 'Mode', '#8b5cf6', 14], [med, 'Median', '#10b981', 28], [mean_, 'Mean', '#ef4444', 42]];
+    items.sort((p, q) => p[0] - q[0]);
+    items.forEach(it => { s += `<line x1="${sx(it[0])}" y1="${Tp - 6}" x2="${sx(it[0])}" y2="${Tp + ph}" stroke="${it[2]}" stroke-width="2.5" stroke-dasharray="${it[1] === 'Mean' ? '5 4' : '0'}"/>`; });
+    // labels staggered so they do not overlap
+    items.forEach((it, i) => { s += T(sx(it[0]), 16 + (i % 2) * 14 + (k === 'sym' ? i * 0 : 0), it[1], { s: 11, c: it[2], w: 800 }); });
+    $('#skewChart').innerHTML = svgWrap(W, H, s, 'skewness');
+    $('#skewOut').innerHTML = `<b>${SH[k].n}:</b> ${rel}.` + (k === 'right' ? ' The long tail is on the <b>right</b>, and the mean is pulled toward it.' : k === 'left' ? ' The long tail is on the <b>left</b>, and the mean is pulled toward it.' : ' Both tails are balanced.');
+  });
+})();
+
+/* ---------- Slide 11: variability ---------- */
+(function () {
+  const A = [10, 60, 50, 30, 40, 20], B = [35, 45, 30, 35, 40, 25], W = 620, L = 30, R = 30, sx = v => L + v / 70 * (W - L - R); let s = '';
+  [['Brand A', A, 55], ['Brand B', B, 125]].forEach(([nm, d, y]) => {
+    s += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#1e293b" stroke-width="2"/>` + T(L, y - 40, nm, { a: 'start', s: 12, w: 800, c: '#0b63c5' });
+    for (let v = 0; v <= 70; v += 10) s += `<line x1="${sx(v)}" y1="${y}" x2="${sx(v)}" y2="${y + 5}" stroke="#1e293b"/>` + T(sx(v), y + 18, v, { s: 10 });
+    const c = {}; d.forEach(v => { c[v] = (c[v] || 0) + 1; s += `<circle cx="${sx(v)}" cy="${y - 9 - (c[v] - 1) * 14}" r="6" fill="#4f8ad6"><title>${v}</title></circle>`; });
+    s += `<line x1="${sx(35)}" y1="${y - 32}" x2="${sx(35)}" y2="${y}" stroke="#ef4444" stroke-dasharray="4 3" stroke-width="2"/>` + T(sx(35), y - 36, 'mean 35', { s: 10, c: '#b91c1c', w: 700 });
+    s += `<line x1="${sx(Math.min(...d))}" y1="${y + 30}" x2="${sx(Math.max(...d))}" y2="${y + 30}" stroke="#10b981" stroke-width="3"/>` + T((sx(Math.min(...d)) + sx(Math.max(...d))) / 2, y + 44, 'range = ' + (Math.max(...d) - Math.min(...d)), { s: 11, c: '#047857', w: 700 });
+  });
+  $('#paintDots').innerHTML = svgWrap(W, 190, s, 'paint lifetimes');
+})();
+(function () {
+  const upd = () => {
+    const n = parseFloat($('#vN').value), sx = parseFloat($('#vSx').value), sxx = parseFloat($('#vSxx').value);
+    if ([n, sx, sxx].some(isNaN) || n < 2) { ['vMean', 'vVar', 'vSd'].forEach(i => $('#' + i).textContent = '—'); $('#vSteps').textContent = 'Enter n ≥ 2, Σx and Σx².'; return; }
+    const v = (sxx - sx * sx / n) / (n - 1), m = sx / n;
+    $('#vMean').innerHTML = `<small>Mean</small>${fmtN(r3(m))}`; $('#vVar').innerHTML = `<small>Variance s²</small>${v < 0 ? 'invalid' : fmtN(r3(v))}`; $('#vSd').innerHTML = `<small>Std. deviation s</small>${v < 0 ? '—' : fmtN(r3(Math.sqrt(v)))}`;
+    $('#vSteps').innerHTML = v < 0 ? 'Σx² cannot be smaller than (Σx)²/n — check your numbers.' : `s² = [${fmtN(sxx)} − ${fmtN(sx)}²/${fmtN(n)}] / (${fmtN(n)} − 1) = [${fmtN(sxx)} − ${fmtN(r3(sx * sx / n))}] / ${fmtN(n - 1)} = ${fmtN(r3(sxx - sx * sx / n))} / ${fmtN(n - 1)} = <b>${fmtN(r3(v))}</b> → s = √${fmtN(r3(v))} = <b>${fmtN(r3(Math.sqrt(v)))}</b>`;
+  };
+  ['#vN', '#vSx', '#vSxx'].forEach(i => $(i).addEventListener('input', upd)); upd();
+  const upd2 = () => {
+    const d = parseNums($('#vRaw').value);
+    if (d.length < 2) { ['rN', 'rMean', 'rVar', 'rSd'].forEach(i => $('#' + i).textContent = '—'); return; }
+    const m = mean(d), v = (sum(d.map(x => x * x)) - Math.pow(sum(d), 2) / d.length) / (d.length - 1);
+    $('#rN').innerHTML = `<small>n</small>${d.length}`; $('#rMean').innerHTML = `<small>Mean</small>${fmtN(r3(m))}`; $('#rVar').innerHTML = `<small>Variance s²</small>${fmtN(r3(v))}`; $('#rSd').innerHTML = `<small>Std. deviation s</small>${fmtN(r3(Math.sqrt(v)))}`;
+  };
+  $('#vRaw').addEventListener('input', upd2); upd2();
+})();
+(function () { // SD slider
+  const draw = () => {
+    const sd = parseFloat($('#sdSlider').value); $('#sdVal').textContent = sd;
+    const W = 600, H = 230, L = 20, R = 20, Tp = 20, B = 36, ph = H - Tp - B, pw = W - L - R, sx = x => L + (x + 10) / 20 * pw, f = x => Math.exp(-x * x / (2 * sd * sd)) / (sd * Math.sqrt(2 * Math.PI)), sy = y => Tp + ph - y / 0.42 * ph;
+    let d = ''; for (let i = 0; i <= 200; i++) { const x = -10 + i / 10; d += (i ? 'L' : 'M') + sx(x) + ' ' + sy(f(x)) + ' '; }
+    let s = `<path d="${d}" fill="none" stroke="#0b63c5" stroke-width="3"/>`;
+    s += `<rect x="${sx(-sd)}" y="${Tp}" width="${sx(sd) - sx(-sd)}" height="${ph}" fill="#06b6d4" fill-opacity=".12"/>`;
+    s += `<line x1="${L}" y1="${Tp + ph}" x2="${W - R}" y2="${Tp + ph}" stroke="#334e68" stroke-width="1.5"/>`;
+    for (let x = -10; x <= 10; x += 5) s += `<line x1="${sx(x)}" y1="${Tp + ph}" x2="${sx(x)}" y2="${Tp + ph + 5}" stroke="#334e68"/>` + T(sx(x), Tp + ph + 19, x, { s: 10 });
+    s += `<line x1="${sx(0)}" y1="${Tp}" x2="${sx(0)}" y2="${Tp + ph}" stroke="#ef4444" stroke-dasharray="5 4" stroke-width="2"/>` + T(sx(0), Tp + 12, 'mean', { s: 11, c: '#b91c1c', w: 700 });
+    s += T(sx(sd), Tp + 28, '+1 s', { s: 11, a: 'start', c: '#0e7490', w: 700 }) + T(sx(-sd), Tp + 28, '−1 s', { s: 11, a: 'end', c: '#0e7490', w: 700 });
+    $('#sdChart').innerHTML = svgWrap(W, H, s, 'standard deviation');
+  };
+  $('#sdSlider').addEventListener('input', draw); draw();
+})();
+$('#wheelsHist').innerHTML = histSVG({ centers: [1, 2, 3, 4, 5, 6, 7, 8], values: [1, 7, 11, 7, 0, 1, 0, 1], title: 'Histogram of the wheels data (MINITAB)', xTitle: 'Wheels', yTitle: 'Frequency', colors: ['#9ca3af'] });
+
+/* ---------- Slide 12: quartiles & z ---------- */
+(function () {
+  const upd = () => {
+    const d = parseNums($('#qInput').value); if (d.length < 2) { $('#qCells').innerHTML = ''; ['qQ1', 'qQ2', 'qQ3', 'qIQR'].forEach(i => $('#' + i).textContent = '—'); return; }
+    const q = quartiles(d), n = q.s.length, h = Math.floor(n / 2);
+    $('#qCells').innerHTML = q.s.map((v, i) => { const mid = n % 2 && i === h, lower = i < h, st = mid ? 'background:#fde68a;border-color:#f59e0b' : lower ? 'background:#e0f2fe' : 'background:#cffafe'; return `<div class="cell" style="${st}">${v}</div>`; }).join('');
+    $('#qQ1').innerHTML = `<small>Q1 (median of lower half)</small>${fmtN(r3(q.q1))}`; $('#qQ2').innerHTML = `<small>Q2 = median</small>${fmtN(r3(q.q2))}`; $('#qQ3').innerHTML = `<small>Q3 (median of upper half)</small>${fmtN(r3(q.q3))}`; $('#qIQR').innerHTML = `<small>IQR = Q3 − Q1</small>${fmtN(r3(q.q3 - q.q1))}`;
+  };
+  $('#qInput').addEventListener('input', upd); upd();
+  const z = () => {
+    const x = parseFloat($('#zX').value), m = parseFloat($('#zM').value), s = parseFloat($('#zS').value);
+    if ([x, m, s].some(isNaN) || s <= 0) { $('#zOut').textContent = 'Enter x, the mean, and a positive s.'; $('#zLine').innerHTML = ''; return; }
+    const zz = (x - m) / s;
+    $('#zOut').innerHTML = `z = (${fmtN(x)} − ${fmtN(m)}) ÷ ${fmtN(s)} = <b>${fmtN(r3(zz))}</b> — the value is ${fmtN(r3(Math.abs(zz)))} standard deviation${Math.abs(zz) === 1 ? '' : 's'} ${zz > 0 ? 'above' : zz < 0 ? 'below' : 'exactly at'} the mean.`;
+    const W = 620, L = 30, R = 30, sx = v => L + (Math.max(-4, Math.min(4, v)) + 4) / 8 * (W - L - R), ay = 60; let g = `<line x1="${L}" y1="${ay}" x2="${W - R}" y2="${ay}" stroke="#334e68" stroke-width="2"/>`;
+    for (let v = -4; v <= 4; v++) g += `<line x1="${sx(v)}" y1="${ay - 5}" x2="${sx(v)}" y2="${ay + 5}" stroke="#334e68"/>` + T(sx(v), ay + 22, 'z=' + v, { s: 10 });
+    g += `<line x1="${sx(0)}" y1="${ay - 30}" x2="${sx(0)}" y2="${ay}" stroke="#ef4444" stroke-dasharray="4 3" stroke-width="2"/>` + T(sx(0), ay - 34, 'mean', { s: 11, c: '#b91c1c', w: 700 });
+    g += `<circle cx="${sx(zz)}" cy="${ay}" r="9" fill="${Math.abs(zz) > 3 ? '#ef4444' : '#0b63c5'}"/>` + T(sx(zz), ay - 16, 'z = ' + fmtN(r3(zz)), { s: 11, c: '#0b63c5', w: 800 });
+    $('#zLine').innerHTML = svgWrap(W, 100, g, 'z-score line');
+  };
+  ['#zX', '#zM', '#zS'].forEach(i => $(i).addEventListener('input', z)); z();
+})();
+
+/* ---------- Slide 13: box plots ---------- */
+$('#boxGeneric').innerHTML = boxSVG({ min: 2, q1: 4, med: 6, q3: 9, max: 13, axisMin: 0, axisMax: 14, step: 2, labels: true, h: 150 });
+$('#boxRight').innerHTML = boxSVG({ min: 1, q1: 2, med: 3, q3: 6, max: 14, axisMin: 0, axisMax: 15, step: 5, h: 130 });
+$('#boxLeft').innerHTML = boxSVG({ min: 1, q1: 9, med: 12, q3: 13, max: 14, axisMin: 0, axisMax: 15, step: 5, h: 130 });
+$('#boxEx1').innerHTML = boxSVG({ min: 40, q1: 67.5, med: 200, q3: 275, max: 420, axisMin: 0, axisMax: 450, step: 50, h: 150 });
+$('#boxEx2').innerHTML = boxSVG({ min: 0, q1: 3, med: 4, q3: 6, max: 11, outliers: [12, 13, 16], axisMin: 0, axisMax: 16, step: 2, h: 150 });
+(function () {
+  const upd = () => {
+    const d = parseNums($('#bxInput').value); if (d.length < 4) { $('#bxChart').innerHTML = ''; $('#bxOut').textContent = 'Enter at least 4 numbers.'; return; }
+    const q = quartiles(d), iqr = q.q3 - q.q1, lo = q.q1 - 1.5 * iqr, hi = q.q3 + 1.5 * iqr, out = q.s.filter(v => v < lo || v > hi), inl = q.s.filter(v => v >= lo && v <= hi);
+    const aMin = Math.min(q.min, lo), aMax = Math.max(q.max, hi), step = niceStep((aMax - aMin) / 10), axMin = Math.floor(aMin / step) * step, axMax = Math.ceil(aMax / step) * step;
+    $('#bxChart').innerHTML = boxSVG({ min: Math.min(...inl), q1: q.q1, med: q.q2, q3: q.q3, max: Math.max(...inl), outliers: out, axisMin: axMin, axisMax: axMax, step, labels: true, fences: [lo, hi], h: 190 });
+    $('#bxQ1').innerHTML = `<small>Q1</small>${fmtN(r3(q.q1))}`; $('#bxQ3').innerHTML = `<small>Q3</small>${fmtN(r3(q.q3))}`; $('#bxIQR').innerHTML = `<small>IQR</small>${fmtN(r3(iqr))}`; $('#bxLo').innerHTML = `<small>Q1 − 1.5·IQR</small>${fmtN(r3(lo))}`; $('#bxHi').innerHTML = `<small>Q3 + 1.5·IQR</small>${fmtN(r3(hi))}`;
+    $('#bxOut').innerHTML = out.length ? `Outlier${out.length > 1 ? 's' : ''}: <b style="color:#b91c1c">${out.join(', ')}</b> (outside the interval from ${fmtN(r3(lo))} to ${fmtN(r3(hi))}).` : `No outliers: every value lies inside the interval from ${fmtN(r3(lo))} to ${fmtN(r3(hi))}.`;
+  };
+  $('#bxInput').addEventListener('input', upd); upd();
+  const zo = () => {
+    const m = parseFloat($('#zoM').value), s = parseFloat($('#zoS').value), v = parseNums($('#zoV').value);
+    if (isNaN(m) || isNaN(s) || s <= 0 || !v.length) { $('#zoOut').textContent = 'Enter x̄, a positive s, and some values.'; return; }
+    $('#zoOut').innerHTML = '<table class="data"><tr><th>x</th><th>z = (x − x̄) ÷ s</th><th>|z| &gt; 3 ?</th></tr>' + v.map(x => { const z = (x - m) / s, o = Math.abs(z) > 3; return `<tr><td>${fmtN(x)}</td><td>${fmtN(r3(z))}</td><td style="${o ? 'color:#b91c1c;font-weight:800' : ''}">${o ? 'outlier' : 'not an outlier'}</td></tr>`; }).join('') + '</table>';
+  };
+  ['#zoM', '#zoS', '#zoV'].forEach(i => $(i).addEventListener('input', zo)); zo();
+})();
+
+/* ================= FINAL EXAM (25 new questions) ================= */
+const EXAM = [
+  { t: 'Types of data', q: 'Which of the following is a <b>quantitative</b> variable?', o: ['Eye colour', 'Nationality', 'Shoe size', 'Favourite sport'], a: 2, e: 'Shoe size is a number on which arithmetic (such as an average) makes sense. The other three are categories.' },
+  { t: 'Relative frequency', q: 'A class has frequency 12 in a sample of n = 60. Its relative frequency is:', o: ['0.12', '0.20', '0.50', '5'], a: 1, e: 'Relative frequency = f ÷ n = 12 ÷ 60 = 0.20 (that is, 20%).' },
+  { t: 'Percentages', q: 'The class percentages of a frequency distribution of a qualitative variable always add up to:', o: ['1', '50%', '100%', 'n'], a: 2, e: 'All classes together make the whole sample, so the percentages sum to 100% (and the relative frequencies to 1), apart from rounding.' },
+  { t: 'Pie chart', q: 'A class has relative frequency 0.25. In a pie chart its wedge has an angle of:', o: ['25°', '45°', '90°', '180°'], a: 2, e: 'Degree = relative frequency × 360° = 0.25 × 360° = 90°.' },
+  { t: 'Pareto diagram', q: 'A manager wants to show which of six types of defects occur most often, with the biggest problems appearing first. The best graph is a:', o: ['Pie chart', 'Dot plot', 'Pareto diagram', 'Time series plot'], a: 2, e: 'A Pareto diagram is a bar graph with the bars sorted from the highest frequency to the lowest.' },
+  { t: 'Histogram', q: 'How does a histogram of a numerical variable differ from a bar graph of categories?', o: ['Its bars touch, because the classes are numerical intervals with class boundaries', 'It uses percentages only', 'Its bars must be sorted from the highest to the lowest', 'It can only be drawn for qualitative data'], a: 0, e: 'The horizontal axis of a histogram shows class boundaries, so there are no gaps between bars. Bar graphs have separate bars for separate categories.' },
+  { t: 'Class boundaries', q: 'The class limits of a class are 30–39 (whole numbers). Its class boundaries are:', o: ['30 – 39', '29.5 – 39.5', '30.5 – 38.5', '29 – 40'], a: 1, e: 'Lower boundary = 30 − 0.5 = 29.5; upper boundary = 39 + 0.5 = 39.5. Boundaries remove the gap between classes.' },
+  { t: 'Stem-and-leaf', q: 'In a stem-and-leaf plot the row <span class="mono">4 | 2 7 9</span> represents the values:', o: ['4, 2, 7, 9', '42, 47, 49', '4.2, 7, 9', '24, 74, 94'], a: 1, e: 'The stem (4) is the tens digit and each leaf is a units digit, so the values are 42, 47 and 49.' },
+  { t: 'Dot plot', q: 'Which graph makes it easiest to spot one unusually large value in a small set of numbers?', o: ['Pie chart', 'Dot plot', 'Pareto diagram', 'Bar graph of categories'], a: 1, e: 'A dot plot shows every value as a dot on a number line, so a dot far from the rest stands out immediately.' },
+  { t: 'Time series', q: 'In a time series plot, the horizontal axis normally shows:', o: ['The class frequencies', 'The percentages', 'Time (dates or periods)', 'The class boundaries'], a: 2, e: 'A time series plot (run chart) follows data over time, so time goes on the horizontal axis and the points are joined by a line.' },
+  { t: 'Mean', q: 'The mean of the measurements 4, 8, 6, 5, 7 is:', o: ['5', '6', '7', '30'], a: 1, e: 'Σx = 4 + 8 + 6 + 5 + 7 = 30 and n = 5, so x̄ = 30 ÷ 5 = 6.' },
+  { t: 'Median', q: 'The median of 3, 9, 4, 12 is:', o: ['4', '6', '6.5', '7'], a: 2, e: 'Sorted: 3, 4, 9, 12. n = 4 is even, so the median is the mean of the middle two: (4 + 9) ÷ 2 = 6.5.' },
+  { t: 'Outliers and the mean', q: 'For the data 2, 3, 4, 5, 100 the mean is 22.8 and the median is 4. Which statement is correct?', o: ['The mean describes the typical value better', 'The median describes the typical value better, because the mean is pulled up by the extreme value 100', 'The mean and the median are equal', 'Neither can be computed with an extreme value'], a: 1, e: 'The mean uses every value, so 100 drags it up to 22.8. The median (4) depends only on the middle position and is not affected by how large the extreme value is.' },
+  { t: 'Mode', q: 'The mode of the data 2, 3, 3, 5, 5, 5, 9 is:', o: ['3', '5', '9', '4.57'], a: 1, e: 'The mode is the most frequent value: 5 occurs three times. (4.57 is the mean, 32 ÷ 7.)' },
+  { t: 'Shape', q: 'Which ordering is correct for a <b>right-skewed</b> (positively skewed) distribution?', o: ['mean < median < mode', 'mean = median = mode', 'mean > median > mode', 'median > mean > mode'], a: 2, e: 'The long right tail pulls the mean upward the most, then the median, and the mode stays the smallest: mean > median > mode.' },
+  { t: 'Range', q: 'The smallest value of a data set is 12 and the largest is 48. The range is:', o: ['30', '36', '48', '60'], a: 1, e: 'Range = largest − smallest = 48 − 12 = 36.' },
+  { t: 'Variance', q: 'For a sample with n = 3, Σx = 12 and Σx² = 56, the sample variance s² is:', o: ['4', '8', '2.67', '16'], a: 0, e: 's² = [Σx² − (Σx)²/n] ÷ (n − 1) = [56 − 144/3] ÷ 2 = (56 − 48) ÷ 2 = 4. (8 is the numerator; 2.67 results from dividing by n instead of n − 1.)' },
+  { t: 'Units of variability', q: 'Exam marks are measured in points. The variance is measured in ____, and the standard deviation in ____.', o: ['points; points²', 'points²; points', 'points²; points²', 'points; points'], a: 1, e: 'The variance averages squared deviations, so its unit is squared (points²). Taking the square root returns the standard deviation to the original unit (points).' },
+  { t: 'Standard deviation', q: 'Two machines fill bottles with the same mean volume. Machine X has s = 0.5 ml and Machine Y has s = 2 ml. Which statement is correct?', o: ['Machine Y is more consistent', 'Machine X is more consistent', 'They are equally consistent because the means are equal', 'The machines cannot be compared'], a: 1, e: 'With equal means, the smaller standard deviation means the values are closer to the mean, so Machine X is more consistent.' },
+  { t: 'z-score', q: 'A student scores x = 80 in a test with mean 70 and standard deviation 5. The z-score is:', o: ['+2', '+10', '+0.5', '−2'], a: 0, e: 'z = (x − x̄) ÷ s = (80 − 70) ÷ 5 = +2: the score is 2 standard deviations above the mean.' },
+  { t: 'z-score', q: 'A value x = 55 comes from a data set with mean 70 and standard deviation 10. Its z-score is:', o: ['+1.5', '−1.5', '−15', '+0.15'], a: 1, e: 'z = (55 − 70) ÷ 10 = −1.5: the value lies 1.5 standard deviations below the mean.' },
+  { t: 'Percentile', q: 'A student’s score is at the 90th percentile. This means that:', o: ['The student answered 90% of the questions correctly', 'About 90% of the scores are at or below this score', 'About 90% of the scores are above this score', 'The score equals 90'], a: 1, e: 'The k-th percentile is a value with about k% of the data at or below it. It describes the position in the data, not the percentage of correct answers.' },
+  { t: 'IQR rule', q: 'For a data set Q₁ = 10 and Q₃ = 18. By the IQR rule, is the value 33 an outlier?', o: ['Yes, because it is above the upper fence 30', 'No, because the upper fence is 36', 'No, because outliers can only be below Q₁', 'It cannot be decided without the mean'], a: 0, e: 'IQR = 18 − 10 = 8 and 1.5 × 8 = 12. Upper fence = 18 + 12 = 30 and lower fence = 10 − 12 = −2. Since 33 > 30 it is an outlier.' },
+  { t: 'z-score rule', q: 'Which z-score would <b>not</b> be flagged as an outlier by the rule |z| > 3?', o: ['3.727', '−3.273', '−2.9', '4.1'], a: 2, e: 'Only values with |z| greater than 3 are outliers. |−2.9| = 2.9 is less than 3.' },
+  { t: 'Box plot', q: 'In a box plot, the box extends from:', o: ['The minimum to the maximum', 'Q₁ to Q₃ (it contains the middle 50% of the data)', 'The mean minus s to the mean plus s', 'The median to the maximum'], a: 1, e: 'The box runs from the lower quartile Q₁ to the upper quartile Q₃ with a line at the median; its length is the IQR.' }
+];
+
+(function () {
+  const root = $('#examRoot'); if (!root) return;
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  let qs, idx, right, wrong;
+  const letters = 'ABCD';
+  function start() {
+    qs = shuffle(EXAM).map(q => { const o = shuffle(q.o.map((t, i) => ({ t, ok: i === q.a }))); return { t: q.t, q: q.q, o, e: q.e }; });
+    idx = 0; right = 0; wrong = []; show();
+  }
+  function show() {
+    if (idx >= qs.length) return result();
+    const q = qs[idx];
+    root.innerHTML = `<div class="card primary"><div class="row" style="justify-content:space-between"><b>Question ${idx + 1} of ${qs.length}</b><span class="pill">${q.t}</span><span>✅ ${right}</span></div>
+      <div class="progress-track" style="margin:8px 0 14px"><div class="progress-fill" style="width:${idx / qs.length * 100}%"></div></div>
+      <div class="quiz" style="margin:0"><div class="q"><span class="qnum">${idx + 1}</span><span>${q.q}</span></div>
+      <div class="opts">${q.o.map((o, i) => `<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span> ${o.t}</div>`).join('')}</div>
+      <div class="feedback" id="exFb"></div></div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn primary" type="button" id="exNext" disabled>${idx === qs.length - 1 ? 'Finish ▶' : 'Next ▶'}</button></div></div>`;
+    $$('.opt', root).forEach(el => el.addEventListener('click', () => {
+      if (el.classList.contains('disabled')) return; const i = +el.dataset.i, ok = q.o[i].ok;
+      $$('.opt', root).forEach((x, k) => { x.classList.add('disabled'); if (q.o[k].ok) x.classList.add('correct'); });
+      if (!ok) el.classList.add('wrong');
+      const fb = $('#exFb'); fb.className = 'feedback show ' + (ok ? 'ok' : 'no'); fb.textContent = (ok ? 'Correct! ' : 'Not quite. ') + q.e;
+      if (ok) right++; else wrong.push({ q: q.q, mine: q.o[i].t, good: q.o.find(x => x.ok).t, e: q.e, t: q.t });
+      $('#exNext').disabled = false;
+    }));
+    $('#exNext').addEventListener('click', () => { idx++; show(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  }
+  function result() {
+    const p = Math.round(right / qs.length * 100), msg = p >= 90 ? 'Excellent! You have mastered the chapter. 🌟' : p >= 75 ? 'Very good — review the mistakes below. 👍' : p >= 50 ? 'Good start — revisit the slides listed below and try again.' : 'Review the lecture slides carefully, then retake the exam.';
+    root.innerHTML = `<div class="card primary" style="text-align:center"><h2 style="color:var(--primary-dark)">📝 Exam result</h2><div class="big" style="font-size:2.6rem">${right} / ${qs.length}</div><p style="font-size:1.2rem"><b>${p}%</b></p><p>${msg}</p>
+      <p><button class="btn primary" type="button" id="exRetake">🔄 Retake the exam</button> <button class="btn ghost" type="button" onclick="goTo(0)">Back to the beginning</button></p></div>` +
+      (wrong.length ? `<div class="card accent"><h3>Review your mistakes (${wrong.length})</h3>` + wrong.map((w, i) => `<div class="widget"><p><span class="pill">${w.t}</span></p><p><b>${i + 1}.</b> ${w.q}</p><p style="color:#b91c1c">Your answer: ${w.mine}</p><p style="color:#047857"><b>Correct answer: ${w.good}</b></p><p style="font-size:.92rem">${w.e}</p></div>`).join('') + '</div>' : '<div class="card accent"><h3>🎉 No mistakes — a perfect score!</h3></div>');
+    $('#exRetake').addEventListener('click', start); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  start();
+})();
+
+</script>
+</body>
+</html>
