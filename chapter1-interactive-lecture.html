@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1 — Statistics, Data, and Statistical Thinking | Interactive Lecture</title>
+<style>:root{
+  --ink:#17153B; --ink2:#3B3963; --muted:#5E5C82; --paper:#EEEDF6; --white:#fff;
+  --c:#5B3DF5; --ok:#0B8A5B; --okbg:#CBF5E0; --bad:#C2255C; --badbg:#FFD9E6; --hi:#FFE066;
+  --tint:color-mix(in srgb,var(--c) 11%,white);
+  --display:"Arial Black","Segoe UI Black","Avenir Next Heavy","Helvetica Neue",system-ui,sans-serif;
+  --body:system-ui,"Segoe UI",Tahoma,"Noto Kufi Arabic",Arial,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+  font-size:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--body);color:var(--ink);line-height:1.7;min-height:100vh;
+  background:var(--paper);background-image:radial-gradient(rgba(23,21,59,.13) 1.1px,transparent 1.2px);background-size:22px 22px}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+
+/* ---------- top bar ---------- */
+header.top{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff;border-bottom:4px solid var(--c)}
+.top-in{display:flex;align-items:center;gap:16px;padding:10px 20px;max-width:1280px;margin:0 auto}
+.brand{display:flex;flex-direction:column;line-height:1.15}
+.brand b{font-family:var(--display);font-size:1.05rem;letter-spacing:-.2px}
+.brand small{opacity:.75;font-size:.72rem;margin-top:2px}
+.spacer{flex:1}
+.ticket{display:flex;gap:0;border:2px solid #fff;border-radius:4px;overflow:hidden;font-size:.82rem}
+.ticket div{padding:4px 12px;display:flex;gap:6px;align-items:baseline}
+.ticket div+div{border-left:2px dashed rgba(255,255,255,.55)}
+.ticket b{font-family:var(--display);font-size:1rem}
+.progress-track{height:5px;background:rgba(255,255,255,.18)}
+.progress-fill{height:100%;width:0;background:var(--c);filter:brightness(1.35);transition:width .45s ease}
+
+/* ---------- shell: rail + page ---------- */
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);gap:0;max-width:1280px;margin:0 auto}
+nav#tabs{position:sticky;top:78px;align-self:start;height:calc(100vh - 78px);overflow-y:auto;padding:22px 14px 90px 20px;display:flex;flex-direction:column;gap:6px}
+.tab{display:flex;align-items:center;gap:10px;text-align:left;background:transparent;border:2px solid transparent;border-radius:4px;padding:7px 8px;cursor:pointer;color:var(--ink2);font-size:.86rem;font-weight:600;line-height:1.25;transition:background .15s}
+.tab .num{flex:0 0 auto;width:26px;height:26px;display:grid;place-items:center;border:2px solid var(--tc,var(--ink));color:var(--tc,var(--ink));font-weight:800;font-size:.78rem;background:#fff;border-radius:3px}
+.tab:hover{background:rgba(255,255,255,.7)}
+.tab.active{background:#fff;border-color:var(--ink);color:var(--ink);box-shadow:3px 3px 0 var(--tc)}
+.tab.active .num{background:var(--tc);color:#fff}
+.tab.done .num::after{content:"";}
+main#main{padding:26px 24px 110px 10px;min-width:0}
+section.slide{display:none;max-width:860px}
+section.slide.active{display:block;animation:rise .35s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){section.slide.active{animation:none}.progress-fill{transition:none}}
+
+/* ---------- slide header ---------- */
+.slidehead{display:flex;align-items:center;gap:20px;margin:4px 0 26px}
+.bignum{font-family:var(--display);font-size:clamp(4.4rem,11vw,7.2rem);line-height:.82;color:transparent;-webkit-text-stroke:3px var(--c);letter-spacing:-4px;flex:0 0 auto}
+.slide-title{font-family:var(--display);font-size:clamp(1.5rem,3.4vw,2.25rem);line-height:1.1;margin:0 0 6px;letter-spacing:-.6px;color:var(--ink)}
+.subtitle{margin:0;color:var(--muted);font-size:.95rem}
+
+/* ---------- sheets ---------- */
+.card{background:#fff;border:2px solid var(--ink);border-radius:4px;box-shadow:6px 6px 0 var(--c);padding:24px 26px;margin:0 6px 30px 0}
+.card.primary,.card.accent{}
+h3{font-family:var(--display);font-size:1.12rem;letter-spacing:-.2px;margin:26px 0 8px;color:var(--ink)}
+h3:first-child{margin-top:0}
+h4{margin:0 0 6px;font-size:1rem;color:var(--ink)}
+p{margin:9px 0;max-width:68ch}
+ul,ol{margin:8px 0 8px 22px;padding:0;max-width:68ch}
+li{margin:6px 0}
+.ar{font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif;font-weight:600;direction:rtl;display:inline-block;color:var(--c)}
+.term{background:linear-gradient(transparent 55%,var(--hi) 55%);font-weight:700}
+.mono{font-family:Consolas,"Courier New",monospace}
+.pill{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-weight:700;font-size:.8rem;background:#fff;margin:2px 2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.two,.three{grid-template-columns:1fr}}
+.big{font-family:var(--display);font-size:1.9rem;color:var(--c)}
+
+/* definitions */
+.formula{font-family:var(--serif);font-size:1.12rem;line-height:1.6;padding:12px 18px;margin:14px 0;background:var(--tint);border-left:8px solid var(--c);max-width:70ch}
+.formula b{font-style:italic}
+.frac{display:inline-block;vertical-align:middle;text-align:center;margin:0 5px}
+.frac .top{display:block;border-bottom:2px solid var(--ink);padding:0 6px 2px}
+.frac .bot{display:block;padding-top:2px}
+
+/* ---------- Arabic notes ---------- */
+.explain,.tipbox,.warnbox,.srcnote{direction:rtl;text-align:right;padding:12px 16px;margin:14px 0;font-size:.97rem;line-height:1.95;font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif;max-width:74ch}
+.explain{background:var(--tint);border:2px solid var(--c);border-radius:4px 22px 4px 22px}
+.explain .h{color:var(--c);filter:brightness(.78)}
+.tipbox{background:#fff;border:2px dashed var(--ink);border-radius:4px}
+.warnbox{background:var(--badbg);border:2px solid var(--bad);border-radius:4px;color:#6b0f2f}
+.srcnote{background:var(--ink);color:#fff;border-radius:4px;font-size:.9rem;line-height:1.85}
+.srcnote b{color:var(--hi)}
+.srcnote.added{background:#fff;color:var(--ink);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--hi)}
+.srcnote.added b{color:var(--ink);background:var(--hi);padding:0 5px}
+.explain b,.tipbox b,.warnbox b{font-weight:800}
+
+/* ---------- widgets (instrument panels) ---------- */
+.widget{position:relative;background:#fff;border:2px dashed var(--ink);border-radius:4px;padding:26px 16px 16px;margin:20px 0}
+.widget>h4{position:absolute;top:-14px;left:12px;background:var(--ink);color:#fff;padding:3px 12px;font-size:.84rem;border-radius:3px;max-width:calc(100% - 24px)}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.seg button{border:2px solid var(--ink);background:#fff;color:var(--ink);padding:5px 12px;font-size:.84rem;font-weight:700;cursor:pointer;border-radius:3px}
+.seg button:hover{background:var(--tint)}
+.seg button.on{background:var(--ink);color:#fff}
+.cells{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0}
+.cell{min-width:38px;padding:5px 9px;text-align:center;border:2px solid var(--ink);background:#fff;font-weight:700;border-radius:3px;transition:transform .12s}
+.cell.hl{background:var(--hi);transform:translateY(-2px)}
+.cell.sel{background:var(--c);color:#fff}
+input.num,textarea.num{border:2px solid var(--ink);border-radius:3px;padding:7px 10px;font:inherit;width:100%;background:#fff;color:var(--ink)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row input.num{flex:1;min-width:140px}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:8px 0}
+.calc-grid label{font-size:.8rem;color:var(--muted);font-weight:700;display:block;margin-bottom:3px}
+.out{border:2px solid var(--ink);padding:7px 10px;font-weight:800;text-align:center;background:var(--tint);border-radius:3px}
+.out small{display:block;font-weight:600;color:var(--muted);font-size:.72rem}
+.readout{margin:10px 0;padding:10px 14px;border-left:6px solid var(--ink);background:#F6F5FC;font-size:.93rem}
+.plot-box{border:2px solid var(--ink);border-radius:4px;padding:10px;text-align:center;background:#fff}
+.plot-box svg{max-width:100%;height:auto}
+.plot-box .cap{font-size:.82rem;color:var(--muted);margin-top:4px}
+svg text{font-family:system-ui,"Segoe UI",Arial,sans-serif}
+
+/* ---------- questions ---------- */
+.quiz{background:#F7F6FD;border:2px solid var(--ink);border-radius:4px;padding:14px 16px;margin:16px 0}
+.quiz .q{font-weight:700;margin-bottom:10px;display:flex;gap:10px}
+.qnum{flex:0 0 auto;min-width:26px;height:26px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:.78rem;border-radius:3px;padding:0 4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{display:flex;gap:10px;align-items:center;background:#fff;border:2px solid var(--ink);padding:8px 12px;cursor:pointer;font-size:.93rem;border-radius:3px;transition:transform .12s,box-shadow .12s}
+.opt:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--c)}
+.opt .key{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;background:var(--ink);color:#fff;font-weight:800;font-size:.76rem;border-radius:3px}
+.opt.correct{background:var(--okbg);border-color:var(--ok)}
+.opt.correct .key{background:var(--ok)}
+.opt.wrong{background:var(--badbg);border-color:var(--bad)}
+.opt.wrong .key{background:var(--bad)}
+.opt.disabled{pointer-events:none}
+.feedback{display:none;margin-top:10px;font-size:.9rem;font-weight:700}
+.feedback.show{display:block}
+.feedback.ok{color:var(--ok)}
+.feedback.no{color:var(--bad)}
+.quiz.numq .chk{padding:8px 18px}
+.quiz.numq.done input{background:var(--okbg);border-color:var(--ok)}
+/* classification rows */
+.gq{display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:center;padding:10px 0;border-bottom:2px dotted rgba(23,21,59,.35)}
+.gq .gt{font-size:.95rem}
+.gq .gtag{display:inline-block;min-width:22px;color:#fff;background:var(--ink);padding:0 6px;border-radius:3px;margin-right:6px;font-size:.78rem;text-align:center}
+.gq .gb{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.gq .gb button{border:2px solid var(--ink);background:#fff;padding:4px 11px;font-weight:700;font-size:.8rem;cursor:pointer;border-radius:3px}
+.gq .gb button:hover{background:var(--hi)}
+.gq .gb button.right{background:var(--okbg);border-color:var(--ok)}
+.gq .gb button.miss{background:var(--badbg);border-color:var(--bad)}
+.gq.locked .gb button{pointer-events:none}
+.gq .feedback{grid-column:1/-1;margin:0}
+@media(max-width:620px){.gq{grid-template-columns:1fr}.gq .gb{justify-content:flex-start}}
+
+/* ---------- buttons ---------- */
+.btn{border:2px solid var(--ink);background:#fff;color:var(--ink);padding:8px 18px;font-weight:800;font-size:.9rem;cursor:pointer;border-radius:3px;box-shadow:3px 3px 0 var(--ink);transition:transform .1s,box-shadow .1s}
+.btn:hover{background:var(--hi)}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.btn.primary{background:var(--ink);color:#fff;box-shadow:3px 3px 0 var(--c)}
+.btn.primary:hover{background:var(--c)}
+.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+
+/* ---------- reveal ---------- */
+.reveal{border:2px solid var(--ink);background:#fff;margin:12px 0;border-radius:4px}
+.reveal summary{cursor:pointer;font-weight:800;padding:8px 14px;list-style:none;background:var(--hi)}
+.reveal summary::-webkit-details-marker{display:none}
+.reveal summary::before{content:"＋ "}
+.reveal[open] summary::before{content:"－ "}
+.reveal .body{padding:10px 16px;font-size:.94rem}
+
+/* ---------- tables ---------- */
+table.data{width:100%;border-collapse:collapse;margin:12px 0;font-size:.9rem;background:#fff}
+table.data th,table.data td{border:2px solid var(--ink);padding:7px 10px;text-align:center}
+table.data th{background:var(--ink);color:#fff}
+table.data td.l,table.data th.l{text-align:left}
+.steps .step{display:flex;gap:12px;padding:10px 0;border-bottom:2px dotted rgba(23,21,59,.3)}
+.steps .n{flex:0 0 auto;width:30px;height:30px;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800;border-radius:3px}
+
+/* ---------- objectives / summary / think-pair-share ---------- */
+.obj-list{list-style:none;margin:0;padding:0}
+.obj-list li{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:2px dotted rgba(23,21,59,.3)}
+.obj-list .icon{flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;background:var(--c);color:#fff;font-weight:800;border-radius:3px}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.sum-card{border:2px solid var(--ink);padding:12px 14px;background:var(--tint);border-radius:4px}
+.sum-card h4{font-family:var(--display);font-size:.95rem}
+.sum-card p{margin:0;font-size:.88rem}
+.tps{border:2px solid var(--ink);background:var(--hi);padding:14px 16px;margin:18px 0;border-radius:4px}
+.tps h4{margin:0 0 6px}
+.tps .phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.phase{background:#fff;border:2px solid var(--ink);padding:8px 10px;border-radius:3px;font-size:.85rem}
+.phase b{display:block}
+@media(max-width:700px){.tps .phases{grid-template-columns:1fr}}
+.roadmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:10px 0}
+.roadmap button{text-align:left;border:2px solid var(--ink);background:#fff;padding:9px 12px;cursor:pointer;border-radius:3px;font-size:.9rem}
+.roadmap button:hover{background:var(--hi);box-shadow:3px 3px 0 var(--ink)}
+.roadmap button b{display:block}
+.roadmap button span{font-size:.78rem;color:var(--muted)}
+.roadmap button.nocontent{border-style:dashed;opacity:.75}
+
+/* ---------- footer nav + toast ---------- */
+.slide-nav{position:fixed;left:0;right:0;bottom:0;z-index:55;background:var(--ink);border-top:4px solid var(--c)}
+.slide-nav .inner{max-width:1280px;margin:0 auto;padding:9px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.slide-nav .pos{color:#fff;font-weight:700;font-size:.85rem}
+.slide-nav .btn{box-shadow:none;padding:6px 16px}
+.toast{position:fixed;top:92px;right:18px;z-index:100;background:var(--ok);color:#fff;border:2px solid var(--ink);padding:10px 18px;font-weight:800;border-radius:4px;box-shadow:4px 4px 0 var(--ink);transform:translateX(150%);transition:transform .35s}
+.toast.show{transform:none}
+.toast.bad{background:var(--bad)}
+
+/* ---------- topic-specific ---------- */
+.pop-dot{cursor:default}
+.node{cursor:pointer}
+.lad{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid var(--ink);margin:10px 0}
+.lad button{border:0;border-right:2px solid var(--ink);background:#fff;padding:12px 6px;font-weight:800;cursor:pointer}
+.lad button:last-child{border-right:0}
+.lad button.on{background:var(--c);color:#fff}
+.lad button small{display:block;font-weight:600;font-size:.7rem;opacity:.85}
+.chk-yes{color:var(--ok);font-weight:900}
+.chk-no{color:var(--bad);font-weight:900}
+.cloud{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;align-items:baseline;padding:12px;line-height:1.1}
+.cloud span{font-family:var(--display);cursor:default}
+
+@media(max-width:900px){
+  .shell{grid-template-columns:1fr}
+  nav#tabs{position:sticky;top:78px;z-index:40;height:auto;flex-direction:row;overflow-x:auto;overflow-y:hidden;padding:8px 14px;background:var(--paper);border-bottom:2px solid var(--ink)}
+  .tab{flex:0 0 auto;white-space:nowrap}
+  main#main{padding:20px 14px 110px}
+  .card{padding:18px 16px;margin-right:4px}
+  .slidehead{gap:12px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><b>Chapter 1 · Statistics, Data, and Statistical Thinking</b><small>Interactive lecture · based on the course slides</small></div>
+    <div class="spacer"></div>
+    <div class="ticket"><div>Score <b id="scoreVal">0</b></div><div>Streak <b id="streakVal">0</b></div></div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+<div class="shell">
+<nav id="tabs" aria-label="Sections"></nav>
+<main id="main">
+<section class="slide active" data-title="The Science of Statistics">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.1</span><div><h2 class="slide-title">The Science of Statistics</h2><p class="subtitle">Section 1.1 · <span class="ar">علم الإحصاء</span></p></div></header>
+<div class="card primary"><h3>What does statistics mean to you?</h3><div class="cloud" id="wordCloud"></div><div class="tps"><h4>🤝 Think–Pair–Share <span class="ar">(فكّر – ناقش – شارك)</span></h4><p>Write the first three words that come to mind when you hear “statistics”. Compare them with your neighbour, then share one with the class.</p><div class="phases"><div class="phase"><b>Think · 30 s</b>Three words, alone.</div><div class="phase"><b>Pair · 60 s</b>Compare with a neighbour.</div><div class="phase"><b>Share · 30 s</b>One word to the class.</div></div></div><div class="formula"><b>Statistics</b> is the science of data. It involves <b>collecting, classifying, summarizing, organizing, analyzing,</b> and <b>interpreting</b> numerical and categorical information.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الإحصاء هو <b>علم التعامل مع البيانات</b>: نجمعها، ثم نحوّلها من أرقام وكلمات مبعثرة إلى معلومة نفهمها ونبني عليها قرارًا. والبيانات قد تكون <b>رقمية</b> (العمر، الراتب) أو <b>وصفية/تصنيفية</b> (الجنسية، لون العين).</div><h3>The six actions of statistics</h3><div class="widget"><h4>🔎 Follow one data set through the six actions</h4><div class="seg" id="pipeSeg"></div><div id="pipeOut"></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> المثال المستخدم في الأداة (نوم الطلاب) من إعدادي لتقريب الفكرة، وليس من الشرائح الأصلية.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>Which phrase best describes statistics?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> The study of money</div><div class="opt" data-correct="true"><span class="key">B</span> The science of data</div><div class="opt" data-correct="false"><span class="key">C</span> A branch of geometry</div><div class="opt" data-correct="false"><span class="key">D</span> Only drawing graphs</div></div><div class="feedback" data-fb-ok="Correct! Statistics is the science of data." data-fb-no="Look at the first line of the definition."></div></div></div>
+<div class="card accent"><h3>Chapter map</h3><p>Click a section to jump to it.</p><div class="roadmap"><button type="button" onclick="goTo(1)"><b>1.2 Types of Statistical Applications in Business</b><span>Descriptive vs inferential</span></button><button type="button" onclick="goTo(2)"><b>1.3 Fundamental Elements of Statistics</b><span>Unit, population, variable, sample, census</span></button><button type="button" onclick="goTo(3)"><b>1.5 Types of Data</b><span>Data, data set, qualitative vs quantitative</span></button><button type="button" onclick="goTo(4)"><b>1.5 Measurement Scales</b><span>Nominal, ordinal, interval, ratio</span></button><button type="button" onclick="goTo(5)"><b>1.6 Collecting Data</b><span>Published source, experiment, observational study</span></button><button type="button" onclick="goTo(6)"><b>1.6 Sampling Techniques</b><span>Random, systematic, stratified, cluster</span></button><button type="button" onclick="goTo(7)"><b>1.6 Problems with Nonrandom Samples</b><span>Selection bias, nonresponse bias, measurement error</span></button><button type="button" onclick="goTo(8)"><b>1.7 Business Analytics</b><span>Critical thinking with statistics</span></button></div><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> فهرس الفصل في الشريحة 2 ينتقل من <b>1.3</b> إلى <b>1.5</b> دون قسم 1.4، وكذلك عنوان 1.2 مكتوب "Types of Statistical" ثم يكتمل على الشريحة 5 بـ "Applications in Business". لا يوجد محتوى ناقص؛ فقط ترقيم الأقسام يقفز، وقد حافظت على ترقيم المصدر.</div><h3>🎯 Learning objectives <span class="ar">(أهداف المحاضرة)</span></h3><ul class="obj-list"><li><span class="icon">1</span><div>Define statistics and tell <span class="term">descriptive</span> from <span class="term">inferential</span> statistics.</div></li><li><span class="icon">2</span><div>Identify the <span class="term">experimental unit, population, sample, variable</span> and census in a study.</div></li><li><span class="icon">3</span><div>Classify data as <span class="term">qualitative or quantitative</span> and name its <span class="term">measurement scale</span>.</div></li><li><span class="icon">4</span><div>Choose a data-collection method and a <span class="term">sampling technique</span>.</div></li><li><span class="icon">5</span><div>Recognise <span class="term">selection bias, nonresponse bias and measurement error</span>.</div></li><li><span class="icon">6</span><div>Explain how statistics supports <span class="term">business decisions</span>.</div></li></ul><h3>How this lecture works</h3><ul><li><b>💡 Simple explanation</b> boxes in Arabic under every idea.</li><li><b>Instruments</b> (dashed panels) you can play with.</li><li>Questions give <b>+10</b> each; the last tab is a <b>25-question exam</b>.</li><li><b>📝</b> marks a correction to the source; <b>➕</b> marks something I added.</li></ul><p style="font-size:.82rem;color:var(--muted)">Content follows the Chapter 1 slides by the course instructor; examples and exercises keep the same numbers.</p></div>
+</section>
+<section class="slide" data-title="Descriptive vs Inferential">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.2</span><div><h2 class="slide-title">Types of Statistical Applications in Business</h2><p class="subtitle">Section 1.2 · <span class="ar">الإحصاء الوصفي والإحصاء الاستدلالي</span></p></div></header>
+<div class="card primary"><p>Statistics involves two different processes:</p><div class="two"><div class="plot-box" style="text-align:left"><h4>① Describing sets of data</h4><p style="margin:0">→ <b>Descriptive statistics</b></p></div><div class="plot-box" style="text-align:left"><h4>② Drawing conclusions</h4><p style="margin:0">(making estimates, decisions, predictions, etc.) → <b>Inferential statistics</b></p></div></div><p>So, the applications of statistics can be divided into two broad areas: <b>descriptive statistics</b> and <b>inferential statistics</b>.</p><h3>Branches of statistics</h3><div class="two"><div><h4>Descriptive statistics</h4><div class="formula"><b>Descriptive statistics</b> utilizes numerical and graphical methods to explore data, i.e., to look for patterns in a data set, to summarize the information revealed in a data set, and to present the information in a convenient form.</div><p><b>For example:</b></p><ul><li>The average age of the students is 14 years.</li><li>The median household income for people aged 25–34 is $35,888.</li></ul></div><div><h4>Inferential statistics</h4><div class="formula"><b>Inferential statistics</b> utilizes sample data to make estimates, decisions, predictions, or other generalizations about a larger set of data.</div><p><b>For example:</b></p><ul><li>The relationship between smoking and lung cancer.</li><li>Probability.</li></ul></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>الوصفي</b> = "ماذا حدث؟" نلخّص البيانات التي بين أيدينا برقم أو رسم (متوسط، نسبة، جدول).<br>
+      <b>الاستدلالي</b> = "ماذا نتوقع عن الكل؟" نأخذ <b>عينة</b> ثم نعمّم أو نتنبأ أو نقدّر على مجموعة أكبر.</div><div class="tipbox" dir="rtl"><b>🧠 للحفظ</b><br>كلمات تدلّ غالبًا على الاستدلالي: <b>will / may / can / experts say</b> (تنبؤ أو تعميم). وأرقام "تقرير" ما حدث فعلًا (<b>is / was / reports</b>) غالبًا وصفية.</div><h3>Example of descriptive statistics</h3><div class="plot-box"><div id="cookiePie"></div><div class="cap">The figure describes the variety of categories of the boxes of Girl Scout cookies sold.</div></div><p>The pie chart only <b>describes</b> the sales that happened (Thin Mints 25%, other 23%, Samoas 19%, Tagalongs 13%, Do-si-dos 11%, Trefoils 9%; total 100%).</p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>Which sentence is an example of inferential statistics?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> The average age of the students is 14 years.</div><div class="opt" data-correct="false"><span class="key">B</span> The median income is $35,888.</div><div class="opt" data-correct="true"><span class="key">C</span> A sample is used to predict the preference of all voters.</div><div class="opt" data-correct="false"><span class="key">D</span> The pie chart shows the cookies sold.</div></div><div class="feedback" data-fb-ok="Correct! A prediction about a larger group from a sample." data-fb-no="Inferential = sample → generalization."></div></div></div>
+<div class="card accent"><h3>Exercise — descriptive or inferential?</h3><p>In each statement, tell whether descriptive or inferential statistics have been used. Choose, and the answer is checked at once.</p><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Inferential" data-why="It is a prediction about a larger group (the future population)."><div class="gt"><b class="gtag">a.</b> By 2040 at least 3.5 billion people will run short of water.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Descriptive" data-why="It only summarizes the 100 cases observed; no generalization is made."><div class="gt"><b class="gtag">b.</b> In a sample of 100 on-the-job fatalities, 90% of the victims were men.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Descriptive" data-why="A reported figure that describes what was measured."><div class="gt"><b class="gtag">c.</b> Expenditures for the cable industry were $5.66 billion in 1996.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Descriptive" data-why="A summary number (median) of observed data."><div class="gt"><b class="gtag">d.</b> The median household income for people aged 25–34 is $35,888.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Inferential" data-why="It claims something general beyond the observed cases."><div class="gt"><b class="gtag">e.</b> Allergy therapy makes bees go away.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Inferential" data-why="A general claim drawn from a sample (“can raise”)."><div class="gt"><b class="gtag">f.</b> Drinking decaffeinated coffee can raise cholesterol levels by 7%.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Descriptive" data-why="An average that summarizes the data."><div class="gt"><b class="gtag">g.</b> The national average annual medicine expenditure per person is $1052.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Inferential" data-why="A prediction (“may soon”)."><div class="gt"><b class="gtag">h.</b> Experts say that mortgage rates may soon hit bottom.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Descriptive" data-why="It lists observed values; nothing is predicted."><div class="gt"><b class="gtag">i.</b> The U.S. government reports the population of the United States was 179,323,000 in 1960; 203,302,000 in 1970; 226,542,000 in 1980; 248,709,000 in 1990, and 265,000,000 in 2000.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Descriptive|Inferential" data-ok="Descriptive" data-why="A reported average of observed earnings."><div class="gt"><b class="gtag">m.</b> According to the Bureau of Labor Statistics, the average hourly earnings of production workers was $17.90 for April 2008.</div><div class="gb"></div><div class="feedback"></div></div><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> في الشريحة 11 الترقيم يقفز من <b>i</b> إلى <b>m</b> (لم تُعرض البنود j وk وl). تركت الحرفين كما في المصدر.</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> الشرح بجانب كل إجابة (سبب التصنيف) من إضافتي؛ التصنيف نفسه (Descriptive/Inferential) هو إجابة الشرائح.</div></div>
+</section>
+<section class="slide" data-title="Fundamental Elements">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.3</span><div><h2 class="slide-title">Fundamental Elements of Statistics</h2><p class="subtitle">Section 1.3 · <span class="ar">العناصر الأساسية: الوحدة والمجتمع والمتغير والعينة</span></p></div></header>
+<div class="card primary"><h3>Six words every study uses</h3><table class="data"><tr><th>Term</th><th>Definition (from the lecture)</th></tr><tr><td class="l">Experimental unit<br><span class="ar">(الوحدة التجريبية)</span></td><td class="l">Also called observational unit: an object (e.g., person, thing, transaction, or event) upon which we collect data.</td></tr><tr><td class="l">Population<br><span class="ar">(المجتمع)</span></td><td class="l">A set (or collection) of all units (usually people, objects, transactions, or events) that we are interested in studying.</td></tr><tr><td class="l">Variable<br><span class="ar">(المتغير)</span></td><td class="l">A characteristic or property of an individual experimental unit.</td></tr><tr><td class="l">Measurement<br><span class="ar">(القياس)</span></td><td class="l">The process we use to assign numbers to variables of individual population units.</td></tr><tr><td class="l">Census<br><span class="ar">(الحصر الشامل)</span></td><td class="l">Measuring a variable for every experimental unit of a population.</td></tr><tr><td class="l">Sample<br><span class="ar">(العينة)</span></td><td class="l">A subset (or portion/part) of the units of a population.</td></tr></table><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>تخيّل أنك تريد معرفة <b>متوسط أعمار كل مشاهدي قناة</b>:<br>
+      • <b>الوحدة</b> = شخص واحد (مشاهد). • <b>المجتمع</b> = كل المشاهدين. • <b>المتغير</b> = العمر. • <b>القياس</b> = أن تسأل "كم عمرك؟".<br>
+      • <b>الحصر الشامل</b> = تقيس الجميع (مكلف). • <b>العينة</b> = جزء منهم تقيسه فعلًا.</div><h3>Examples of populations</h3><table class="data"><tr><th>#</th><th>Population</th><th>Kind</th></tr><tr><td class="l">1</td><td class="l">All employed workers in the United States.</td><td class="l">Sets (groups) of people</td></tr><tr><td class="l">2</td><td class="l">All registered voters in California.</td><td class="l">Sets (groups) of people</td></tr><tr><td class="l">3</td><td class="l">Everyone who has purchased a particular brand of cellular telephone.</td><td class="l">Sets (groups) of people</td></tr><tr><td class="l">4</td><td class="l">All the cars produced last year by a particular assembly line.</td><td class="l">Sets of objects</td></tr><tr><td class="l">5</td><td class="l">The entire stock of spare parts at United Airlines’ maintenance facility.</td><td class="l">Sets of objects</td></tr><tr><td class="l">6</td><td class="l">All sales made at the drive-through window of a McDonald’s restaurant during a given year.</td><td class="l">Set of transactions</td></tr><tr><td class="l">7</td><td class="l">The set of all accidents occurring on a particular stretch of interstate during a holiday period.</td><td class="l">Set of events</td></tr></table><h3>Measurement — two examples</h3><ul><li>Measure the preference for a food product by asking a consumer to rate the product’s taste on a scale from 1 to 10.</li><li>Measure workforce age by simply asking each worker, “How old are you?”</li></ul></div>
+<div class="card accent"><h3>Why take a sample?</h3><div class="formula">Studying all units of a population would be prohibitively <b>time consuming and/or costly</b>. A reasonable alternative is to select and study a subset of all units in the population.</div><div class="widget"><h4>🧪 Population lab — sample or census?</h4>
+      <div class="row" style="margin-bottom:6px"><label for="popN" style="font-weight:700">Sample size n = <b id="popNv">12</b></label><input id="popN" type="range" min="3" max="60" step="1" value="12" style="flex:1;min-width:150px"></div>
+      <div class="row" style="margin-bottom:6px"><button class="btn primary" type="button" id="popDraw">Draw a random sample</button><button class="btn" type="button" id="popCensus">Census (measure everyone)</button><button class="btn" type="button" id="popClear">Clear</button></div>
+      <div id="popLab"></div><div class="readout" id="popOut">Each dot is one experimental unit (a person). The variable is <b>age</b>. Press “Draw a random sample”.</div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>النقاط الستون تمثّل <b>المجتمع</b>. عند الضغط على "عيّنة" تُلوَّن النقاط المختارة فقط ونقيس العمر لها وحدها، أما "الحصر الشامل" فيقيس الجميع. لاحظ أن متوسط العينة <b>قريب</b> من متوسط المجتمع (وليس مطابقًا) — وهذه هي فكرة الاستدلال في الإحصاء.</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> أداة المختبر ومتوسط الأعمار فيها من إضافتي لتوضيح الفكرة (الأعمار مولَّدة بقيم ثابتة، ولا علاقة لها ببيانات المصدر).</div><div class="plot-box" style="margin-top:14px"><div id="popSample"></div><div class="cap">Population: all items · Sample: items selected from the population (cars figure in the slides).</div></div></div>
+<div class="card primary"><h3>Example — invoice errors</h3><p>Suppose a company is being audited for invoice errors. Instead of examining all 15,472 invoices produced by the company during a given year, an auditor may select and examine a group of just 100 invoices. <b>Determine the population and the sample.</b></p><details class="reveal"><summary>Show the lecture solution</summary><div class="body"><b>Population:</b> the 15,472 invoices. &nbsp; <b>Sample:</b> the 100 invoices.</div></details><div class="quiz numq" data-numq data-answer="15472" data-tol="0"><div class="q"><span class="qnum">✎</span><span>How many units are in the <b>population</b>?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 15472" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 15,472 invoices." data-fb-no="All invoices produced during the year."></div></div><div class="quiz numq" data-numq data-answer="100" data-tol="0"><div class="q"><span class="qnum">✎</span><span>How many units are in the <b>sample</b>?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 100 invoices." data-fb-no="The invoices actually examined."></div></div><h3>Example — FOX viewers</h3><p>According to a report in the Washington Post, the average age of viewers of television programs broadcast on CBS, NBC, and ABC is 54 years. Suppose a rival network (e.g., FOX) executive hypothesizes that the average age of FOX viewers is less than 54. To test her hypothesis, she samples 200 FOX viewers and determines the age of each. Describe the population, the sample and the variable of interest.</p><details class="reveal"><summary>Show the lecture solution</summary><div class="body"><ol><li><b>The population:</b> the set of all FOX viewers.</li><li><b>The sample:</b> 200 FOX viewers.</li><li><b>The variable:</b> age (in years).</li></ol></div></details><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>In the FOX example, the <b>variable of interest</b> is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> The 200 viewers</div><div class="opt" data-correct="false"><span class="key">B</span> All FOX viewers</div><div class="opt" data-correct="true"><span class="key">C</span> The age of a viewer (in years)</div><div class="opt" data-correct="false"><span class="key">D</span> The number 54</div></div><div class="feedback" data-fb-ok="Correct! Age (in years)." data-fb-no="The variable is the characteristic measured on each unit."></div></div><h3>Example — the cola wars</h3><p>Cola wars is the popular term for the intense competition between Coca-Cola and Pepsi displayed in their marketing campaigns. 1,000 cola consumers are given a blind taste test (a taste test in which the two brand names are disguised). Each consumer is asked to state a preference for brand A or brand B.</p><details class="reveal"><summary>Show the lecture solution</summary><div class="body"><ol><li><b>The population:</b> the set of all cola consumers.</li><li><b>The sample:</b> 1,000 cola consumers.</li><li><b>The variable:</b> cola preference.</li></ol></div></details><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>“Cola preference (A or B)” is what kind of data?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Quantitative</div><div class="opt" data-correct="true"><span class="key">B</span> Qualitative (categorical)</div><div class="opt" data-correct="false"><span class="key">C</span> Neither</div><div class="opt" data-correct="false"><span class="key">D</span> A census</div></div><div class="feedback" data-fb-ok="Correct! The answers are categories, not numbers." data-fb-no="A or B are categories."></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> نوع بيانات "cola preference" (وصفية) إضافة مني؛ الشريحة تكتفي بتحديد المتغير.</div></div>
+</section>
+<section class="slide" data-title="Types of Data">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.5</span><div><h2 class="slide-title">Types of Data</h2><p class="subtitle">Section 1.5 · <span class="ar">أنواع البيانات: وصفية وكمية</span></p></div></header>
+<div class="card primary"><h3>Data, data set, data value</h3><div class="formula"><b>Data</b> are obtained by measuring the values of one or more variables on the units in the sample (or population).</div><div class="formula"><b>Data set</b> is the collection of data values. &nbsp;·&nbsp; <b>Data value</b> is each value in the data set.</div><div class="widget"><h4>🗂️ Click a term to see it on the table</h4><div class="seg" id="dtSeg"></div><div id="dtTable"></div><div class="readout" id="dtOut"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الجدول: كل <b>عمود</b> = متغير (Age, Gender, Nationality). كل <b>خلية</b> = قيمة بيانات (Data value). الجدول كله = مجموعة البيانات (Data set). و"Data" = القيم المقاسة لمتغير ما (مثل عمود الجنسية).</div></div>
+<div class="card accent"><h3>Types of data</h3><div class="two"><div><h4>Quantitative data</h4><div class="formula">Measurements recorded on a <b>naturally occurring numerical scale</b>.</div><ol><li>The temperature (in degrees Celsius) at which each unit in a sample of 20 pieces of heat-resistant plastic begins to melt.</li><li>The current unemployment rate (measured as a percentage) for each of the 50 states.</li><li>The scores of a sample of 150 MBA applicants on the GMAT, a standardized business school entrance exam.</li><li>The number of female executives employed in each of a sample of 75 manufacturing companies.</li></ol></div><div><h4>Qualitative data</h4><div class="formula">Measurements that <b>cannot be measured on a natural numerical scale</b>; they can only be classified into one of a group of categories. Also named <b>categorical data</b>.</div><ol><li>The political party affiliation (Democrat, Republican, or Independent) in a sample of 50 CEOs.</li><li>The defective status (defective or not) of each of 100 computer chips manufactured by Intel.</li><li>The size of a car (subcompact, compact, midsize, or full-size) rented by each of a sample of 30 business travelers.</li><li>A taste tester’s ranking (best, worst, etc.) of four brands of barbecue sauce for a panel of 10 testers.</li></ol></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>اختبار سريع:</b> هل يمكن أن أضع القيمة على <b>مقياس رقمي طبيعي</b> وأحسب لها متوسطًا؟ نعم ← كمية. هل هي <b>فئة أو صفة</b>؟ ← وصفية.<br>
+      انتبه: الأرقام قد تكون <b>رموزًا لفئات</b> (رقم الهاتف، رقم الطالب) فتبقى وصفية.</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> تقسيم البيانات الكمية إلى <b>منفصلة (Discrete)</b> وهي ما نعدّه مثل عدد المتاجر، و<b>متصلة (Continuous)</b> وهي ما نقيسه مثل الوزن والزمن، إضافة مني، والشرائح تذكر الكلمتين فقط ضمن خيارات سؤال.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>“The number of female executives in each company” is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Qualitative</div><div class="opt" data-correct="true"><span class="key">B</span> Quantitative</div><div class="opt" data-correct="false"><span class="key">C</span> Nominal</div><div class="opt" data-correct="false"><span class="key">D</span> Ordinal</div></div><div class="feedback" data-fb-ok="Correct! It is a count on a natural numerical scale." data-fb-no="It is a number you can add and average."></div></div></div>
+<div class="card primary"><h3>Example — toxic waste in the Tennessee River</h3><p>Chemical and manufacturing plants sometimes discharge toxic-waste materials such as DDT into nearby rivers and streams. These toxins can adversely affect the plants and animals inhabiting the river and the riverbank. The U.S. Army Corps of Engineers conducted a study of fish in the Tennessee River (in Alabama) and its three tributary creeks: Flint Creek, Limestone Creek, and Spring Creek. A total of 144 fish were captured. Determine the type for each of the following variables:</p><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Qualitative" data-why="A place name is a category."><div class="gt"><b class="gtag">1.</b> River where each fish was captured.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Qualitative" data-why="Species names are categories."><div class="gt"><b class="gtag">2.</b> Species (channel catfish, largemouth bass, or smallmouth buffalo fish).</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why="Measured in centimeters."><div class="gt"><b class="gtag">3.</b> Length (centimeters).</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why="Measured in grams."><div class="gt"><b class="gtag">4.</b> Weight (grams).</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why="Measured in parts per million."><div class="gt"><b class="gtag">5.</b> DDT concentration (parts per million).</div><div class="gb"></div><div class="feedback"></div></div><details class="reveal"><summary>Show the lecture solution</summary><div class="body">Length, weight and DDT are <b>quantitative</b> variables; river and species are <b>qualitative</b> variables.</div></details><div class="quiz numq" data-numq data-answer="144" data-tol="0"><div class="q"><span class="qnum">✎</span><span>How many fish were captured in total?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 144 fish." data-fb-no="Read the first paragraph again."></div></div></div>
+<div class="card accent"><h3>Exercise — qualitative or quantitative? (set 1)</h3><p>Classify each variable as qualitative or quantitative data.</p><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">a.</b> The highest wind speed of a hurricane.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">b.</b> The weight of baggage on an airplane.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Qualitative" data-why=""><div class="gt"><b class="gtag">c.</b> The gender of the employee.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">d.</b> The number of pages in a Statistics book.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Qualitative" data-why=""><div class="gt"><b class="gtag">e.</b> The color of the cars for sale.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">f.</b> Amount of income tax paid.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Qualitative" data-why=""><div class="gt"><b class="gtag">g.</b> Hair color.</div><div class="gb"></div><div class="feedback"></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> الشريحة 29 تعرض هذا التمرين بنقاط فارغة بلا حل؛ الإجابات هنا من عندي: كل متغير يُقاس بعدد أو كمية (كمي)، وما كان صفة أو فئة (جنس، لون) وصفي.</div><h3>Exercise — qualitative or quantitative? (set 2)</h3><p>Classify each variable as qualitative or quantitative.</p><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Qualitative" data-why=""><div class="gt"><b class="gtag">a.</b> Marital status of nurses in a hospital.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">b.</b> Time it takes to run a marathon.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">c.</b> Weights of lobsters in a tank in a restaurant.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Qualitative" data-why=""><div class="gt"><b class="gtag">d.</b> Colors of automobiles in a shopping center parking lot.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">e.</b> Ounces of ice cream in a large milkshake.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">f.</b> Capacity of the NFL football stadiums.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Qualitative|Quantitative" data-ok="Quantitative" data-why=""><div class="gt"><b class="gtag">g.</b> Ages of people living in a personal care home.</div><div class="gb"></div><div class="feedback"></div></div></div>
+</section>
+<section class="slide" data-title="Measurement Scales">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.5</span><div><h2 class="slide-title">Measurement Scales</h2><p class="subtitle">Section 1.5 · <span class="ar">مستويات القياس: اسمي وترتيبي وفترات ونسبة</span></p></div></header>
+<div class="card primary"><h3>Measurement scales <span class="ar">(مستويات القياس)</span></h3><p>Data can be measured at four levels. Two are for qualitative data and two for quantitative data.</p><div class="two"><div class="plot-box" style="text-align:left"><h4>Qualitative levels</h4><p style="margin:0"><b>Nominal</b> and <b>Ordinal</b></p></div><div class="plot-box" style="text-align:left"><h4>Quantitative levels</h4><p style="margin:0"><b>Interval</b> and <b>Ratio</b></p></div></div><div class="widget"><h4>🪜 The four levels — click a level</h4><div class="lad" id="ladBtns"></div><div id="ladOut"></div></div><h3>What each level can do</h3><table class="data"><tr><th>Level</th><th>Names / categories</th><th>Ranking (order)</th><th>Precise differences</th><th>True zero & ratios</th></tr><tr><td>Nominal</td><td><span class="chk-yes">✓</span></td><td><span class="chk-no">✗</span></td><td><span class="chk-no">✗</span></td><td><span class="chk-no">✗</span></td></tr><tr><td>Ordinal</td><td><span class="chk-yes">✓</span></td><td><span class="chk-yes">✓</span></td><td><span class="chk-no">✗</span></td><td><span class="chk-no">✗</span></td></tr><tr><td>Interval</td><td><span class="chk-yes">✓</span></td><td><span class="chk-yes">✓</span></td><td><span class="chk-yes">✓</span></td><td><span class="chk-no">✗ (no meaningful zero)</span></td></tr><tr><td>Ratio</td><td><span class="chk-yes">✓</span></td><td><span class="chk-yes">✓</span></td><td><span class="chk-yes">✓</span></td><td><span class="chk-yes">✓</span></td></tr></table><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>كل مستوى يرث خصائص ما قبله ويضيف خاصية:<br>
+      <b>اسمي</b>: أسماء فقط ← <b>ترتيبي</b>: + ترتيب ← <b>فترات</b>: + فروق دقيقة (لكن لا صفر حقيقي) ← <b>نسبة</b>: + صفر حقيقي ونسب حقيقية.</div><div class="tipbox" dir="rtl"><b>🧠 للحفظ</b><br>للحفظ: <b>N-O-I-R</b> = Nominal, Ordinal, Interval, Ratio (ومن الأسهل إلى الأقوى). اسأل بالترتيب: هل هي أسماء فقط؟ هل تُرتَّب؟ هل الفرق بين قيمتين له معنى؟ هل الصفر يعني "لا شيء"؟</div></div>
+<div class="card accent"><h3>Why “true zero” matters</h3><div class="widget"><h4>🌡️ Is 40° twice as hot as 20°? Is 40 kg twice 20 kg?</h4><div class="row"><label for="tmpC" style="font-weight:700">Value x = <b id="tmpCv">40</b></label><input id="tmpC" type="range" min="5" max="80" step="1" value="40" style="flex:1;min-width:150px"></div><div class="two" id="tmpOut"></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> أداة الحرارة والكتلة من إضافتي لتوضيح معنى الصفر الحقيقي.</div><div class="formula">Interval: precise differences exist, but there is <b>no meaningful zero</b> (e.g., temperature, IQ tests).<br>Ratio: all the characteristics of interval measurement, <b>and there exists a true zero</b> (e.g., height, weight, time, salary, age). True ratios exist when the same variable is measured on two different subjects.</div><h3>Examples from the lecture</h3><table class="data"><tr><th>Level</th><th>Examples</th></tr><tr><td class="l">Nominal</td><td class="l">Eye color, gender, political party, blood types.</td></tr><tr><td class="l">Ordinal</td><td class="l">Grade of course (A, B, C); size (S, M, L); rating scale (Poor, Good, Excellent); ranking of tennis players.</td></tr><tr><td class="l">Interval</td><td class="l">Temperature, IQ tests.</td></tr><tr><td class="l">Ratio</td><td class="l">Height, weight, time, salary, age.</td></tr></table></div>
+<div class="card primary"><h3>Exercise — answer the following</h3><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>1. Blood type is an example of which type of data?</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> Qualitative</div><div class="opt" data-correct="false"><span class="key">B</span> Ordinal</div><div class="opt" data-correct="false"><span class="key">C</span> Continuous</div><div class="opt" data-correct="false"><span class="key">D</span> Discrete</div></div><div class="feedback" data-fb-ok="Correct! Blood type is a category (qualitative)." data-fb-no="Blood type = a category."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>2. Number of stores represents a:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Qualitative variable</div><div class="opt" data-correct="true"><span class="key">B</span> Quantitative variable</div><div class="opt" data-correct="false"><span class="key">C</span> Ordinal variable</div><div class="opt" data-correct="false"><span class="key">D</span> Nominal variable</div></div><div class="feedback" data-fb-ok="Correct! A count is quantitative." data-fb-no="You can count stores: it is numeric."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>3. If you classified the fruit in a basket as apple, orange and banana, this would be an example of which level of measurement?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Ordinal</div><div class="opt" data-correct="true"><span class="key">B</span> Nominal</div><div class="opt" data-correct="false"><span class="key">C</span> Ratio</div><div class="opt" data-correct="false"><span class="key">D</span> Interval</div></div><div class="feedback" data-fb-ok="Correct! Nominal: names only, no order." data-fb-no="Categories with no ranking are nominal."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">4</span><span>4. Which of the following represents ordinal level of measurement?</span></div><div class="opts"><div class="opt" data-correct="true"><span class="key">A</span> Rating scale</div><div class="opt" data-correct="false"><span class="key">B</span> IQ score</div><div class="opt" data-correct="false"><span class="key">C</span> Age</div><div class="opt" data-correct="false"><span class="key">D</span> Marital status</div></div><div class="feedback" data-fb-ok="Correct! A rating scale can be ranked." data-fb-no="Ordinal = categories that can be ranked."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">5</span><span>5. Which one of the following variables is qualitative?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Amount of fat in a piece of cheese</div><div class="opt" data-correct="false"><span class="key">B</span> Salary of college professors</div><div class="opt" data-correct="true"><span class="key">C</span> Favorite TV program</div><div class="opt" data-correct="false"><span class="key">D</span> Age of a person</div></div><div class="feedback" data-fb-ok="Correct! Favourite programme is a category." data-fb-no="The other three are numbers."></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> الشريحتان 34–35 تعرضان الأسئلة الخمسة دون إجابات؛ الإجابات هنا من عندي.</div><h3>Exercise — nominal, ordinal, interval or ratio?</h3><p>Classify each as nominal-level, ordinal-level, interval-level or ratio-level of measurement.</p><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ratio" data-why="Counts pages: a true zero (no pages)."><div class="gt"><b class="gtag">a.</b> Pages in the 25 best-selling mystery novels.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ordinal" data-why="Ranks only; the gaps between ranks are unknown."><div class="gt"><b class="gtag">b.</b> Rankings of golfers in a tournament.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Interval" data-why="Differences are meaningful but there is no true zero."><div class="gt"><b class="gtag">c.</b> Temperatures inside 10 pizza ovens.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ratio" data-why="Weight has a true zero."><div class="gt"><b class="gtag">d.</b> Weights of selected cell phones.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ratio" data-why="Salary has a true zero."><div class="gt"><b class="gtag">e.</b> Salaries of the coaches in the NFL.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ratio" data-why="Time has a true zero."><div class="gt"><b class="gtag">f.</b> Times required to complete a chess game.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ordinal" data-why="Ordered categories, no precise differences."><div class="gt"><b class="gtag">g.</b> Ratings of textbooks (poor, fair, good, excellent).</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ratio" data-why="A count with a true zero."><div class="gt"><b class="gtag">h.</b> Number of lamps delivered by battery chargers.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Ratio" data-why="Age has a true zero."><div class="gt"><b class="gtag">i.</b> Ages of children in a day care center.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Nominal|Ordinal|Interval|Ratio" data-ok="Nominal" data-why="Names of categories, no order."><div class="gt"><b class="gtag">j.</b> Categories of magazines in a physician’s office (sports, women’s, health, men’s, news).</div><div class="gb"></div><div class="feedback"></div></div><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> في إجابة البند (j) كُتب "<b>Normal</b>"، والمقصود <b>Nominal</b> (فئات مجلات بلا ترتيب). كما أن البند (c) يعدّ Interval لأن درجة الحرارة (مئوية/فهرنهايت) لا صفر حقيقي لها.</div></div>
+</section>
+<section class="slide" data-title="Collecting Data">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.6</span><div><h2 class="slide-title">Collecting Data</h2><p class="subtitle">Section 1.6 · <span class="ar">طرق جمع البيانات</span></p></div></header>
+<div class="card primary"><p>Once you decide on the type of data (quantitative or qualitative) appropriate for the problem at hand, you will need to collect the data. Generally, there are <b>three different ways</b> to obtain it:</p><div class="three"><div class="plot-box" style="text-align:left"><h4>1. Published source</h4><p style="margin:0;font-size:.9rem">Data collected for you already.</p></div><div class="plot-box" style="text-align:left"><h4>2. Designed experiment</h4><p style="margin:0;font-size:.9rem">The researcher controls the units.</p></div><div class="plot-box" style="text-align:left"><h4>3. Observational study</h4><p style="margin:0;font-size:.9rem">Units are observed in their natural setting (e.g., a survey).</p></div></div><h3>1. Published source</h3><div class="formula">Sometimes the data set of interest has already been collected for you and is available in a published source, such as a <b>book, journal, newspaper, or Web site</b>.</div><p><b>For example:</b> you may want to examine and summarize the unemployment rates (percentages of eligible workers who are unemployed) in the 50 states of the United States. You can find this data set (as well as numerous other data sets) at the library in the <i>Statistical Abstract of the United States</i>, published annually by the U.S. government.</p><h3>2. Designed experiment</h3><div class="formula">A <b>designed experiment</b> is a data-collection method where the researcher exerts <b>full control</b> over the characteristics of the experimental units (people, objects, or events) in the study.</div><h3>3. Observational study</h3><div class="formula">An <b>observational study</b> is a data-collection method where the experimental units sampled are observed in their <b>natural setting</b>. No attempt is made to control the characteristics of the experimental units sampled. (Examples include opinion polls and surveys.)</div><div class="formula"><b>Survey:</b> the most common type of observational study, where the researcher samples a group of people, asks one or more questions, and records the responses.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>الفرق الجوهري: <b>من يتحكم؟</b><br>
+      • مصدر منشور: لا أحد يتحكم الآن؛ البيانات جاهزة. • تجربة مصممة: <b>الباحث يتحكم</b> في الوحدات والظروف. • دراسة رصدية: الباحث <b>يراقب فقط</b> ولا يتدخل (الاستبيان مثال).</div></div>
+<div class="card accent"><h3>Which method is it?</h3><p>Choose the data-collection method for each situation.</p><div class="gq" data-g data-opts="Published source|Designed experiment|Observational study" data-ok="Published source" data-why="The data already exist in a published source."><div class="gt"><b class="gtag">1.</b> You download the unemployment rates of the 50 states from a government yearbook.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Published source|Designed experiment|Observational study" data-ok="Designed experiment" data-why="The researcher controls the units and the conditions."><div class="gt"><b class="gtag">2.</b> A researcher assigns 40 plants at random to two fertilizers and measures their growth under identical conditions.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Published source|Designed experiment|Observational study" data-ok="Observational study" data-why="Units are observed as they are; this is a survey."><div class="gt"><b class="gtag">3.</b> A pollster phones 500 voters and records their opinions.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Published source|Designed experiment|Observational study" data-ok="Published source" data-why="Already collected and published."><div class="gt"><b class="gtag">4.</b> A student copies tuition-fee figures from a university’s annual report.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Published source|Designed experiment|Observational study" data-ok="Designed experiment" data-why="The researcher decides who gets which treatment."><div class="gt"><b class="gtag">5.</b> A pharmacist gives half the patients drug A and half drug B, then records their blood pressure.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Published source|Designed experiment|Observational study" data-ok="Observational study" data-why="Observed in their natural setting; no control."><div class="gt"><b class="gtag">6.</b> An observer counts the cars passing a gate in one day without influencing the drivers.</div><div class="gb"></div><div class="feedback"></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> البنود الستة من إعدادي لتدريب التمييز بين الطرق الثلاث؛ ليست في الشرائح.</div><h3>Example — online shopping survey (UPS)</h3><p>How do consumers feel about using the Internet for online shopping? To find out, United Parcel Service (UPS) commissioned a nationwide survey of 5,118 U.S. adults who had conducted at least two online transactions in 2015. One finding from the study is that 74% of online shoppers have used a smartphone to do their shopping. <b>Identify the data-collection method.</b></p><details class="reveal"><summary>Show the lecture solution</summary><div class="body">The data-collection method is a <b>survey</b>: 5,118 adults completed the questionnaire.</div></details><div class="quiz numq" data-numq data-answer="5118" data-tol="0"><div class="q"><span class="qnum">✎</span><span>How many adults completed the questionnaire?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="e.g. 5118" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 5,118 adults." data-fb-no="Read the first sentence of the example."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>The UPS study is best described as a:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Published source</div><div class="opt" data-correct="false"><span class="key">B</span> Designed experiment</div><div class="opt" data-correct="true"><span class="key">C</span> Survey (observational study)</div><div class="opt" data-correct="false"><span class="key">D</span> Census</div></div><div class="feedback" data-fb-ok="Correct! A survey is an observational study." data-fb-no="Nobody controlled the shoppers; they were asked questions."></div></div></div>
+</section>
+<section class="slide" data-title="Sampling Techniques">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.6</span><div><h2 class="slide-title">Sampling Techniques</h2><p class="subtitle">Section 1.6 · <span class="ar">أنواع العينات العشوائية</span></p></div></header>
+<div class="card primary"><p>Four ways to take a random-type sample: <span class="pill">Random</span> <span class="pill">Systematic</span> <span class="pill">Stratified</span> <span class="pill">Cluster</span></p><h3>1. Random sampling</h3><div class="formula">A <b>random sample</b> is a sample in which <b>all members of the population have an equal chance</b> of being selected. Members are selected by using chance methods or random numbers.</div><h3>Example — select a random sample of 15 subjects out of 85, each numbered from 1 to 85</h3><div class="widget"><h4>🎲 Random-number table (Table 1-3 in the slide)</h4><div class="row"><button class="btn primary" type="button" id="rnStep">Read next number</button><button class="btn" type="button" id="rnAll">Finish the sample</button><button class="btn" type="button" id="rnReset">Start again</button></div>
+      <p style="font-size:.85rem;margin:8px 0 4px">Start: the circled number (row 6, column 2). Read <b>two digits</b> at a time, left to right, row after row. <i>Click any cell to choose another starting point.</i></p>
+      <div id="rnTable" style="overflow-x:auto"></div><div class="readout" id="rnOut"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>نعطي كل فرد رقمًا من 1 إلى 85، ثم نقرأ أرقامًا من الجدول <b>اثنين اثنين</b>:<br>
+      • رقم بين 1 و85 ← نختاره. • رقم أكبر من 85 أو 00 ← <b>نتجاوزه</b> (لا يوجد فرد بهذا الرقم). • رقم تكرّر ← <b>نتجاوزه</b> لأن الفرد اختير سابقًا. نتوقف عند اكتمال 15 فردًا.</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> الشريحة 43 تعرض الجدول فقط (مع تدوير الرقم 12) دون حل؛ خطوات القراءة والعينة الناتجة من عندي (قراءة أفقية من الخلية المُدوَّرة).</div></div>
+<div class="card accent"><h3>2. Systematic sampling</h3><div class="formula">A <b>systematic sample</b> is a sample obtained by selecting <b>every k-th member</b> of the population, where k is a counting number.<br><b>k = N / n</b>, where n is the sample size and N is the population size.</div><div class="widget"><h4>📏 Systematic sample builder</h4><div class="calc-grid"><div><label>Population size N</label><input class="num" id="syN" type="text" inputmode="numeric" value="100"></div><div><label>Sample size n</label><input class="num" id="syn" type="text" inputmode="numeric" value="10"></div><div><label>Random start (1 … k)</label><input class="num" id="syS" type="text" inputmode="numeric" value="4"></div></div>
+      <div class="out" id="syK"></div><div id="syGrid"></div><div class="readout" id="syOut"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>نحسب <b>الخطوة k = N ÷ n</b>، ثم نختار بداية عشوائية بين 1 وk، ونأخذ كل <b>k-ths</b> بعدها. مثال: 100 فرد وعينة 10 ← k = 10، فإذا بدأنا من 4 نأخذ 4، 14، 24، …</div><p>Summary in the slide: <i>select every k-th subject after the 1st subject is selected from 1 to k.</i></p><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>A population has N = 200 units and we want n = 20. The step k is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> 5</div><div class="opt" data-correct="true"><span class="key">B</span> 10</div><div class="opt" data-correct="false"><span class="key">C</span> 20</div><div class="opt" data-correct="false"><span class="key">D</span> 180</div></div><div class="feedback" data-fb-ok="Correct! k = 200 ÷ 20 = 10." data-fb-no="k = N ÷ n."></div></div><div class="quiz numq" data-numq data-answer="20" data-tol="0"><div class="q"><span class="qnum">✎</span><span>N = 500 and n = 25: what is k?</span></div><div class="row"><input class="num" type="text" inputmode="decimal" placeholder="type your answer" aria-label="answer"><button class="btn primary chk" type="button">Check</button></div><div class="feedback" data-fb-ok="Correct! 500 ÷ 25 = 20." data-fb-no="Divide N by n."></div></div></div>
+<div class="card primary"><h3>3. Stratified samples</h3><div class="formula">A <b>stratified sample</b> is obtained by dividing the population into <b>subgroups (strata)</b> according to some characteristic relevant to the study. Then subjects are selected from <b>each</b> subgroup.</div><p><b>For example:</b> a researcher selects a random sample from each gender to check their blood pressure.</p><h3>4. Cluster samples</h3><div class="formula">A <b>cluster sample</b> is obtained by dividing the population into sections or <b>clusters</b>, then selecting <b>one or more clusters</b> and using <b>all members</b> in the cluster(s) as the members of the sample.</div><p><b>For example:</b> in a large school district, all teachers from two buildings are interviewed to determine whether they believe the students have less homework to do now than in previous years.</p><div class="widget"><h4>👥 Population of 48 people in 4 groups — draw a stratified or a cluster sample</h4><div class="row" style="margin-bottom:6px"><label for="scN" style="font-weight:700">People per group (stratified) = <b id="scNv">2</b></label><input id="scN" type="range" min="1" max="6" step="1" value="2" style="flex:1;min-width:140px"></div>
+      <div class="row"><button class="btn primary" type="button" id="scStrat">Stratified: pick randomly from each group</button><button class="btn primary" type="button" id="scClus">Cluster: pick 2 groups, take everyone</button><button class="btn" type="button" id="scClear">Clear</button></div>
+      <div id="scGrid"></div><div class="readout" id="scOut">The four groups are shown in four colours (strata or clusters).</div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>الفرق بين الطبقية والعنقودية</b> (أكثر نقطة يخلط فيها الطلاب):<br>
+      • <b>طبقية Stratified</b>: نقسّم المجتمع ثم نأخذ <b>عينة من كل مجموعة</b> (كل المجموعات ممثَّلة).<br>
+      • <b>عنقودية Cluster</b>: نختار <b>مجموعات كاملة</b> عشوائيًا ونأخذ <b>كل أفرادها</b> (بعض المجموعات لا تظهر أبدًا).</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> أداة الـ 48 شخصًا من إعدادي؛ الشرائح 46 و48 تعرض صورتين توضيحيتين (طبقية: Population → Strata → Sample، وعنقودية: عشوائيًا اختيار عنقودين من 4) وهذه الأداة تعيد الفكرة نفسها.</div></div>
+<div class="card accent"><h3>Summary of sampling techniques</h3><table class="data"><tr><th>Technique</th><th>How subjects are selected</th></tr><tr><td class="l">Random sampling</td><td class="l">Subjects are selected by a random number generator.</td></tr><tr><td class="l">Systematic sampling</td><td class="l">Select every k-th subject after the 1st subject is selected from 1 to k.</td></tr><tr><td class="l">Stratified sampling</td><td class="l">Divide the population into subgroups called “strata”, then subjects are selected randomly within each group.</td></tr><tr><td class="l">Cluster sampling</td><td class="l">Subjects are selected by using intact subgroups randomly.</td></tr></table><div class="tipbox" dir="rtl"><b>🧠 للحفظ</b><br>سؤال واحد يحسم أغلب الحالات: <b>هل استخدمتُ كل أفراد مجموعة كاملة؟</b> نعم ← عنقودية. <b>هل أخذت عينة من كل مجموعة؟</b> ← طبقية. <b>كل k-th؟</b> ← منتظمة. <b>أرقام عشوائية؟</b> ← عشوائية.</div><h3>Exercise — determine the type of sampling technique</h3><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Cluster" data-why="A whole intact group (one hospital) is selected."><div class="gt"><b class="gtag">1.</b> Out of 10 hospitals in a municipality, a researcher selects one and collects records for a 24-hour period on the types of emergencies that were treated there.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Stratified" data-why="The population is divided into subgroups, then sampled from each."><div class="gt"><b class="gtag">2.</b> A researcher divides a group of students according to gender, major field, and low, average and high grade. Then, she randomly selects six students from each group to answer questions in a survey.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Random" data-why="Chosen with random numbers."><div class="gt"><b class="gtag">3.</b> The subscribers to a magazine are numbered. Then, a sample of these people is selected using random numbers.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Systematic" data-why="Every k-th unit (k = 10)."><div class="gt"><b class="gtag">4.</b> Every 10th bottle of Cola is selected, and the amount of liquid in the bottle is measured to see if the machines that fill the bottles are working properly.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Cluster" data-why="Whole clusters (hospitals) are chosen and everyone in them is used."><div class="gt"><b class="gtag">5.</b> A researcher wanted to know doctors’ opinion about herbal therapy in Jeddah. For this study he chose randomly 3 hospitals out of 20 hospitals in Jeddah, and all doctors in the 3 hospitals were asked.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Stratified" data-why="Subgroups (strata), a sample from each."><div class="gt"><b class="gtag">6.</b> A researcher wanted to do a study about doctors’ income in Jeddah. He divided hospitals into two sectors (private and public), then he took a sample from each sector.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Stratified" data-why="Subgroups, then a sample from each."><div class="gt"><b class="gtag">7.</b> What type of sampling has been used if employees were divided into education classes and a sample was chosen from each class to be surveyed?</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Random" data-why="Lecture answer: random sampling."><div class="gt"><b class="gtag">8.</b> A researcher selected 10 devices from different labs to be tested.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Random|Systematic|Stratified|Cluster" data-ok="Systematic" data-why="Every k-th unit (k = 7)."><div class="gt"><b class="gtag">9.</b> Every seventh customer entering a shopping mall is asked to select her or his favorite store.</div><div class="gb"></div><div class="feedback"></div></div><div class="srcnote" dir="rtl"><b>📝 تصحيح على المصدر:</b> البند 8 ("اختيار 10 أجهزة من مختبرات مختلفة") إجابته في الشرائح <b>Random</b>؛ وقد يُقرأ أيضًا كعيّنة طبقية إذا اعتُبرت المختبرات طبقات، لكنني أبقيت إجابة المصدر.</div></div>
+</section>
+<section class="slide" data-title="Biases">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.6</span><div><h2 class="slide-title">Problems with Nonrandom Samples</h2><p class="subtitle">Section 1.6 · <span class="ar">مشكلات العينات غير العشوائية</span></p></div></header>
+<div class="card primary"><p>When a sample is not random, three problems may spoil the results: <span class="pill">Selection bias</span> <span class="pill">Nonresponse bias</span> <span class="pill">Measurement error</span></p><h3>1. Selection bias</h3><div class="formula"><b>Selection bias</b> results when a subset of experimental units in the population has <b>little or no chance</b> of being selected for the sample.</div><h3>2. Nonresponse bias</h3><div class="formula"><b>Nonresponse bias</b> is a type of selection bias that results when the response data <b>differ from the potential data for the nonresponders</b>.</div><h3>3. Measurement error</h3><div class="formula"><b>Measurement error</b> refers to <b>inaccuracies in the values of the data collected</b>. In surveys, the error may be due to ambiguous or leading questions and the interviewer’s effect on the respondent.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br><b>تشبيه:</b> تريد معرفة طعم قدر الشوربة.<br>
+      • <b>انحياز الاختيار</b>: تتذوق من الطبقة العلوية فقط (جزء من القدر لا فرصة له). • <b>انحياز عدم الاستجابة</b>: اخترت الجميع لكن من أجابوا يختلفون عمّن لم يجيبوا. • <b>خطأ القياس</b>: لسانك أو سؤالك نفسه يُخطئ (سؤال إيحائي أو غامض).</div><h3>Which problem is it?</h3><div class="gq" data-g data-opts="Selection bias|Nonresponse bias|Measurement error" data-ok="Selection bias" data-why="A group has little or no chance of being selected."><div class="gt"><b class="gtag">1.</b> A phone survey calls only landline numbers, so people with mobile phones only can never be chosen.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Selection bias|Nonresponse bias|Measurement error" data-ok="Nonresponse bias" data-why="Responders differ from non-responders."><div class="gt"><b class="gtag">2.</b> Only 15% of the mailed questionnaires are returned, and those who replied feel more strongly about the topic.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Selection bias|Nonresponse bias|Measurement error" data-ok="Measurement error" data-why="A leading question distorts the answers."><div class="gt"><b class="gtag">3.</b> The question reads: “Don’t you agree that this excellent service should be free?”</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Selection bias|Nonresponse bias|Measurement error" data-ok="Selection bias" data-why="Students elsewhere have little or no chance of being selected."><div class="gt"><b class="gtag">4.</b> To study student habits, a researcher interviews only students sitting in the library on a Friday morning.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Selection bias|Nonresponse bias|Measurement error" data-ok="Measurement error" data-why="The interviewer’s effect on the respondent."><div class="gt"><b class="gtag">5.</b> The interviewer frowns when respondents say they dislike the product, so they change their answers.</div><div class="gb"></div><div class="feedback"></div></div><div class="gq" data-g data-opts="Selection bias|Nonresponse bias|Measurement error" data-ok="Nonresponse bias" data-why="The non-responders’ views differ from the responders’."><div class="gt"><b class="gtag">6.</b> Employees who are unhappy at work usually do not answer the company’s satisfaction survey.</div><div class="gb"></div><div class="feedback"></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> البنود الستة من إعدادي لتدريب التمييز؛ التعريفات الثلاثة فقط من الشرائح.</div></div>
+<div class="card accent"><h3>See nonresponse bias happen</h3><div class="widget"><h4>📉 A survey of 1,000 people — who answers?</h4><p style="font-size:.92rem">In the population, <b>40%</b> truly “like online shopping”. Those who like it answer the survey with probability <b>90%</b>. Move the slider to change how likely the others are to answer.</p>
+      <div class="row"><label for="nrS" style="font-weight:700">Others answer with probability <b id="nrSv">30</b>%</label><input id="nrS" type="range" min="5" max="90" step="1" value="30" style="flex:1;min-width:150px"></div>
+      <div id="nrChart"></div><div class="readout" id="nrOut"></div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>عندما يجيب "المتحمسون" أكثر من غيرهم تبدو النسبة في العينة أكبر من الحقيقة. وحين تتساوى احتمالات الإجابة يختفي الانحياز. <b>حجم العينة الكبير لا يعالج الانحياز</b>؛ المهم من أجاب.</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> هذه المحاكاة من إضافتي (الأرقام 40% و90% افتراضية للتوضيح).</div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>A larger sample automatically removes nonresponse bias.</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> True</div><div class="opt" data-correct="true"><span class="key">B</span> False — the problem is who responds, not how many</div></div><div class="feedback" data-fb-ok="Correct! Bias comes from the selection/response process." data-fb-no="Think about the slider: the sample size never changed the bias."></div></div></div>
+</section>
+<section class="slide" data-title="Business Analytics">
+<header class="slidehead"><span class="bignum" aria-hidden="true">1.7</span><div><h2 class="slide-title">Business Analytics: Critical Thinking with Statistics</h2><p class="subtitle">Section 1.7 · <span class="ar">تحليلات الأعمال والتفكير الإحصائي</span></p></div></header>
+<div class="card primary"><div class="formula"><b>Business analytics</b> refers to methodologies (e.g., statistical methods) that extract useful information from data in order to make better business decisions.</div><div class="formula"><b>Statistical thinking</b> involves applying rational thought and the science of statistics to critically assess data and inferences. Fundamental to the thought process is that <b>variation exists</b> in populations and process data.</div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>التحليلات التجارية تحوّل البيانات إلى <b>قرار أفضل</b>. والتفكير الإحصائي يعني أن تفحص البيانات بعقل ناقد، مع تذكّر أن <b>كل شيء يتغيّر</b> (حتى القارورات المعبأة بآلة واحدة لا تتساوى تمامًا).</div><h3>Role of statistics in business analytics</h3><p>Click “Next step” to walk through the flow diagram of the slide with an example.</p><div class="widget"><h4>🔁 From a real-world problem to a solution</h4><div class="row" style="margin-bottom:6px"><button class="btn primary" type="button" id="baNext">Next step</button><button class="btn" type="button" id="baReset">Restart</button></div><div id="baFlow"></div><div class="readout" id="baOut"></div></div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> مثال "انخفاض المبيعات" الذي يمرّ عبر مراحل المخطط من إعدادي؛ مراحل المخطط نفسها من الشريحة 59.</div><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>Which is the correct order in the flow diagram?</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Statistical analysis → managerial question → real-world problem</div><div class="opt" data-correct="true"><span class="key">B</span> Real-world problem → managerial formulation → managerial question → statistical formulation → statistical analysis</div><div class="opt" data-correct="false"><span class="key">C</span> Managerial solution → statistical analysis → real-world problem</div><div class="opt" data-correct="false"><span class="key">D</span> Statistical formulation → real-world problem → answer</div></div><div class="feedback" data-fb-ok="Correct! The problem is turned step by step into a statistical question." data-fb-no="The diagram starts at the real-world problem and goes down the left side."></div></div></div>
+<div class="card accent"><h3>Variation exists everywhere</h3><div class="widget"><h4>🍼 Ten “500 ml” bottles from the same machine</h4><button class="btn primary" type="button" id="varBtn">Fill 10 bottles</button><div id="varChart"></div><div class="readout" id="varOut">Press the button: every filling is slightly different.</div></div><div class="explain" dir="rtl"><b class="h">💡 شرح مبسط</b><br>حتى لو كانت الآلة مضبوطة على 500 مل، ستجد القوارير <b>متقاربة لكن غير متطابقة</b>. هذا هو <b>التغيّر (variation)</b>، وعلم الإحصاء يساعدنا على فهمه وقياسه بدل تجاهله.</div><div class="srcnote added" dir="rtl"><b>➕ إضافة (ليست في الشرائح الأصلية):</b> أداة القوارير محاكاة عشوائية من إضافتي (القيم مولَّدة).</div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>Statistical thinking assumes that:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> All items in a process are identical</div><div class="opt" data-correct="true"><span class="key">B</span> Variation exists in populations and process data</div><div class="opt" data-correct="false"><span class="key">C</span> Data never need to be questioned</div><div class="opt" data-correct="false"><span class="key">D</span> Only large samples have variation</div></div><div class="feedback" data-fb-ok="Correct! Variation exists." data-fb-no="Read the definition again."></div></div></div>
+</section>
+<section class="slide" data-title="Summary">
+<header class="slidehead"><span class="bignum" aria-hidden="true">∑</span><div><h2 class="slide-title">Summary and Final Challenge</h2><p class="subtitle">Putting it all together · <span class="ar">الخلاصة والتحدي الأخير</span></p></div></header>
+<div class="card primary"><h3>📌 Summary</h3><div class="summary-grid"><div class="sum-card"><h4>Statistics</h4><p>The science of data: collecting, classifying, summarizing, organizing, analyzing, interpreting.</p></div><div class="sum-card"><h4>Two branches</h4><p>Descriptive: summarizes data. Inferential: uses a sample to generalize, estimate, predict.</p></div><div class="sum-card"><h4>Elements</h4><p>Unit, population, variable, measurement, census, sample.</p></div><div class="sum-card"><h4>Data types</h4><p>Qualitative (categories) and quantitative (numbers).</p></div><div class="sum-card"><h4>Scales</h4><p>Nominal → ordinal → interval → ratio.</p></div><div class="sum-card"><h4>Collecting</h4><p>Published source, designed experiment, observational study (survey).</p></div><div class="sum-card"><h4>Sampling</h4><p>Random, systematic (k = N/n), stratified, cluster.</p></div><div class="sum-card"><h4>Problems</h4><p>Selection bias, nonresponse bias, measurement error.</p></div><div class="sum-card"><h4>Analytics</h4><p>Statistics turns data into better decisions; variation exists.</p></div></div><h3>Easily confused pairs</h3><table class="data"><tr><th>Pair</th><th>The difference</th></tr><tr><td class="l">Population vs sample</td><td class="l">All units vs a part of them.</td></tr><tr><td class="l">Census vs sample</td><td class="l">Measure every unit vs measure a subset.</td></tr><tr><td class="l">Stratified vs cluster</td><td class="l">Sample from every group vs take whole groups.</td></tr><tr><td class="l">Interval vs ratio</td><td class="l">No true zero vs true zero.</td></tr><tr><td class="l">Nominal vs ordinal</td><td class="l">No order vs ordered categories.</td></tr><tr><td class="l">Selection vs nonresponse bias</td><td class="l">Some units cannot be chosen vs chosen units do not answer.</td></tr></table></div>
+<div class="card accent"><h3>🎓 Final challenge</h3><div class="quiz" data-quiz><div class="q"><span class="qnum">1</span><span>A researcher measures the heights of 40 randomly selected students to learn about all students. The 40 students are the:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Population</div><div class="opt" data-correct="true"><span class="key">B</span> Sample</div><div class="opt" data-correct="false"><span class="key">C</span> Variable</div><div class="opt" data-correct="false"><span class="key">D</span> Census</div></div><div class="feedback" data-fb-ok="Correct! A sample." data-fb-no="They are a part of all students."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">2</span><span>Every 8th car leaving a factory is inspected. This is:</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Random sampling</div><div class="opt" data-correct="true"><span class="key">B</span> Systematic sampling</div><div class="opt" data-correct="false"><span class="key">C</span> Cluster sampling</div><div class="opt" data-correct="false"><span class="key">D</span> Stratified sampling</div></div><div class="feedback" data-fb-ok="Correct! Systematic." data-fb-no="Every k-th unit."></div></div><div class="quiz" data-quiz><div class="q"><span class="qnum">3</span><span>Temperature in °C is measured on the ______ scale.</span></div><div class="opts"><div class="opt" data-correct="false"><span class="key">A</span> Nominal</div><div class="opt" data-correct="false"><span class="key">B</span> Ordinal</div><div class="opt" data-correct="true"><span class="key">C</span> Interval</div><div class="opt" data-correct="false"><span class="key">D</span> Ratio</div></div><div class="feedback" data-fb-ok="Correct! Interval — zero is not “nothing”." data-fb-no="No true zero."></div></div></div>
+<div class="card" style="text-align:center"><h2 style="font-family:var(--display);margin:6px 0">🎉 Chapter 1 complete</h2>
+    <p style="margin-left:auto;margin-right:auto"><b>Final score: <span id="finalScore">0</span> / <span id="maxScore">0</span></b> &nbsp;·&nbsp; <b>Best streak: <span id="finalStreak">0</span></b></p>
+    <p class="ar" style="margin:6px 0">أحسنت! أكملت المحاضرة التفاعلية.</p>
+    <p><button class="btn" type="button" onclick="resetQuizzes()">🔄 Retry all questions</button> <button class="btn primary" type="button" onclick="goTo(slides.length-1)">📝 Take the final exam</button></p></div>
+</section>
+<section class="slide" data-title="Final Exam"><header class="slidehead"><span class="bignum" aria-hidden="true">?</span><div><h2 class="slide-title">Final Exam</h2><p class="subtitle">25 new questions · <span class="ar">الاختبار النهائي</span></p></div></header><div class="card"><p>These questions are different from those in the slides. Pick an answer to see the explanation at once; at the end you get your score, your mistakes with the correct answers, and a retake button. The exam does not change the lecture score.</p></div><div id="examRoot"></div></section>
+</main>
+</div>
+<div class="slide-nav"><div class="inner">
+  <button class="btn" id="prevBtn">◀ Previous</button>
+  <div class="pos" id="posLabel">Slide 1</div>
+  <button class="btn primary" id="nextBtn">Next ▶</button>
+</div></div>
+<div class="toast" id="toast">Correct! +10</div>
+<script>
+/* ================= HELPERS ================= */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const r3 = x => Math.round(x * 1000) / 1000;
+const fmtN = x => (Number.isInteger(x) ? String(x) : String(r3(x)));
+const sum = a => a.reduce((p, c) => p + c, 0);
+function parseNums(s) { return (s || '').replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 1632)).replace(/[،;]/g, ',').split(/[\s,]+/).map(t => t.trim()).filter(t => t !== '').map(Number).filter(v => !isNaN(v)); }
+const T = (x, y, t, o) => { o = o || {}; return `<text x="${x}" y="${y}" font-size="${o.s || 11}" text-anchor="${o.a || 'middle'}" fill="${o.c || '#17153B'}" font-weight="${o.w || 500}">${t}</text>`; };
+function svgWrap(w, h, inner, title) { return `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="${title || 'figure'}">${inner}</svg>`; }
+const SEC = ['#5B3DF5', '#0A8F8F', '#D9480F', '#1C6DD0', '#C2255C', '#2B8A3E', '#5B3DF5', '#0A8F8F', '#D9480F', '#1C6DD0', '#C2255C'];
+const PAL = ['#5B3DF5', '#0A8F8F', '#D9480F', '#1C6DD0', '#C2255C', '#2B8A3E', '#E8A317'];
+
+function pieSVG(c) { // labels, values, sub, title
+  const W = 520, H = 330, cx = W / 2, cy = 176, r = 104, tot = sum(c.values); let a0 = -Math.PI / 2, s = '';
+  if (c.title) s += T(W / 2, 20, c.title, { s: 13, w: 800 });
+  c.values.forEach((v, i) => {
+    const a1 = a0 + v / tot * 2 * Math.PI, col = PAL[i % PAL.length], big = (a1 - a0) > Math.PI ? 1 : 0;
+    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0), x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    s += `<path d="M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 ${big} 1 ${x1} ${y1} Z" fill="${col}" stroke="#17153B" stroke-width="2"><title>${c.labels[i]}</title></path>`;
+    const am = (a0 + a1) / 2, lx = cx + (r + 22) * Math.cos(am), ly = cy + (r + 22) * Math.sin(am), anc = Math.cos(am) >= 0 ? 'start' : 'end';
+    s += T(lx, ly - 1, c.labels[i], { a: anc, s: 11, w: 800 }) + T(lx, ly + 12, c.sub ? c.sub[i] : '', { a: anc, s: 11, c: '#5E5C82' });
+    a0 = a1;
+  });
+  return svgWrap(W, H, s, c.title);
+}
+
+/* ================= STATE & NAV ================= */
+let current = 0, score = 0, streak = 0, bestStreak = 0;
+const slides = $$('.slide'), tabsNav = $('#tabs');
+slides.forEach((s, i) => {
+  const t = document.createElement('button'); t.className = 'tab' + (i === 0 ? ' active' : ''); t.style.setProperty('--tc', SEC[i % SEC.length]);
+  t.innerHTML = `<span class="num">${i + 1}</span><span>${s.dataset.title}</span>`; t.addEventListener('click', () => goTo(i)); tabsNav.appendChild(t);
+});
+function setColor() { document.documentElement.style.setProperty('--c', SEC[current % SEC.length]); }
+function goTo(i) {
+  if (i < 0 || i >= slides.length) return;
+  slides[current].classList.remove('active'); current = i; slides[current].classList.add('active'); setColor();
+  $$('.tab').forEach((t, k) => t.classList.toggle('active', k === current));
+  const act = $$('.tab')[current]; if (act && act.scrollIntoView) act.scrollIntoView({ inline: 'center', block: 'nearest' });
+  $('#posLabel').textContent = `Slide ${current + 1} of ${slides.length}`; $('#prevBtn').disabled = current === 0; $('#nextBtn').disabled = current === slides.length - 1;
+  $('#progressFill').style.width = ((current + 1) / slides.length * 100) + '%'; window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$('#prevBtn').addEventListener('click', () => goTo(current - 1)); $('#nextBtn').addEventListener('click', () => goTo(current + 1));
+$('#progressFill').style.width = (1 / slides.length * 100) + '%'; $('#prevBtn').disabled = true; $('#posLabel').textContent = `Slide 1 of ${slides.length}`; setColor();
+
+/* ================= SCORE ================= */
+function addScore(n) { score += n; $('#scoreVal').textContent = score; $('#finalScore').textContent = score; $('#finalStreak').textContent = bestStreak; $('#streakVal').textContent = streak; }
+let toastTimer;
+function showToast(msg, bad) { const t = $('#toast'); t.textContent = msg; t.classList.toggle('bad', !!bad); t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1700); }
+function award(ok, fb) {
+  fb.classList.add('show');
+  if (ok) { fb.classList.add('ok'); fb.classList.remove('no'); fb.textContent = fb.dataset.fbOk || 'Correct!'; streak++; bestStreak = Math.max(bestStreak, streak); addScore(10); showToast('Correct! +10', false); }
+  else { fb.classList.add('no'); fb.classList.remove('ok'); fb.textContent = fb.dataset.fbNo || 'Not quite.'; streak = 0; $('#streakVal').textContent = 0; }
+}
+
+/* ---- multiple choice ---- */
+$$('[data-quiz]').forEach(quiz => {
+  const opts = $$('.opt', quiz), fb = $('.feedback', quiz);
+  opts.forEach(opt => opt.addEventListener('click', () => {
+    if (opt.classList.contains('disabled')) return; const ok = opt.dataset.correct === 'true';
+    opts.forEach(o => o.classList.add('disabled')); opt.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) opts.forEach(o => { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+    award(ok, fb);
+  }));
+});
+/* ---- numeric ---- */
+$$('[data-numq]').forEach(q => {
+  const inp = $('input', q), fb = $('.feedback', q), btn = $('.chk', q), ans = parseFloat(q.dataset.answer), tol = parseFloat(q.dataset.tol || '0.01'); let done = false;
+  const check = () => {
+    if (done) return; const raw = parseNums(inp.value.replace(/,(\d{3})/g, '$1')); if (!raw.length) { fb.className = 'feedback show no'; fb.textContent = 'Type a number first.'; return; }
+    const ok = Math.abs(raw[0] - ans) <= tol; if (ok) { done = true; q.classList.add('done'); inp.disabled = true; btn.disabled = true; } award(ok, fb);
+  };
+  btn.addEventListener('click', check); inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+  q._reset = () => { done = false; q.classList.remove('done'); inp.disabled = false; btn.disabled = false; inp.value = ''; fb.className = 'feedback'; };
+});
+/* ---- classification rows ---- */
+$$('[data-g]').forEach(g => {
+  const opts = g.dataset.opts.split('|'), gb = $('.gb', g), fb = $('.feedback', g); fb.dataset.fbOk = 'Correct! ' + g.dataset.why; fb.dataset.fbNo = '';
+  gb.innerHTML = opts.map(o => `<button type="button">${o}</button>`).join('');
+  $$('button', gb).forEach(b => b.addEventListener('click', () => {
+    if (g.classList.contains('locked')) return; const ok = b.textContent === g.dataset.ok; g.classList.add('locked');
+    b.classList.add(ok ? 'right' : 'miss'); if (!ok) $$('button', gb).forEach(x => { if (x.textContent === g.dataset.ok) x.classList.add('right'); });
+    fb.dataset.fbNo = 'Answer: ' + g.dataset.ok + '. ' + g.dataset.why; award(ok, fb);
+  }));
+  g._reset = () => { g.classList.remove('locked'); $$('button', gb).forEach(b => b.classList.remove('right', 'miss')); fb.className = 'feedback'; fb.textContent = ''; };
+});
+document.addEventListener('keydown', e => { if (/INPUT|TEXTAREA/.test((e.target || {}).tagName || '')) return; if (e.key === 'ArrowRight') goTo(current + 1); if (e.key === 'ArrowLeft') goTo(current - 1); });
+function resetQuizzes() {
+  $$('[data-quiz],[data-numq],[data-g]').forEach(q => {
+    $$('.opt', q).forEach(o => o.classList.remove('correct', 'wrong', 'disabled'));
+    if (q._reset) q._reset(); else { const f = $('.feedback', q); f.classList.remove('show', 'ok', 'no'); }
+  });
+  score = 0; streak = 0; bestStreak = 0; $('#scoreVal').textContent = 0; $('#finalScore').textContent = 0; $('#finalStreak').textContent = 0; $('#streakVal').textContent = 0; goTo(0);
+}
+$('#maxScore').textContent = $$('[data-quiz],[data-numq],[data-g]').length * 10;
+
+/* ================= WIDGETS (Chapter 1) ================= */
+function mkSeg(id, items, on, cb) {
+  const el = $('#' + id); if (!el) return;
+  el.innerHTML = items.map((it, i) => `<button type="button" class="${i === on ? 'on' : ''}" data-v="${it[0]}">${it[1]}</button>`).join('');
+  $$('button', el).forEach(b => b.addEventListener('click', () => { $$('button', el).forEach(x => x.classList.remove('on')); b.classList.add('on'); cb(b.dataset.v); }));
+  cb(items[on][0]);
+}
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- Slide 1: word cloud + six actions ---------- */
+(function () {
+  const W = [['Statistics', 3.1], ['data', 2.1], ['collection', 1.7], ['interpretation', 1.5], ['analysis', 1.3], ['organization', 1.2], ['descriptive', 1.2], ['statistical', 1.3], ['inference', 1.4], ['probability', 1], ['design', 1], ['theory', 1.1], ['experiments', 1], ['prediction', 1], ['samples', 1], ['population', 1.2], ['mathematical', 1], ['scientific', 1]];
+  $('#wordCloud').innerHTML = W.map((w, i) => `<span style="font-size:${w[1] * 0.95}rem;color:${PAL[i % PAL.length]}">${w[0]}</span>`).join('');
+  const steps = [
+    ['collecting', 'جمع البيانات', 'Ask 30 students: “How many hours did you sleep last night?”'],
+    ['classifying', 'تصنيف البيانات', 'Group the answers: by gender, by year, and as “less than 6 h / 6–8 h / more than 8 h”.'],
+    ['summarizing', 'تلخيص البيانات', 'Reduce 30 answers to a few numbers, e.g. the average sleep is 6.8 hours.'],
+    ['organizing', 'تنظيم البيانات', 'Put the results in a table or a graph so that patterns are easy to see.'],
+    ['analyzing', 'تحليل البيانات', 'Compare first-year with final-year students: who sleeps less?'],
+    ['interpreting', 'تفسير النتائج', 'Explain what the results mean and what to do: “Students with less sleep report lower marks → run a sleep-awareness campaign.”']];
+  mkSeg('pipeSeg', steps.map((s, i) => [i, (i + 1) + '. ' + s[0]]), 0, v => { const s = steps[+v]; $('#pipeOut').innerHTML = `<div class="readout"><b>${s[0]}</b> <span class="ar">(${s[1]})</span><br>${s[2]}</div>`; });
+})();
+
+/* ---------- Slide 2: cookies pie ---------- */
+$('#cookiePie').innerHTML = pieSVG({ labels: ['Thin Mints', 'other', 'Samoas', 'Tagalongs', 'Do-si-dos', 'Trefoils'], values: [25, 23, 19, 13, 11, 9], sub: ['25.0%', '23.0%', '19.0%', '13.0%', '11.0%', '9.0%'], title: 'Girl Scout cookies sold, by variety' });
+
+/* ---------- Slide 3: population lab ---------- */
+(function () {
+  const N = 60, ages = []; let seed = 7; for (let i = 0; i < N; i++) { seed = (seed * 1103515245 + 12345) & 0x7fffffff; ages.push(18 + seed % 33); }
+  const popMean = sum(ages) / N; let picked = new Set(), mode = '';
+  const draw = () => {
+    const W = 600, cols = 12, gx = 46, gy = 40; let s = '';
+    ages.forEach((a, i) => { const x = 30 + (i % cols) * gx, y = 28 + Math.floor(i / cols) * gy, on = picked.has(i);
+      s += `<g class="pop-dot"><circle cx="${x}" cy="${y}" r="13" fill="${on ? '#5B3DF5' : '#fff'}" stroke="#17153B" stroke-width="2"/>` + T(x, y + 4, a, { s: 10, c: on ? '#fff' : '#17153B', w: 700 }) + `<title>unit ${i + 1}: age ${a}</title></g>`; });
+    $('#popLab').innerHTML = svgWrap(W, 28 + 5 * gy + 16, s, 'population of 60 people');
+    if (!picked.size) return;
+    const m = sum([...picked].map(i => ages[i])) / picked.size;
+    $('#popOut').innerHTML = mode === 'census' ? `<b>Census:</b> all 60 units measured → population mean age = <b>${fmtN(r3(popMean))}</b> (cost: 60 measurements).` :
+      `<b>Sample:</b> n = ${picked.size} units measured (${fmtN(r3(picked.size / N * 100))}% of the work) → sample mean age = <b>${fmtN(r3(m))}</b>. The population mean is ${fmtN(r3(popMean))}; the sample is off by ${fmtN(r3(Math.abs(m - popMean)))} years.`;
+  };
+  $('#popN').addEventListener('input', () => { $('#popNv').textContent = $('#popN').value; });
+  $('#popDraw').addEventListener('click', () => { mode = 'sample'; picked = new Set(shuffle([...Array(N).keys()]).slice(0, +$('#popN').value)); draw(); });
+  $('#popCensus').addEventListener('click', () => { mode = 'census'; picked = new Set([...Array(N).keys()]); draw(); });
+  $('#popClear').addEventListener('click', () => { picked = new Set(); $('#popOut').innerHTML = 'Each dot is one experimental unit (a person) with its age. Press “Draw a random sample”.'; draw(); });
+  draw();
+  // static "cars" population / sample picture
+  const cols = ['#0A8F8F', '#C2255C', '#1C6DD0', '#17153B', '#E8A317'], sel = new Set([8, 9, 12, 16, 18, 19]); let g = '';
+  g += T(110, 16, 'Population (all items)', { s: 11, w: 800 }) + T(420, 16, 'Sample (items selected)', { s: 11, w: 800 }) + `<rect x="10" y="24" width="200" height="130" fill="#fff" stroke="#17153B" stroke-width="2"/><rect x="320" y="60" width="200" height="60" fill="#fff" stroke="#17153B" stroke-width="2"/>`;
+  for (let i = 0; i < 25; i++) { const x = 30 + (i % 5) * 38, y = 42 + Math.floor(i / 5) * 25; g += `<rect x="${x - 9}" y="${y - 6}" width="18" height="11" rx="4" fill="${cols[i % 5]}"/>` + (sel.has(i) ? `<circle cx="${x}" cy="${y}" r="12" fill="none" stroke="#17153B" stroke-width="2"/>` : ''); }
+  [...sel].forEach((k, j) => { const x = 345 + (j % 3) * 62, y = 80 + Math.floor(j / 3) * 26; g += `<rect x="${x - 9}" y="${y - 6}" width="18" height="11" rx="4" fill="${cols[k % 5]}"/>`; });
+  g += `<path d="M215 90 L312 90" stroke="#17153B" stroke-width="2" marker-end="url(#ah)"/><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#17153B"/></marker></defs>`;
+  $('#popSample').innerHTML = svgWrap(530, 168, g, 'population and sample');
+})();
+
+/* ---------- Slide 4: data / data set / data value ---------- */
+(function () {
+  const rows = [[20, 'male', 'Saudi'], [25, 'male', 'Yemeni'], [30, 'female', 'Egyptian'], [23, 'male', 'Jordanian'], [30, 'female', 'Lebanese']], head = ['Age', 'Gender', 'Nationality'];
+  let mode = 'variable', cell = null;
+  const draw = () => {
+    let h = '<table class="data"><tr>' + head.map((x, c) => `<th style="${mode === 'variable' ? 'background:#5B3DF5' : ''}">${x}</th>`).join('') + '</tr>';
+    rows.forEach((r, i) => { h += '<tr>' + r.map((v, c) => { const hl = mode === 'set' || (mode === 'data' && c === 2) || (mode === 'value' && cell && cell[0] === i && cell[1] === c); return `<td data-i="${i}" data-c="${c}" style="${hl ? 'background:#FFE066;font-weight:800' : ''};cursor:${mode === 'value' ? 'pointer' : 'default'}">${v}</td>`; }).join('') + '</tr>'; });
+    $('#dtTable').innerHTML = h + '</table>';
+    $$('#dtTable td').forEach(td => td.addEventListener('click', () => { if (mode === 'value') { cell = [+td.dataset.i, +td.dataset.c]; draw(); } }));
+    const msg = { variable: '<b>Variables:</b> Age, Gender, Nationality — the characteristics measured (the column headings).', set: '<b>Data set:</b> the whole collection of data values (every cell below the headings).', data: '<b>Data:</b> the values obtained by measuring a variable on the units — here the Nationality column.', value: cell ? `<b>Data value:</b> “${rows[cell[0]][cell[1]]}” is one data value (a single cell).` : '<b>Data value:</b> each single value in the data set. Click any cell.' };
+    $('#dtOut').innerHTML = msg[mode];
+  };
+  mkSeg('dtSeg', [['variable', 'Variable'], ['set', 'Data set'], ['data', 'Data'], ['value', 'Data value']], 0, v => { mode = v; draw(); });
+})();
+
+/* ---------- Slide 5: ladder + temperature ---------- */
+(function () {
+  const L = {
+    Nominal: ['Qualitative', 'Classifies data into mutually exclusive (non-overlapping) categories in which no order or ranking can be imposed on the data.', 'Eye color, gender, political party, blood types.', 'اسمي: أسماء فئات فقط، لا ترتيب بينها.'],
+    Ordinal: ['Qualitative', 'Classifies data into categories that can be ranked. However, precise differences between the ranks do not exist.', 'Grade of course (A, B, C); size (S, M, L); rating scale (Poor, Good, Excellent); ranking of tennis players.', 'ترتيبي: يمكن ترتيب الفئات لكن لا نعرف المسافة الدقيقة بينها.'],
+    Interval: ['Quantitative', 'Ranks data, and precise differences between units of measure do exist; however, there is no meaningful zero.', 'Temperature, IQ tests.', 'فترات: الفروق لها معنى لكن الصفر ليس "لا شيء".'],
+    Ratio: ['Quantitative', 'Possesses all the characteristics of interval measurement, and there exists a true zero. True ratios exist when the same variable is measured on two different subjects.', 'Height, weight, time, salary, age.', 'نسبة: صفر حقيقي، فيصح أن نقول "ضعف" و"نصف".']
+  };
+  const keys = Object.keys(L), box = $('#ladBtns');
+  box.innerHTML = keys.map((k, i) => `<button type="button" data-k="${k}" class="${i === 0 ? 'on' : ''}">${k}<small>${L[k][0]}</small></button>`).join('');
+  const show = k => { $$('button', box).forEach(b => b.classList.toggle('on', b.dataset.k === k)); const d = L[k]; $('#ladOut').innerHTML = `<div class="readout"><b>${k}</b> — ${d[1]}<br><b>Examples:</b> ${d[2]}<div class="ar" style="margin-top:4px">${d[3]}</div></div>`; };
+  $$('button', box).forEach(b => b.addEventListener('click', () => show(b.dataset.k))); show('Nominal');
+  const upd = () => {
+    const x = +$('#tmpC').value; $('#tmpCv').textContent = x; const f = x * 9 / 5 + 32, f0 = 20 * 9 / 5 + 32;
+    $('#tmpOut').innerHTML = `<div class="out"><small>Temperature: ${x} °C vs 20 °C</small>ratio = ${fmtN(r3(x / 20))} <br><small>in °F: ${fmtN(r3(f))} vs ${f0} → ratio = ${fmtN(r3(f / f0))}</small><small>The ratio changes with the unit ⇒ no true zero ⇒ <b>interval</b></small></div>` +
+      `<div class="out"><small>Weight: ${x} kg vs 20 kg</small>ratio = ${fmtN(r3(x / 20))} <br><small>in lb: ${fmtN(r3(x * 2.20462))} vs ${fmtN(r3(20 * 2.20462))} → ratio = ${fmtN(r3(x / 20))}</small><small>The ratio never changes ⇒ true zero ⇒ <b>ratio scale</b></small></div>`;
+  };
+  $('#tmpC').addEventListener('input', upd); upd();
+})();
+
+/* ---------- Slide 7: random numbers, systematic, strat/cluster ---------- */
+const RN = [
+  '79 41 71 93 60 35 04 67 96 04 79 10 86', '26 52 53 13 43 50 92 09 87 21 83 75 17', '18 13 41 30 56 20 37 74 49 56 45 46 83', '19 82 02 69 34 27 77 34 24 93 16 77 00',
+  '14 57 44 30 93 76 32 13 55 29 49 30 77', '29 12 18 50 06 33 15 79 50 28 50 45 45', '01 27 92 67 93 31 97 55 29 21 64 27 29', '55 75 65 68 65 73 07 95 66 43 43 92 16',
+  '84 95 95 96 62 30 91 64 74 83 47 89 71', '62 62 21 37 82 62 19 44 08 64 34 50 11', '66 57 28 69 13 99 74 31 58 19 47 66 89', '48 13 69 97 29 01 75 58 05 40 40 18 29',
+  '94 31 73 19 75 76 33 18 05 53 04 51 41', '00 06 53 98 01 55 08 38 49 42 10 44 38', '46 16 44 27 80 15 28 01 64 27 89 03 27', '77 49 85 95 62 93 25 39 63 74 54 82 85',
+  '81 96 43 27 39 53 85 61 12 90 67 96 02', '40 46 15 73 23 75 96 68 13 99 49 64 11'].map(r => r.split(' '));
+(function () {
+  const R = RN.length, C = 13, flat = []; RN.forEach(r => r.forEach(v => flat.push(v)));
+  let start = 5 * C + 1, ptr = start, status = {}, chosen = [];
+  const draw = () => {
+    let h = '<table class="data" style="font-size:.8rem;min-width:520px">';
+    RN.forEach((r, i) => { h += '<tr>' + r.map((v, c) => { const k = i * C + c, st = status[k]; let sty = 'cursor:pointer;padding:4px 6px;';
+      if (st === 'ok') sty += 'background:#CBF5E0;font-weight:800;'; else if (st === 'big') sty += 'color:#9a98b8;text-decoration:line-through;'; else if (st === 'dup') sty += 'background:#FFE066;'; if (k === start) sty += 'outline:3px solid #C2255C;outline-offset:-3px;'; if (k === ptr && chosen.length < 15) sty += 'box-shadow:inset 0 -4px 0 #5B3DF5;';
+      return `<td data-k="${k}" style="${sty}">${v}</td>`; }).join('') + '</tr>'; });
+    $('#rnTable').innerHTML = h + '</table>';
+    $$('#rnTable td').forEach(td => td.addEventListener('click', () => { start = ptr = +td.dataset.k; status = {}; chosen = []; draw(); }));
+    $('#rnOut').innerHTML = `<b>Selected (${chosen.length} of 15):</b> ${chosen.length ? chosen.join(', ') : '—'}<br><span style="font-size:.85rem">Green = chosen · crossed out = bigger than 85 or 00 (no such subject) · yellow = repeated number (skipped). Numbers read: ${Object.keys(status).length}.</span>` + (chosen.length === 15 ? '<br><b>✅ The sample of 15 subjects is complete.</b>' : '');
+  };
+  const step = () => {
+    if (chosen.length >= 15 || ptr >= flat.length) return; const v = +flat[ptr], k = ptr;
+    if (v === 0 || v > 85) status[k] = 'big'; else if (chosen.includes(v)) status[k] = 'dup'; else { status[k] = 'ok'; chosen.push(v); }
+    ptr++; draw();
+  };
+  $('#rnStep').addEventListener('click', step); $('#rnAll').addEventListener('click', () => { let g = 0; while (chosen.length < 15 && ptr < flat.length && g++ < 400) step(); });
+  $('#rnReset').addEventListener('click', () => { start = ptr = 5 * C + 1; status = {}; chosen = []; draw(); }); draw();
+})();
+(function () {
+  const upd = () => {
+    const N = Math.round(+$('#syN').value), n = Math.round(+$('#syn').value);
+    if (!(N >= 2 && n >= 1 && n <= N && N <= 300)) { $('#syK').textContent = 'Enter N (2–300) and n ≤ N.'; $('#syGrid').innerHTML = ''; $('#syOut').textContent = ''; return; }
+    const kx = N / n, k = Math.max(1, Math.floor(kx)); let st = Math.round(+$('#syS').value) || 1; st = Math.min(Math.max(st, 1), k);
+    const sel = new Set(); for (let p = st; p <= N && sel.size < n; p += k) sel.add(p);
+    $('#syK').innerHTML = `k = N ÷ n = ${N} ÷ ${n} = <b>${fmtN(r3(kx))}</b>` + (Number.isInteger(kx) ? '' : ` → use k = ${k}`);
+    const cols = Math.min(25, N), cs = 22; let s = ''; for (let i = 1; i <= N; i++) { const x = 14 + ((i - 1) % cols) * cs, y = 14 + Math.floor((i - 1) / cols) * cs, on = sel.has(i); s += `<circle cx="${x}" cy="${y}" r="9" fill="${on ? '#C2255C' : '#fff'}" stroke="#17153B" stroke-width="1.5"><title>${i}</title></circle>` + (N <= 100 ? T(x, y + 3, i, { s: 7, c: on ? '#fff' : '#17153B', w: 700 }) : ''); }
+    $('#syGrid').innerHTML = svgWrap(cols * cs + 6, Math.ceil(N / cols) * cs + 6, s, 'systematic sample');
+    $('#syOut').innerHTML = `Start at ${st}, then every ${k}: <b>${[...sel].slice(0, 30).join(', ')}${sel.size > 30 ? ', …' : ''}</b> (${sel.size} units).`;
+  };
+  ['#syN', '#syn', '#syS'].forEach(i => $(i).addEventListener('input', upd)); upd();
+})();
+(function () {
+  const G = 4, per = 12, cols = ['#5B3DF5', '#0A8F8F', '#D9480F', '#C2255C']; let sel = new Set(), kind = '';
+  const pos = i => { const g = Math.floor(i / per), j = i % per, bx = (g % 2) * 280 + 20, by = Math.floor(g / 2) * 112 + 18; return [bx + (j % 4) * 56 + 14, by + Math.floor(j / 4) * 30 + 14]; };
+  const draw = () => {
+    let s = ''; for (let g = 0; g < G; g++) { const bx = (g % 2) * 280 + 20, by = Math.floor(g / 2) * 112 + 18; s += `<rect x="${bx - 6}" y="${by - 6}" width="236" height="104" fill="${cols[g]}" fill-opacity=".1" stroke="${cols[g]}" stroke-width="2" stroke-dasharray="5 4"/>` + T(bx + 4, by - 8, 'Group ' + (g + 1), { a: 'start', s: 10, c: cols[g], w: 800 }); }
+    for (let i = 0; i < G * per; i++) { const [x, y] = pos(i), g = Math.floor(i / per), on = sel.has(i); s += `<circle cx="${x}" cy="${y}" r="11" fill="${on ? cols[g] : '#fff'}" stroke="${cols[g]}" stroke-width="2.5"/>` + (on ? T(x, y + 4, '✓', { s: 11, c: '#fff', w: 800 }) : ''); }
+    $('#scGrid').innerHTML = svgWrap(580, 230, s, 'population in four groups');
+  };
+  $('#scN').addEventListener('input', () => { $('#scNv').textContent = $('#scN').value; });
+  $('#scStrat').addEventListener('click', () => { sel = new Set(); const m = +$('#scN').value; for (let g = 0; g < G; g++) shuffle([...Array(per).keys()]).slice(0, m).forEach(j => sel.add(g * per + j)); draw();
+    $('#scOut').innerHTML = `<b>Stratified:</b> ${m} randomly chosen from <b>each</b> of the 4 groups → ${sel.size} people; every group is represented.`; });
+  $('#scClus').addEventListener('click', () => { sel = new Set(); const gs = shuffle([0, 1, 2, 3]).slice(0, 2); gs.forEach(g => { for (let j = 0; j < per; j++) sel.add(g * per + j); }); draw();
+    $('#scOut').innerHTML = `<b>Cluster:</b> groups ${gs.map(g => g + 1).sort().join(' and ')} were chosen at random and <b>everyone</b> in them is in the sample → ${sel.size} people; the other two groups are not represented at all.`; });
+  $('#scClear').addEventListener('click', () => { sel = new Set(); draw(); $('#scOut').textContent = 'The four groups are shown in four colours (strata or clusters).'; }); draw();
+})();
+
+/* ---------- Slide 8: nonresponse ---------- */
+(function () {
+  const upd = () => {
+    const r = +$('#nrS').value / 100; $('#nrSv').textContent = $('#nrS').value; const yes = 0.4, ry = 0.9, est = yes * ry / (yes * ry + (1 - yes) * r), n = Math.round(1000 * (yes * ry + (1 - yes) * r));
+    const bar = (y, v, col, t) => `<rect x="150" y="${y}" width="${v * 380}" height="26" fill="${col}" stroke="#17153B" stroke-width="2"/>` + T(144, y + 18, t, { a: 'end', s: 12, w: 700 }) + T(156 + v * 380, y + 18, fmtN(r3(v * 100)) + '%', { a: 'start', s: 12, w: 800 });
+    $('#nrChart').innerHTML = svgWrap(600, 96, bar(8, yes, '#0A8F8F', 'True population') + bar(52, est, '#C2255C', 'Survey estimate'), 'true value and estimate');
+    $('#nrOut').innerHTML = `About <b>${n}</b> of the 1,000 people answer. Among them <b>${fmtN(r3(est * 100))}%</b> like online shopping, but the true value is <b>40%</b> → bias of <b>${fmtN(r3((est - yes) * 100))}</b> percentage points.` + (Math.abs(est - yes) < 0.005 ? ' Equal response rates ⇒ no bias.' : '');
+  };
+  $('#nrS').addEventListener('input', upd); upd();
+})();
+
+/* ---------- Slide 9: flow diagram + variation ---------- */
+(function () {
+  const N = [['REAL-WORLD PROBLEM', 310, 28, 'ell'], ['Managerial formulation of problem', 105, 118], ['Managerial question relating to problem', 105, 208], ['Statistical formulation of question', 105, 298], ['STATISTICAL ANALYSIS', 310, 378, 'ell'], ['Answer to statistical question', 515, 298], ['Answer to managerial question', 515, 208], ['Managerial solution to problem', 515, 118]];
+  const TXT = ['Sales of our product keep falling.', 'Management suspects the new, higher price is the reason.', 'Do customers buy less at the new price than at the old price?', 'Compare mean weekly sales before and after the price change, using a sample of 40 stores.', 'Run the statistical analysis on the sample data.', 'Mean weekly sales fell by 12%, more than chance variation would explain.', 'Yes: the price increase reduced demand.', 'Return to the old price or offer promotions. Then monitor sales again: a new problem or question may appear.'];
+  let st = 0;
+  const draw = () => {
+    const arrows = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 0]];
+    let s = `<defs><marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9Z" fill="#17153B"/></marker></defs>`;
+    const anchor = (i, to) => { const [, x, y, t] = N[i], w = t ? 0 : 85, h = t ? 20 : 22; return [x, y + (to ? (i < 4 || i === 7 ? -h : h) : 0)]; };
+    const edge = (a, b) => { const [, x1, y1] = N[a], [, x2, y2] = N[b]; return `<line x1="${x1 + (x2 - x1) * .0}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#17153B" stroke-width="2" marker-end="url(#ar2)" opacity=".0"/>`; };
+    const link = [[310, 48, 105, 96], [105, 140, 105, 186], [105, 230, 105, 276], [105, 320, 262, 366], [358, 366, 515, 320], [515, 276, 515, 230], [515, 186, 515, 140], [515, 96, 358, 44]];
+    link.forEach((l, i) => { s += `<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="${i < st ? '#C2255C' : '#17153B'}" stroke-width="${i < st ? 3.5 : 2}" marker-end="url(#ar2)"/>`; });
+    s += `<line x1="440" y1="196" x2="205" y2="132" stroke="#5E5C82" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar2)"/>` + T(322, 150, 'Reformulation of problem', { s: 10, c: '#5E5C82', w: 700 });
+    s += `<line x1="430" y1="208" x2="212" y2="208" stroke="#5E5C82" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar2)"/>` + T(322, 202, 'New question', { s: 10, c: '#5E5C82', w: 700 });
+    N.forEach((n, i) => { const on = i === st, done = i < st, fill = on ? '#C2255C' : done ? '#FFE066' : '#fff', col = on ? '#fff' : '#17153B';
+      if (n[3] === 'ell') s += `<ellipse cx="${n[1]}" cy="${n[2]}" rx="95" ry="22" fill="${fill}" stroke="#17153B" stroke-width="2"/>` + T(n[1], n[2] + 4, n[0], { s: 11, c: col, w: 800 });
+      else { const words = n[0].split(' '), mid = Math.ceil(words.length / 2); s += `<rect x="${n[1] - 92}" y="${n[2] - 22}" width="184" height="44" fill="${fill}" stroke="#17153B" stroke-width="2"/>` + T(n[1], n[2] - 3, words.slice(0, mid).join(' '), { s: 10.5, c: col, w: 700 }) + T(n[1], n[2] + 12, words.slice(mid).join(' '), { s: 10.5, c: col, w: 700 }); } });
+    $('#baFlow').innerHTML = svgWrap(620, 414, s, 'role of statistics in business analytics');
+    $('#baOut').innerHTML = `<b>Step ${st + 1} of ${N.length} — ${N[st][0].toLowerCase().replace(/^./, c => c.toUpperCase())}.</b> ${TXT[st]}`;
+    $('#baNext').disabled = st >= N.length - 1;
+  };
+  $('#baNext').addEventListener('click', () => { if (st < N.length - 1) st++; draw(); }); $('#baReset').addEventListener('click', () => { st = 0; draw(); }); draw();
+})();
+(function () {
+  const go = () => {
+    const v = Array.from({ length: 10 }, () => Math.round((500 + (Math.random() + Math.random() + Math.random() - 1.5) * 8) * 10) / 10), mn = Math.min(...v), mx = Math.max(...v);
+    let s = ''; v.forEach((x, i) => { const h = (x - 480) * 6, bx = 20 + i * 56; s += `<rect x="${bx}" y="${210 - h}" width="40" height="${h}" fill="#1C6DD0" stroke="#17153B" stroke-width="2"/>` + T(bx + 20, 204 - h, x, { s: 11, w: 800 }); });
+    s += `<line x1="10" y1="90" x2="590" y2="90" stroke="#C2255C" stroke-width="2" stroke-dasharray="6 4"/>` + T(590, 84, '500 ml target', { a: 'end', s: 10, c: '#C2255C', w: 800 });
+    $('#varChart').innerHTML = svgWrap(600, 224, s, 'bottle volumes');
+    $('#varOut').innerHTML = `Smallest bottle: <b>${mn} ml</b> · largest bottle: <b>${mx} ml</b> · difference <b>${fmtN(r3(mx - mn))} ml</b>. Same machine, same setting, yet the values vary.`;
+  };
+  $('#varBtn').addEventListener('click', go);
+})();
+
+/* ================= FINAL EXAM (25 new questions) ================= */
+const EXAM = [
+  { t: 'Definition', q: 'Which of these is <b>not</b> one of the actions listed in the definition of statistics?', o: ['Collecting data', 'Summarizing data', 'Interpreting data', 'Advertising data'], a: 3, e: 'Statistics involves collecting, classifying, summarizing, organizing, analyzing and interpreting data. Advertising is not on the list.' },
+  { t: 'Descriptive', q: 'A company reports that its 120 employees earned an average of SAR 9,000 last month. This is:', o: ['Descriptive statistics', 'Inferential statistics', 'A prediction', 'A census of the future'], a: 0, e: 'The average only summarizes data that were observed; nothing is generalized or predicted.' },
+  { t: 'Inferential', q: 'From a sample of 500 voters, a poll concludes that 54% of <b>all</b> voters support a policy. This is:', o: ['Descriptive statistics', 'Inferential statistics', 'A designed experiment', 'Measurement error'], a: 1, e: 'Sample data are used to make a generalization about a larger group, which is inferential statistics.' },
+  { t: 'Experimental unit', q: 'A researcher records the weight of each package shipped by a company. The experimental unit is:', o: ['The weight', 'A package', 'All packages shipped', 'The company'], a: 1, e: 'The unit is the object on which data are collected: one package. The weight is the variable.' },
+  { t: 'Sample', q: 'A teacher wants the average height of all 300 students in a school and measures 30 of them. The 30 students are:', o: ['The population', 'A census', 'A sample', 'A variable'], a: 2, e: 'A sample is a subset of the population (here, 30 out of 300).' },
+  { t: 'Census', q: 'Measuring a variable for <b>every</b> unit of a population is called:', o: ['A sample', 'A census', 'A stratum', 'A cluster'], a: 1, e: 'That is the definition of a census.' },
+  { t: 'Variable', q: 'In a study of cars, which of the following is a <b>variable</b>?', o: ['All cars made last year', 'The 50 cars that were tested', 'The fuel consumption of a car', 'The car company'], a: 2, e: 'A variable is a characteristic of each unit: fuel consumption. The first is the population and the second is the sample.' },
+  { t: 'Data values', q: 'A data set records age, gender and nationality for 5 people. How many data values does it contain?', o: ['3', '5', '8', '15'], a: 3, e: 'Each person has 3 values: 5 × 3 = 15 data values (cells).' },
+  { t: 'Qualitative', q: 'Which variable is <b>qualitative</b>?', o: ['Waiting time in minutes', 'Number of beds in a ward', 'Hospital department (surgery, cardiology, …)', 'Body temperature'], a: 2, e: 'Department is a category. The other three are numbers.' },
+  { t: 'Quantitative', q: 'The number of customers served per hour at a bank is:', o: ['Qualitative data', 'Quantitative data', 'Nominal data', 'Ordinal data'], a: 1, e: 'A count on a natural numerical scale is quantitative.' },
+  { t: 'Nominal', q: 'The nationality of students is measured on which scale?', o: ['Nominal', 'Ordinal', 'Interval', 'Ratio'], a: 0, e: 'Categories with no order or ranking: nominal.' },
+  { t: 'Ordinal', q: 'Customers rate service as “very poor, poor, good, very good”. The level of measurement is:', o: ['Nominal', 'Ordinal', 'Interval', 'Ratio'], a: 1, e: 'The categories can be ranked, but the exact differences between ranks are unknown: ordinal.' },
+  { t: 'Interval', q: 'According to the lecture, which variable is measured at the <b>interval</b> level?', o: ['Number of students', 'Blood type', 'IQ score', 'Rank in class'], a: 2, e: 'IQ tests (like temperature) have meaningful differences but no meaningful zero.' },
+  { t: 'Ratio', q: 'Why can we say that 40 kg is twice 20 kg?', o: ['Because weight is nominal', 'Because weight has a true zero (ratio scale)', 'Because weight is qualitative', 'Because weight is ordinal'], a: 1, e: 'A true zero makes ratios meaningful, which characterizes the ratio scale.' },
+  { t: 'Scales', q: 'Which level ranks the data but does <b>not</b> give precise differences between ranks?', o: ['Nominal', 'Ordinal', 'Interval', 'Ratio'], a: 1, e: 'Ordinal data can be ranked, but the distance between ranks is not precise.' },
+  { t: 'Collecting data', q: 'Unemployment rates for the 50 states are copied from the <i>Statistical Abstract of the United States</i>. The data come from a:', o: ['Published source', 'Designed experiment', 'Survey', 'Cluster sample'], a: 0, e: 'The data had already been collected and published.' },
+  { t: 'Experiment', q: 'What distinguishes a designed experiment from an observational study?', o: ['It never uses people', 'The researcher exerts full control over the units', 'It always uses a census', 'It uses published data only'], a: 1, e: 'In a designed experiment the researcher controls the characteristics of the units; in an observational study they are observed in their natural setting.' },
+  { t: 'Survey', q: 'The most common type of observational study is the:', o: ['Survey', 'Census', 'Designed experiment', 'Pareto study'], a: 0, e: 'The researcher samples people, asks questions and records their responses.' },
+  { t: 'Random sample', q: 'In a random sample, every member of the population has:', o: ['A higher chance if they are near the researcher', 'An equal chance of being selected', 'No chance of being selected', 'A chance only if they volunteer'], a: 1, e: 'Equal chance of selection is the defining feature.' },
+  { t: 'Systematic', q: 'A population has N = 600 units and the sample size is n = 40. In systematic sampling you select every:', o: ['10th unit', '15th unit', '20th unit', '40th unit'], a: 1, e: 'k = N ÷ n = 600 ÷ 40 = 15.' },
+  { t: 'Stratified', q: 'A university divides its students by college and randomly selects 20 students from each college. This is:', o: ['Random sampling', 'Systematic sampling', 'Stratified sampling', 'Cluster sampling'], a: 2, e: 'The population is divided into subgroups (strata) and a sample is taken from every subgroup.' },
+  { t: 'Cluster', q: 'A researcher randomly selects 3 of 30 classrooms and surveys <b>all</b> the students in those 3 classrooms. This is:', o: ['Stratified sampling', 'Systematic sampling', 'Cluster sampling', 'Random sampling of individuals'], a: 2, e: 'Whole intact groups are chosen and everyone in them is used.' },
+  { t: 'Selection bias', q: 'An online-only survey is run about shopping habits. People without internet access cannot take part. This is an example of:', o: ['Selection bias', 'Nonresponse bias', 'Measurement error', 'A census'], a: 0, e: 'Some units have no chance of being selected: selection bias.' },
+  { t: 'Nonresponse bias', q: 'Questionnaires are mailed to 1,000 people, but only those with strong complaints return them, and their views differ from those of the others. This is:', o: ['Selection bias only', 'Nonresponse bias', 'Measurement error', 'Random sampling'], a: 1, e: 'The response data differ from the potential data of the nonresponders.' },
+  { t: 'Business analytics', q: 'Business analytics refers to methods (such as statistical methods) that:', o: ['Replace managers', 'Extract useful information from data to make better business decisions', 'Remove variation from every process', 'Are used only for a census'], a: 1, e: 'Business analytics extracts useful information from data in order to make better business decisions.' }
+];
+(function () {
+  const root = $('#examRoot'); if (!root) return;
+  const shuf = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  let qs, idx, right, wrong; const letters = 'ABCD';
+  function start() { qs = shuf(EXAM).map(q => ({ t: q.t, q: q.q, o: shuf(q.o.map((t, i) => ({ t, ok: i === q.a }))), e: q.e })); idx = 0; right = 0; wrong = []; show(); }
+  function show() {
+    if (idx >= qs.length) return result(); const q = qs[idx];
+    root.innerHTML = `<div class="card"><div class="row" style="justify-content:space-between"><b>Question ${idx + 1} of ${qs.length}</b><span class="pill">${q.t}</span><span>✅ ${right}</span></div>
+      <div class="progress-track" style="margin:8px 0 14px;background:#d9d8ec"><div class="progress-fill" style="width:${idx / qs.length * 100}%;filter:none"></div></div>
+      <div class="quiz" style="margin:0"><div class="q"><span class="qnum">${idx + 1}</span><span>${q.q}</span></div>
+      <div class="opts">${q.o.map((o, i) => `<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span> ${o.t}</div>`).join('')}</div><div class="feedback" id="exFb"></div></div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn primary" type="button" id="exNext" disabled>${idx === qs.length - 1 ? 'Finish' : 'Next'}</button></div></div>`;
+    $$('.opt', root).forEach(el => el.addEventListener('click', () => {
+      if (el.classList.contains('disabled')) return; const i = +el.dataset.i, ok = q.o[i].ok;
+      $$('.opt', root).forEach((x, k) => { x.classList.add('disabled'); if (q.o[k].ok) x.classList.add('correct'); }); if (!ok) el.classList.add('wrong');
+      const fb = $('#exFb'); fb.className = 'feedback show ' + (ok ? 'ok' : 'no'); fb.textContent = (ok ? 'Correct! ' : 'Not quite. ') + q.e;
+      if (ok) right++; else wrong.push({ q: q.q, mine: q.o[i].t, good: q.o.find(x => x.ok).t, e: q.e, t: q.t }); $('#exNext').disabled = false;
+    }));
+    $('#exNext').addEventListener('click', () => { idx++; show(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  }
+  function result() {
+    const p = Math.round(right / qs.length * 100), msg = p >= 90 ? 'Excellent! You have mastered the chapter.' : p >= 75 ? 'Very good. Review the mistakes below.' : p >= 50 ? 'Good start. Revisit the slides and try again.' : 'Review the lecture slides carefully, then retake the exam.';
+    root.innerHTML = `<div class="card" style="text-align:center"><h2 style="font-family:var(--display)">Exam result</h2><div class="big" style="font-size:2.8rem">${right} / ${qs.length}</div><p style="font-size:1.2rem;margin:0 auto"><b>${p}%</b></p><p style="margin:6px auto">${msg}</p>
+      <p><button class="btn primary" type="button" id="exRetake">Retake the exam</button> <button class="btn" type="button" onclick="goTo(0)">Back to the start</button></p></div>` +
+      (wrong.length ? `<div class="card"><h3>Review your mistakes (${wrong.length})</h3>` + wrong.map((w, i) => `<div class="widget" style="margin-top:26px"><h4>${w.t}</h4><p><b>${i + 1}.</b> ${w.q}</p><p style="color:var(--bad)">Your answer: ${w.mine}</p><p style="color:var(--ok)"><b>Correct answer: ${w.good}</b></p><p style="font-size:.92rem">${w.e}</p></div>`).join('') + '</div>' : '<div class="card"><h3>No mistakes: a perfect score!</h3></div>');
+    $('#exRetake').addEventListener('click', start); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  start();
+})();
+
+</script>
+</body>
+</html>
